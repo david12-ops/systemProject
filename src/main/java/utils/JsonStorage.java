@@ -1,4 +1,4 @@
-package utilities;
+package utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,6 +51,21 @@ public abstract class JsonStorage<T> {
 
     public void addItem(T item) {
         items.add(item);
+        saveToFile();
+    }
+
+    public void removeItem(T item) {
+        items.remove(item);
+        saveToFile();
+    }
+
+    public void updateItem(T item, T updatedItem) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).equals(item)) {
+                items.set(i, updatedItem);
+                return;
+            }
+        }
         saveToFile();
     }
 

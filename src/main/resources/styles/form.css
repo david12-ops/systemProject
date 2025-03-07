@@ -1,0 +1,40 @@
+.root {
+    background-color: #f4f4f4;
+    -fx-background-color: #f4f4f4;
+}
+
+.tab-pane {
+    background-color: white;
+    -fx-background-color: white;
+    -fx-tab-min-width: 100px;
+}
+
+.label {
+    font-size: 14px;
+    -fx-font-size: 14px;
+    -fx-text-fill: #333;
+}
+
+.text-field,
+.password-field {
+    padding: 5px;
+    -fx-pref-width: 200px;
+    -fx-padding: 5px;
+}
+
+.button {
+    background-color: #007bff;
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 5px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 15px;
+    -fx-border-radius: 5px;
+}
+
+.button:hover {
+    background-color: #0056b3;
+    -fx-background-color: #0056b3;
+}

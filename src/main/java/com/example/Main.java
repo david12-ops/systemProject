@@ -1,21 +1,89 @@
 package com.example;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+
     @Override
     public void start(Stage primaryStage) {
-        Label label = new Label("Hello, JavaFX with Maven!");
-        StackPane root = new StackPane(label);
-        Scene scene = new Scene(root, 400, 300);
+        TabPane tabPane = new TabPane();
 
-        primaryStage.setTitle("JavaFX App");
+        // Login Tab
+        Tab loginTab = new Tab("Login", createLoginForm(primaryStage));
+        loginTab.setClosable(false);
+
+        // Registration Tab
+        Tab registerTab = new Tab("Register", createRegisterForm(primaryStage));
+        registerTab.setClosable(false);
+
+        tabPane.getTabs().addAll(loginTab, registerTab);
+
+        VBox root = new VBox(tabPane);
+        Scene scene = new Scene(root, 400, 300);
+        scene.getStylesheets().add(getClass().getResource("/styles/form.css").toExternalForm());
+        primaryStage.setTitle("User Authentication");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private GridPane createLoginForm(Stage primaryStage) {
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10));
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.getStyleClass().add("form-grid");
+
+        Label userLabel = new Label("Username:");
+        TextField userField = new TextField();
+
+        Label passLabel = new Label("Password:");
+        PasswordField passField = new PasswordField();
+
+        Button loginButton = new Button("Login");
+        loginButton.setOnAction(e -> {
+            System.out.println("Invalid Credentials");
+        });
+
+        grid.add(userLabel, 0, 0);
+        grid.add(userField, 1, 0);
+        grid.add(passLabel, 0, 1);
+        grid.add(passField, 1, 1);
+        grid.add(loginButton, 1, 2);
+
+        return grid;
+    }
+
+    private GridPane createRegisterForm(Stage primaryStage) {
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10));
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.getStyleClass().add("form-grid");
+
+        Label emailLabel = new Label("Email:");
+        TextField emailField = new TextField();
+
+        Label passLabel = new Label("Password:");
+        PasswordField passField = new PasswordField();
+
+        Button registerButton = new Button("Register");
+        registerButton.setOnAction(e -> {
+            System.out.println("Invalid Credentials");
+        });
+
+        grid.add(emailLabel, 0, 1);
+        grid.add(emailField, 1, 1);
+        grid.add(passLabel, 0, 2);
+        grid.add(passField, 1, 2);
+        grid.add(registerButton, 1, 3);
+
+        return grid;
     }
 
     public static void main(String[] args) {
