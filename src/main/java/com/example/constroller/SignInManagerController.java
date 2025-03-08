@@ -5,6 +5,8 @@ public class SignInManagerController {
     // udelat nejky trvaly token pro usera
 
     public void register(String username, String password) {
+        System.out.println("data" + "\n" + username + "\n" + password);
+
         controller.addAccount(username, password);
     }
 

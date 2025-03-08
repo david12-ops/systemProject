@@ -1,6 +1,8 @@
 package com.example;
 
 import com.example.constroller.SignInManagerController;
+import com.example.constroller.UserController;
+import com.example.model.UserModel;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -13,6 +15,7 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     SignInManagerController controller = new SignInManagerController();
+    UserController uscon = new UserController();
 
     @Override
     public void start(Stage primaryStage) {
@@ -51,7 +54,7 @@ public class Main extends Application {
 
         Button loginButton = new Button("Login");
         loginButton.setOnAction(e -> {
-            System.out.println("Invalid Credentials");
+            System.out.println("Logged");
         });
 
         grid.add(userLabel, 0, 0);
@@ -78,10 +81,19 @@ public class Main extends Application {
 
         Button registerButton = new Button("Register");
         registerButton.setOnAction(e -> {
+            System.out.println("Registered");
             controller.register(emailField.getText().trim(), passField.getText().trim());
         });
 
+        Button removeButton = new Button("Remove");
+        removeButton.setOnAction(e -> {
+            emailField.clear();
+            passField.clear();
+            uscon.removeAccount();
+        });
+
         grid.add(emailLabel, 0, 1);
+        grid.add(removeButton, 0, 3);
         grid.add(emailField, 1, 1);
         grid.add(passLabel, 0, 2);
         grid.add(passField, 1, 2);

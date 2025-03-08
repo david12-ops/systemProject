@@ -13,7 +13,7 @@ import java.util.List;
 
 public abstract class JsonStorage<T> {
 
-    // TODO -problem with adding data
+    // TODO - remove, update, chytrejsi erroring
 
     Dotenv dotenv = Dotenv.load();
     private final String FOLDER_PATH = dotenv.get("FOLDER_DATA_LOCATION");
@@ -60,7 +60,6 @@ public abstract class JsonStorage<T> {
 
     protected void addItem(T item) {
         items.add(item);
-        System.out.println("items: " + items);
         saveToFile();
     }
 

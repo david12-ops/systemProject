@@ -17,6 +17,12 @@ public class User {
     public User() {
     }
 
+    public User(String id, String mailAccount, String password) {
+        this.mailAccount = mailAccount;
+        this.password = password;
+        this.id = id;
+    }
+
     public User(String mailAccount, String password) {
         this.mailAccount = mailAccount;
         this.password = password;
@@ -30,7 +36,4 @@ public class User {
     public String getPassword() {
         return this.password;
     }
-
-    // lsdd.gffg@gmail.com
-    // Example@123
 }

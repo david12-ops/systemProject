@@ -41,33 +41,41 @@ public class AplicationService {
         }
 
         @Override
-        public void validateUserData(String email, String password) {
+        public boolean validateUserData(String email, String password) {
+            boolean valid = true;
             if (!EMAIL_REGEX.matcher(email).matches()) {
                 this.errManager
                         .logError(new AbstractMap.SimpleEntry<>("email", "Provided email is not in correct format"));
+                valid = false;
             }
 
             if (!PASSWORD_REGEX.matcher(password).matches()) {
                 this.errManager.logError(
                         new AbstractMap.SimpleEntry<>("password", "Provided password is not in correct format"));
+                valid = false;
             }
+            return valid;
         }
 
         @Override
-        public void validateMessageData(String sender, String acceptor) {
+        public boolean validateMessageData(String sender, String acceptor) {
+            boolean valid = true;
             if (!EMAIL_REGEX.matcher(sender).matches()) {
                 this.errManager
                         .logError(new AbstractMap.SimpleEntry<>("sender", "Provided sender is not in correct format"));
+                valid = false;
             }
 
             if (!EMAIL_REGEX.matcher(acceptor).matches()) {
                 this.errManager.logError(
                         new AbstractMap.SimpleEntry<>("acceptor", "Provided acceptor is not in correct format"));
+                valid = false;
             }
+            return valid;
         }
 
         @Override
-        public void duplicateUserWithEmail(Operation operation, String senderUserEm, List<User> users) {
+        public boolean nonDuplicateUserWithEmail(Operation operation, String senderUserEm, List<User> users) {
             if (users != null && !users.isEmpty()) {
                 List<User> list = operation == Operation.UPDATE ? users.stream()
                         .filter(user -> !user.getMailAccount().equals(senderUserEm)).collect(Collectors.toList())
@@ -77,10 +85,12 @@ public class AplicationService {
                     if (user.getMailAccount().equals(senderUserEm)) {
                         this.errManager.logError(
                                 new AbstractMap.SimpleEntry<>("duplicateEmail", "Provided email is already used"));
-                        return;
+                        return false;
                     }
                 }
+                return true;
             }
+            return true;
         }
 
     }
@@ -113,8 +123,8 @@ public class AplicationService {
         }
 
         @Override
-        public String getUserFriendlyMessage(Exception e) {
-            throw new UnsupportedOperationException("Unimplemented method 'getUserFriendlyMessage'");
+        public String getUserFriendlyMessage() {
+            return this.errorList.toString();
         }
 
         @Override
@@ -122,10 +132,6 @@ public class AplicationService {
             this.errorList.clear();
         }
 
-        @Override
-        public Integer getSizeErrorList() {
-            return this.errorList.size();
-        }
     }
 
     public ErrorManager getErrHandler() {

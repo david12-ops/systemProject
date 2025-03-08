@@ -8,9 +8,8 @@ public interface ErrorManager {
 
     boolean retryOperation(Runnable operation, int maxRetries);
 
-    String getUserFriendlyMessage(Exception e);
+    String getUserFriendlyMessage();
 
     void clearErrorList();
 
-    Integer getSizeErrorList();
 }
