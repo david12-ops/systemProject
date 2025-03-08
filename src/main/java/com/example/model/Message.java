@@ -1,54 +1,65 @@
 package com.example.model;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Message {
 
-    @JsonProperty("subject")
-    private String subject;
+    @JsonProperty("id")
+    private String id;
 
-    @JsonProperty("description")
-    private String description;
+    @JsonProperty("sender_id")
+    private String senderId;
 
-    @JsonProperty("sender")
-    private String sender;
+    @JsonProperty("receiver_id")
+    private String receiverId;
 
-    @JsonProperty("acceptor")
-    private String acceptor;
+    @JsonProperty("message")
+    private String message;
 
-    private Message message;
+    @JsonProperty("timestamp")
+    private LocalDateTime timestamp;
 
-    public Message(String subject, String description, String sender, String acceptor) {
-        this.subject = subject;
-        this.description = description;
-        this.sender = sender;
-        this.acceptor = acceptor;
-        this.message = createMessage(subject, description, sender, acceptor);
+    public Message() {
     }
 
-    public String getSender() {
-        return message.sender;
+    public Message(String senderId, String receiverId, String message, LocalDateTime timestamp) {
+        this.id = UUID.randomUUID().toString();
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.message = message;
+        this.timestamp = timestamp;
     }
 
-    public String getAcceptor() {
-        return message.acceptor;
+    public String getMessageId() {
+        return id;
     }
 
-    public String getSubject() {
-        return message.subject;
+    public String getSenderId() {
+        return senderId;
     }
 
-    public String getDescription() {
-        return message.description;
+    public String getReceiverId() {
+        return receiverId;
     }
 
-    protected Message createMessage(String title, String description, String fromWho, String toUser) {
-        Message message = new Message(title, description, fromWho, toUser);
+    public String getMessage() {
         return message;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
     }
 
     @Override
     public String toString() {
-        return "'" + subject + "'" + "\n" + "'" + description + "'" + "\n" + "'" + sender + "\n" + acceptor;
+        return "Message{" + "messageId=" + id + ", senderId=" + senderId + ", receiverId=" + receiverId + ", message='"
+                + message + '\'' + ", timestamp=" + timestamp + '}';
     }
 }

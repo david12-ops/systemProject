@@ -6,24 +6,26 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import utils.JsonStorage;
+import utils.Enums.Operation;
 import utils.AplicationService;
 
 public class UserModel extends JsonStorage<User> {
 
-    private static final String FILE_PATH = "/users.json";
-
+    static Dotenv dotenv = Dotenv.load();
     private List<Map.Entry<String, String>> errorList = new ArrayList<>();
     AplicationService service = AplicationService.getInstance(errorList);
+    private List<User> listOfUsers;
 
     public UserModel() {
-        super(FILE_PATH, new TypeReference<List<User>>() {
+        super(dotenv.get("FILE_PATH_USERS"), new TypeReference<List<User>>() {
         });
-        loadFromFile();
+        this.listOfUsers = getItems();
     }
 
     public void addUser(User user) {
-        validateData(user.getMailAccount(), user.getPassword());
+        validateData(Operation.CREATE, user.getMailAccount(), user.getPassword());
         if (service.getErrHandler().getSizeErrorList() == 0) {
             addItem(user);
             service.getErrHandler().clearErrorList();
@@ -35,30 +37,21 @@ public class UserModel extends JsonStorage<User> {
     }
 
     public void updateUser(User user, User updatedUser) {
-        validateData(updatedUser.getMailAccount(), updatedUser.getPassword());
+        validateData(Operation.UPDATE, updatedUser.getMailAccount(), updatedUser.getPassword());
         if (errorList.size() == 0) {
             updateItem(user, updatedUser);
-            errorList.clear();
+            service.getErrHandler().clearErrorList();
         }
     }
 
-    protected void validateData(String email, String password) {
+    protected void validateData(Operation operation, String email, String password) {
         service.getValidationHandler().validateUserData(email, password);
-    }
-
-    public User getUser(String senderUserEm) {
-        for (User user : getItems()) {
-            if (user.getMailAccount().equals(senderUserEm)) {
-                return user;
-            }
-
-        }
-        return null;
+        service.getValidationHandler().duplicateUserWithEmail(operation, email, this.listOfUsers);
     }
 
     @Override
     protected List<User> createEmptyList() {
-        List<User> listOfUsers = new ArrayList<>();
+        this.listOfUsers = new ArrayList<>();
         return listOfUsers;
     }
 

@@ -5,6 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import com.example.model.User;
+
+import utils.Enums.Operation;
 
 public class AplicationService {
 
@@ -58,6 +63,23 @@ public class AplicationService {
             if (!EMAIL_REGEX.matcher(acceptor).matches()) {
                 this.errManager.logError(
                         new AbstractMap.SimpleEntry<>("acceptor", "Provided acceptor is not in correct format"));
+            }
+        }
+
+        @Override
+        public void duplicateUserWithEmail(Operation operation, String senderUserEm, List<User> users) {
+            if (users != null && !users.isEmpty()) {
+                List<User> list = operation == Operation.UPDATE ? users.stream()
+                        .filter(user -> !user.getMailAccount().equals(senderUserEm)).collect(Collectors.toList())
+                        : users;
+
+                for (User user : list) {
+                    if (user.getMailAccount().equals(senderUserEm)) {
+                        this.errManager.logError(
+                                new AbstractMap.SimpleEntry<>("duplicateEmail", "Provided email is already used"));
+                        return;
+                    }
+                }
             }
         }
 

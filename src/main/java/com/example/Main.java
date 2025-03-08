@@ -1,5 +1,7 @@
 package com.example;
 
+import com.example.constroller.SignInManagerController;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -9,6 +11,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+
+    SignInManagerController controller = new SignInManagerController();
 
     @Override
     public void start(Stage primaryStage) {
@@ -39,7 +43,7 @@ public class Main extends Application {
         grid.setVgap(10);
         grid.getStyleClass().add("form-grid");
 
-        Label userLabel = new Label("Username:");
+        Label userLabel = new Label("Email:");
         TextField userField = new TextField();
 
         Label passLabel = new Label("Password:");
@@ -74,7 +78,7 @@ public class Main extends Application {
 
         Button registerButton = new Button("Register");
         registerButton.setOnAction(e -> {
-            System.out.println("Invalid Credentials");
+            controller.register(emailField.getText().trim(), passField.getText().trim());
         });
 
         grid.add(emailLabel, 0, 1);
