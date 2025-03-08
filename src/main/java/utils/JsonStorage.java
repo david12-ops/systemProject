@@ -54,22 +54,22 @@ public abstract class JsonStorage<T> {
         }
     }
 
-    public List<T> getItems() {
+    protected List<T> getItems() {
         return items;
     }
 
-    public void addItem(T item) {
+    protected void addItem(T item) {
         items.add(item);
         System.out.println("items: " + items);
         saveToFile();
     }
 
-    public void removeItem(T item) {
+    protected void removeItem(T item) {
         items.remove(item);
         saveToFile();
     }
 
-    public void updateItem(T item, T updatedItem) {
+    protected void updateItem(T item, T updatedItem) {
         for (int i = 0; i < items.size(); i++) {
             if (items.get(i).equals(item)) {
                 items.set(i, updatedItem);
