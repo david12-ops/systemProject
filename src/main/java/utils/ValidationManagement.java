@@ -6,7 +6,7 @@ import com.example.model.User;
 
 import utils.Enums.Operation;
 
-public interface ValidationManager {
+public interface ValidationManagement {
 
     public boolean validateUserData(String email, String password);
 

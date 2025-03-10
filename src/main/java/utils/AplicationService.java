@@ -32,17 +32,19 @@ public class AplicationService {
         return instance;
     }
 
-    private static class ValidationManagerImpl implements ValidationManager {
+    private static class ValidationManagerImpl implements ValidationManagement {
 
-        private final ErrorManager errManager;
+        private final ErrorManagement errManager;
 
-        public ValidationManagerImpl(ErrorManager errManager) {
+        public ValidationManagerImpl(ErrorManagement errManager) {
             this.errManager = errManager;
         }
 
         @Override
         public boolean validateUserData(String email, String password) {
+            int atIndex = email.indexOf('@');
             boolean valid = true;
+
             if (!EMAIL_REGEX.matcher(email).matches()) {
                 this.errManager
                         .logError(new AbstractMap.SimpleEntry<>("email", "Provided email is not in correct format"));
@@ -54,6 +56,13 @@ public class AplicationService {
                         new AbstractMap.SimpleEntry<>("password", "Provided password is not in correct format"));
                 valid = false;
             }
+
+            if (password.toLowerCase().contains(email.substring(0, atIndex).toLowerCase().trim())) {
+                this.errManager.logError(
+                        new AbstractMap.SimpleEntry<>("password", "Password can not contains part of your email"));
+                valid = false;
+            }
+
             return valid;
         }
 
@@ -95,7 +104,7 @@ public class AplicationService {
 
     }
 
-    private static class ErrorManagerImpl implements ErrorManager {
+    private static class ErrorManagerImpl implements ErrorManagement {
 
         private final List<Map.Entry<String, String>> errorList;
 
@@ -134,11 +143,11 @@ public class AplicationService {
 
     }
 
-    public ErrorManager getErrHandler() {
+    public ErrorManagement getErrHandler() {
         return this.errManager;
     }
 
-    public ValidationManager getValidationHandler() {
+    public ValidationManagement getValidationHandler() {
         return this.validationManager;
     }
 }

@@ -15,13 +15,10 @@ import utils.AplicationService;
 
 public class UserModel extends JsonStorage<User> {
 
-    // TODO - perzistent token for another features like logout etc.
-
     static Dotenv dotenv = Dotenv.load();
     private List<Map.Entry<String, String>> errorList = new ArrayList<>();
     AplicationService service = AplicationService.getInstance(errorList);
     private List<User> listOfUsers;
-    private User currentUser;
 
     public UserModel() {
         super(dotenv.get("FILE_PATH_USERS"), new TypeReference<List<User>>() {
@@ -33,33 +30,43 @@ public class UserModel extends JsonStorage<User> {
         boolean valid = validateData(Operation.CREATE, emailAccount, password);
         if (valid) {
             User newUser = new User(emailAccount, BCrypt.hashpw(password, BCrypt.gensalt()));
-            this.currentUser = newUser;
             addItem(newUser);
-            // chytrejsi erroring
-            // service.getErrHandler().clearErrorList();
         }
     }
 
-    public void removeUser() {
-        User userToRemove = new User("", this.currentUser.getMailAccount(), "");
-        removeItem(userToRemove);
+    public void removeUser(User activeUser, User user) {
+        if (activeUser != null && !activeUser.getMailAccount().equals(user.getMailAccount())) {
+            removeItem(user);
+        }
     }
 
     public void updateUser(User user, User updatedUser) {
         validateData(Operation.UPDATE, updatedUser.getMailAccount(), updatedUser.getPassword());
         if (errorList.size() == 0) {
             updateItem(user, updatedUser);
-            service.getErrHandler().clearErrorList();
         }
     }
 
-    protected boolean validateData(Operation operation, String email, String password) {
+    private boolean validateData(Operation operation, String email, String password) {
         return service.getValidationHandler().validateUserData(email, password)
                 && service.getValidationHandler().nonDuplicateUserWithEmail(operation, email, this.listOfUsers);
     }
 
     public String getErrors() {
         return service.getErrHandler().getUserFriendlyMessage();
+    }
+
+    public User getUserByCredentials(String email, String password) {
+        for (User user : this.listOfUsers) {
+            if (user.getMailAccount().equals(email) && comparePassword(password, user.getPassword())) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    private boolean comparePassword(String enteredPassword, String storedHash) {
+        return BCrypt.checkpw(enteredPassword, storedHash);
     }
 
     @Override

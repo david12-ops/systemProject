@@ -13,8 +13,6 @@ import java.util.List;
 
 public abstract class JsonStorage<T> {
 
-    // TODO - remove, update, chytrejsi erroring
-
     Dotenv dotenv = Dotenv.load();
     private final String FOLDER_PATH = dotenv.get("FOLDER_DATA_LOCATION");
 
@@ -33,21 +31,21 @@ public abstract class JsonStorage<T> {
         File file = filePath.toFile();
         if (file.exists() && file.length() > 0) {
             try {
-                items = objectMapper.readValue(file, typeReference);
+                this.items = objectMapper.readValue(file, typeReference);
             } catch (IOException e) {
                 e.printStackTrace();
-                items = new ArrayList<>();
+                this.items = new ArrayList<>();
             }
         } else {
-            items = createEmptyList();
+            this.items = createEmptyList();
             saveToFile();
         }
     }
 
     private void saveToFile() {
         try {
-            System.out.println("items: " + items);
-            objectMapper.writeValue(filePath.toFile(), items);
+            System.out.println("items: " + this.items);
+            objectMapper.writeValue(filePath.toFile(), this.items);
             System.out.println("Data saved to: " + filePath);
         } catch (IOException e) {
             e.printStackTrace();
@@ -55,23 +53,23 @@ public abstract class JsonStorage<T> {
     }
 
     protected List<T> getItems() {
-        return items;
+        return this.items;
     }
 
     protected void addItem(T item) {
-        items.add(item);
+        this.items.add(item);
         saveToFile();
     }
 
     protected void removeItem(T item) {
-        items.remove(item);
+        this.items.remove(item);
         saveToFile();
     }
 
     protected void updateItem(T item, T updatedItem) {
         for (int i = 0; i < items.size(); i++) {
             if (items.get(i).equals(item)) {
-                items.set(i, updatedItem);
+                this.items.set(i, updatedItem);
                 return;
             }
         }

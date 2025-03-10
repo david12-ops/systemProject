@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.constroller.SignInManagerController;
 import com.example.constroller.UserController;
 import com.example.model.UserModel;
 
@@ -13,9 +12,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-
-    SignInManagerController controller = new SignInManagerController();
-    UserController uscon = new UserController();
+    private UserModel model = new UserModel();
+    private UserController controller = new UserController(model);
 
     @Override
     public void start(Stage primaryStage) {
@@ -54,8 +52,16 @@ public class Main extends Application {
 
         Button loginButton = new Button("Login");
         loginButton.setOnAction(e -> {
-            System.out.println("Logged");
+            controller.login(userField.getText(), passField.getText());
+            if (controller.getLoggedUser() != null) {
+                System.out.println("Logged");
+            } else {
+                System.out.println("Invalid");
+            }
         });
+
+        grid.setStyle("-fx-padding: 20; -fx-alignment: center;");
+        loginButton.setStyle("-fx-padding: 10;");
 
         grid.add(userLabel, 0, 0);
         grid.add(userField, 1, 0);
@@ -89,8 +95,11 @@ public class Main extends Application {
         removeButton.setOnAction(e -> {
             emailField.clear();
             passField.clear();
-            uscon.removeAccount();
+            controller.removeAccount(controller.getLoggedUser());
         });
+
+        grid.setStyle("-fx-padding: 20; -fx-alignment: center;");
+        registerButton.setStyle("-fx-padding: 10;");
 
         grid.add(emailLabel, 0, 1);
         grid.add(removeButton, 0, 3);
