@@ -1,40 +1,52 @@
 .root {
-    background-color: #f4f4f4;
     -fx-background-color: #f4f4f4;
 }
 
-.tab-pane {
-    background-color: white;
-    -fx-background-color: white;
-    -fx-tab-min-width: 100px;
-}
-
 .label {
-    font-size: 14px;
     -fx-font-size: 14px;
     -fx-text-fill: #333;
 }
 
 .text-field,
 .password-field {
-    padding: 5px;
-    -fx-pref-width: 200px;
-    -fx-padding: 5px;
+    -fx-pref-width: 250px;
+    -fx-max-width: 250px;
+    -fx-padding: 8px;
+    -fx-border-color: #ccc;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.error-label {
+    -fx-text-fill: red;
+    -fx-font-size: 12px;
 }
 
 .button {
-    background-color: #007bff;
     -fx-background-color: #007bff;
     -fx-text-fill: white;
-    font-weight: bold;
-    padding: 8px 15px;
-    border-radius: 5px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-padding: 8px 15px;
+    -fx-padding: 10px 20px;
     -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
 }
 
 .button:hover {
-    background-color: #0056b3;
     -fx-background-color: #0056b3;
+}
+
+.hyperlink {
+    -fx-text-fill: #007bff;
+    -fx-font-size: 12px;
+}
+
+.hyperlink:hover {
+    -fx-underline: true;
+}
+
+.form-container {
+    -fx-padding: 20px;
+    -fx-spacing: 10px;
+    -fx-alignment: center;
 }
