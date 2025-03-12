@@ -89,9 +89,11 @@ public class UserController implements AuthManagement, UserManagement {
     @Override
     public void updateAccount(String emailAccount, String password) {
         User loggedUser = getLoggedUser();
-        if (getLoggedUser() != null) {
+        User updatedUser = new User(emailAccount, password);
+
+        // TODO - update for no logged
+        if (loggedUser != null) {
             User currUser = new User(loggedUser.getMailAccount(), loggedUser.getPassword());
-            User updatedUser = new User(emailAccount, password);
             model.updateUser(currUser, updatedUser);
 
             if (getUser(updatedUser.getMailAccount(), updatedUser.getPassword()) != null) {
@@ -99,8 +101,6 @@ public class UserController implements AuthManagement, UserManagement {
                 loggedUser.setPassword(password);
             }
 
-        } else {
-            System.out.println("Invalid operation");
         }
     }
 }

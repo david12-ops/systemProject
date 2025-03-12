@@ -1,6 +1,7 @@
 package com.example.view;
 
 import com.example.constroller.ScreenController;
+import com.example.constroller.UserController;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -10,11 +11,41 @@ import javafx.stage.Stage;
 
 public class LoginScreen extends VBox {
 
-    private void loginButtonAction() {
+    private void loginButtonAction(TextField emailField, PasswordField passwordField, Label emailError,
+            Label passwordError, UserController controller) {
 
+        boolean valid = true;
+        if (emailField.getText().isBlank()) {
+            emailError.setText("Email is required");
+            valid = false;
+        }
+
+        if (passwordField.getText().isBlank()) {
+            passwordError.setText("Password is required");
+            valid = false;
+        }
+
+        if (valid) {
+            controller.login(emailField.getText(), passwordField.getText());
+        }
     }
 
-    public LoginScreen(Stage stage, ScreenController screenController) {
+    private void onchangeInitialize(TextField emailField, PasswordField passwordField, Label emailError,
+            Label passwordError) {
+        emailField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isBlank()) {
+                emailError.setText("");
+            }
+        });
+
+        passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isBlank()) {
+                passwordError.setText("");
+            }
+        });
+    }
+
+    public LoginScreen(Stage stage, ScreenController screenController, UserController controller) {
 
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
@@ -26,12 +57,12 @@ public class LoginScreen extends VBox {
         Label passwordError = new Label();
         passwordError.getStyleClass().add("error-label");
 
+        onchangeInitialize(emailField, passwordField, emailError, passwordError);
+
         Button loginButton = new Button("Login");
         loginButton.getStyleClass().add("button");
         loginButton.setOnAction(event -> {
-            // Validation example
-            emailError.setText(emailField.getText().isEmpty() ? "Email is required" : "");
-            passwordError.setText(passwordField.getText().isEmpty() ? "Password is required" : "");
+            loginButtonAction(emailField, passwordField, emailError, passwordError, controller);
         });
 
         Hyperlink registerLink = new Hyperlink("Don't have an account? Register");
@@ -48,8 +79,8 @@ public class LoginScreen extends VBox {
         this.setAlignment(Pos.CENTER);
     }
 
-    public static void show(Stage primaryStage, ScreenController screenController) {
-        Scene scene = new Scene(new LoginScreen(primaryStage, screenController), 300, 250);
+    public static void show(Stage primaryStage, ScreenController screenController, UserController controller) {
+        Scene scene = new Scene(new LoginScreen(primaryStage, screenController, controller), 300, 250);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Login");
         primaryStage.show();

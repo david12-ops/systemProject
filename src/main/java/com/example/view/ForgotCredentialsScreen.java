@@ -1,8 +1,7 @@
 package com.example.view;
 
-import java.util.HashMap;
-
 import com.example.constroller.ScreenController;
+import com.example.constroller.UserController;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,12 +14,54 @@ import javafx.stage.Stage;
 
 public class ForgotCredentialsScreen extends VBox {
 
-    private void resetButtonAction(TextField emailField, PasswordField newPasswordField, 
-    PasswordField confirmPasswordField, Label emailError, Label newPasswordError, Label confirmPasswordError, ) {
-        if(emailField.getText())
+    private void resetButtonAction(TextField emailField, PasswordField newPasswordField,
+            PasswordField confirmPasswordField, Label emailError, Label newPasswordError, Label confirmPasswordError,
+            UserController controller) {
+
+        boolean valid = true;
+        if (emailField.getText().isBlank()) {
+            emailError.setText("Email is required");
+            valid = false;
+        }
+
+        if (newPasswordField.getText().isBlank()) {
+            newPasswordError.setText("Password is required");
+            valid = false;
+        }
+
+        if (confirmPasswordField.getText().isBlank()) {
+            confirmPasswordError.setText("Password is required");
+            valid = false;
+        }
+
+        if (valid) {
+            controller.updateAccount(emailField.getText(), confirmPasswordField.getText());
+        }
+
     }
 
-    public ForgotCredentialsScreen(Stage stage, ScreenController screenController) {
+    private void onchangeInitialize(TextField emailField, PasswordField newPasswordField,
+            PasswordField confirmPasswordField, Label emailError, Label newPasswordError, Label confirmPasswordError) {
+        emailField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isBlank()) {
+                emailError.setText("");
+            }
+        });
+
+        newPasswordField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isBlank()) {
+                newPasswordError.setText("");
+            }
+        });
+
+        confirmPasswordField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isBlank()) {
+                confirmPasswordError.setText("");
+            }
+        });
+    }
+
+    public ForgotCredentialsScreen(Stage stage, ScreenController screenController, UserController controller) {
 
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
@@ -37,15 +78,14 @@ public class ForgotCredentialsScreen extends VBox {
         Label confirmPasswordError = new Label();
         confirmPasswordError.getStyleClass().add("error-label");
 
+        onchangeInitialize(emailField, newPasswordField, confirmPasswordField, emailError, newPasswordError,
+                confirmPasswordError);
+
         Button resetButton = new Button("Reset");
         resetButton.getStyleClass().add("button");
         resetButton.setOnAction(event -> {
-            // Validation example
-            // emailError.setText(emailField.getText().isEmpty() ? "Email is required" :
-            // "");
-            // passwordError.setText(passwordField.getText().isEmpty() ? "Password is
-            // required" : "");
-            resetButtonAction(emailField, )
+            resetButtonAction(emailField, newPasswordField, confirmPasswordField, emailError, newPasswordError,
+                    confirmPasswordError, controller);
         });
 
         Button backButton = new Button("Back");
@@ -62,8 +102,8 @@ public class ForgotCredentialsScreen extends VBox {
         this.setAlignment(Pos.CENTER);
     }
 
-    public static void show(Stage primaryStage, ScreenController screenController) {
-        Scene scene = new Scene(new LoginScreen(primaryStage, screenController), 800, 700);
+    public static void show(Stage primaryStage, ScreenController screenController, UserController controller) {
+        Scene scene = new Scene(new ForgotCredentialsScreen(primaryStage, screenController, controller), 700, 800);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Reset password");
         primaryStage.show();

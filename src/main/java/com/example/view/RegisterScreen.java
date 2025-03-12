@@ -1,6 +1,7 @@
 package com.example.view;
 
 import com.example.constroller.ScreenController;
+import com.example.constroller.UserController;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,11 +14,41 @@ import javafx.stage.Stage;
 
 public class RegisterScreen extends VBox {
 
-    private void registerButtonAction() {
+    private void registerButtonAction(TextField emailField, PasswordField passwordField, Label emailError,
+            Label passwordError, UserController controller) {
 
+        boolean valid = true;
+        if (emailField.getText().isBlank()) {
+            emailError.setText("Email is required");
+            valid = false;
+        }
+
+        if (passwordField.getText().isBlank()) {
+            passwordError.setText("Password is required");
+            valid = false;
+        }
+
+        if (valid) {
+            controller.register(emailField.getText(), passwordField.getText());
+        }
     }
 
-    public RegisterScreen(Stage stage, ScreenController screenController) {
+    private void onchangeInitialize(TextField emailField, PasswordField passwordField, Label emailError,
+            Label passwordError) {
+        emailField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isBlank()) {
+                emailError.setText("");
+            }
+        });
+
+        passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isBlank()) {
+                passwordError.setText("");
+            }
+        });
+    }
+
+    public RegisterScreen(Stage stage, ScreenController screenController, UserController controller) {
 
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
@@ -29,12 +60,12 @@ public class RegisterScreen extends VBox {
         Label passwordError = new Label();
         passwordError.getStyleClass().add("error-label");
 
+        onchangeInitialize(emailField, passwordField, emailError, passwordError);
+
         Button registerButton = new Button("Register");
         registerButton.getStyleClass().add("button");
         registerButton.setOnAction(event -> {
-            // Validation example
-            emailError.setText(emailField.getText().isEmpty() ? "Email is required" : "");
-            passwordError.setText(passwordField.getText().isEmpty() ? "Password is required" : "");
+            registerButtonAction(emailField, passwordField, emailError, passwordError, controller);
         });
 
         Button backButton = new Button("Back");
@@ -51,8 +82,8 @@ public class RegisterScreen extends VBox {
         this.setAlignment(Pos.CENTER);
     }
 
-    public static void show(Stage primaryStage, ScreenController screenController) {
-        Scene scene = new Scene(new LoginScreen(primaryStage, screenController), 300, 250);
+    public static void show(Stage primaryStage, ScreenController screenController, UserController controller) {
+        Scene scene = new Scene(new RegisterScreen(primaryStage, screenController, controller), 300, 250);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Register");
         primaryStage.show();
