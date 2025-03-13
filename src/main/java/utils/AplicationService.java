@@ -1,8 +1,8 @@
 package utils;
 
 import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -20,14 +20,14 @@ public class AplicationService {
     private ValidationManagerImpl validationManager;
     private static AplicationService instance;
 
-    private AplicationService(List<Map.Entry<String, String>> errorList) {
-        this.errManager = new ErrorManagerImpl(errorList);
+    private AplicationService(HashMap<String, String> errorMap) {
+        this.errManager = new ErrorManagerImpl(errorMap);
         this.validationManager = new ValidationManagerImpl(this.errManager);
     }
 
-    public static AplicationService getInstance(List<Map.Entry<String, String>> errorList) {
+    public static AplicationService getInstance(HashMap<String, String> errorMap) {
         if (instance == null) {
-            instance = new AplicationService(errorList);
+            instance = new AplicationService(errorMap);
         }
         return instance;
     }
@@ -57,10 +57,12 @@ public class AplicationService {
                 valid = false;
             }
 
-            if (password.toLowerCase().contains(email.substring(0, atIndex).toLowerCase().trim())) {
-                this.errManager.logError(
-                        new AbstractMap.SimpleEntry<>("password", "Password can not contains part of your email"));
-                valid = false;
+            if (atIndex != -1) {
+                if (password.toLowerCase().contains(email.substring(0, atIndex).toLowerCase().trim())) {
+                    this.errManager.logError(
+                            new AbstractMap.SimpleEntry<>("password", "Password can not contains part of your email"));
+                    valid = false;
+                }
             }
 
             return valid;
@@ -92,8 +94,8 @@ public class AplicationService {
 
                 for (User user : list) {
                     if (user.getMailAccount().equals(senderUserEm)) {
-                        this.errManager.logError(
-                                new AbstractMap.SimpleEntry<>("duplicateEmail", "Provided email is already used"));
+                        this.errManager
+                                .logError(new AbstractMap.SimpleEntry<>("email", "Provided email is already used"));
                         return false;
                     }
                 }
@@ -102,19 +104,30 @@ public class AplicationService {
             return true;
         }
 
+        @Override
+        public boolean confirmedPassword(String newPassword, String confirmNewPassword) {
+            if (!newPassword.equals(confirmNewPassword)) {
+                this.errManager.logError(new AbstractMap.SimpleEntry<>("confirmPassword",
+                        "Provided new password do not match confirmed"));
+                return false;
+            }
+
+            return true;
+        }
+
     }
 
     private static class ErrorManagerImpl implements ErrorManagement {
 
-        private final List<Map.Entry<String, String>> errorList;
+        private final HashMap<String, String> errorMap;
 
-        public ErrorManagerImpl(List<Map.Entry<String, String>> errorList) {
-            this.errorList = errorList;
+        public ErrorManagerImpl(HashMap<String, String> errorMap) {
+            this.errorMap = errorMap;
         }
 
         @Override
         public void logError(Entry<String, String> error) {
-            this.errorList.add(error);
+            this.errorMap.put(error.getKey(), error.getValue());
         }
 
         @Override
@@ -132,13 +145,13 @@ public class AplicationService {
         }
 
         @Override
-        public String getUserFriendlyMessage() {
-            return this.errorList.toString();
+        public HashMap<String, String> getErrors() {
+            return this.errorMap;
         }
 
         @Override
         public void clearErrorList() {
-            this.errorList.clear();
+            this.errorMap.clear();
         }
 
     }

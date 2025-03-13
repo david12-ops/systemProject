@@ -9,6 +9,7 @@ import com.example.model.User;
 public class SessionService {
     private static SessionService instance;
     private Map<String, User> activeSessions;
+    // TODO - need be more like JWT token or something
 
     private SessionService() {
         this.activeSessions = new HashMap<>();

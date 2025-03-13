@@ -1,8 +1,9 @@
 package com.example.model;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -15,9 +16,11 @@ import utils.AplicationService;
 
 public class UserModel extends JsonStorage<User> {
 
+    // TODO - registration (better comunication with model)
+
     static Dotenv dotenv = Dotenv.load();
-    private List<Map.Entry<String, String>> errorList = new ArrayList<>();
-    AplicationService service = AplicationService.getInstance(errorList);
+    private HashMap<String, String> errorMap = new HashMap<>();
+    AplicationService service = AplicationService.getInstance(errorMap);
     private List<User> listOfUsers;
 
     public UserModel() {
@@ -37,12 +40,15 @@ public class UserModel extends JsonStorage<User> {
     public void removeUser(User activeUser, User user) {
         if (activeUser != null && !activeUser.getMailAccount().equals(user.getMailAccount())) {
             removeItem(user);
+        } else {
+            service.getErrHandler().logError(
+                    new AbstractMap.SimpleEntry<>("removeAccount", "User is not logged or removing active account"));
         }
     }
 
     public void updateUser(User user, User updatedUser) {
-        validateData(Operation.UPDATE, updatedUser.getMailAccount(), updatedUser.getPassword());
-        if (errorList.size() == 0) {
+        boolean valid = validateData(Operation.UPDATE, updatedUser.getMailAccount(), updatedUser.getPassword());
+        if (valid) {
             updateItem(user, updatedUser);
         }
     }
@@ -52,8 +58,8 @@ public class UserModel extends JsonStorage<User> {
                 && service.getValidationHandler().nonDuplicateUserWithEmail(operation, email, this.listOfUsers);
     }
 
-    public String getErrors() {
-        return service.getErrHandler().getUserFriendlyMessage();
+    public HashMap<String, String> getErrors() {
+        return service.getErrHandler().getErrors();
     }
 
     public User getUserByCredentials(String email, String password) {
@@ -62,6 +68,8 @@ public class UserModel extends JsonStorage<User> {
                 return user;
             }
         }
+        service.getErrHandler()
+                .logError(new AbstractMap.SimpleEntry<>("searchUser", "User not found, invalid email or password"));
         return null;
     }
 

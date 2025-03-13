@@ -8,9 +8,11 @@ import utils.Enums.Operation;
 
 public interface ValidationManagement {
 
-    public boolean validateUserData(String email, String password);
+    boolean validateUserData(String email, String password);
 
-    public boolean validateMessageData(String sender, String acceptor);
+    boolean validateMessageData(String sender, String acceptor);
 
-    public boolean nonDuplicateUserWithEmail(Operation operation, String senderUserEm, List<User> users);
+    boolean nonDuplicateUserWithEmail(Operation operation, String senderUserEm, List<User> users);
+
+    boolean confirmedPassword(String newPassword, String confirmNewPassword);
 }

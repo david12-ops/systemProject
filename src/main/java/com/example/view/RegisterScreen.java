@@ -1,5 +1,7 @@
 package com.example.view;
 
+import java.util.HashMap;
+
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
 
@@ -15,40 +17,57 @@ import javafx.stage.Stage;
 public class RegisterScreen extends VBox {
 
     private void registerButtonAction(TextField emailField, PasswordField passwordField, Label emailError,
-            Label passwordError, UserController controller) {
+            Label passwordError, UserController userController, ScreenController screenController,
+            HashMap<String, String> errors) {
 
         boolean valid = true;
+
         if (emailField.getText().isBlank()) {
             emailError.setText("Email is required");
             valid = false;
+        } else {
+            if (errors.get("email") != null) {
+                emailError.setText(errors.get("email"));
+                valid = false;
+            }
         }
 
         if (passwordField.getText().isBlank()) {
             passwordError.setText("Password is required");
             valid = false;
+        } else {
+            if (errors.get("password") != null) {
+                passwordError.setText(errors.get("password"));
+                valid = false;
+            }
         }
 
         if (valid) {
-            controller.register(emailField.getText(), passwordField.getText());
+            userController.register(emailField.getText(), passwordField.getText());
+            screenController.activate("login");
         }
     }
 
     private void onchangeInitialize(TextField emailField, PasswordField passwordField, Label emailError,
-            Label passwordError) {
+            Label passwordError, HashMap<String, String> errors) {
         emailField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
                 emailError.setText("");
+                errors.remove("email");
             }
         });
 
         passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
                 passwordError.setText("");
+                errors.remove("password");
             }
         });
     }
 
-    public RegisterScreen(Stage stage, ScreenController screenController, UserController controller) {
+    public RegisterScreen(Stage stage, ScreenController screenController, UserController userController) {
+
+        HashMap<String, String> errors = userController.getInputErrors();
 
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
@@ -60,12 +79,13 @@ public class RegisterScreen extends VBox {
         Label passwordError = new Label();
         passwordError.getStyleClass().add("error-label");
 
-        onchangeInitialize(emailField, passwordField, emailError, passwordError);
+        onchangeInitialize(emailField, passwordField, emailError, passwordError, errors);
 
         Button registerButton = new Button("Register");
         registerButton.getStyleClass().add("button");
         registerButton.setOnAction(event -> {
-            registerButtonAction(emailField, passwordField, emailError, passwordError, controller);
+            registerButtonAction(emailField, passwordField, emailError, passwordError, userController, screenController,
+                    errors);
         });
 
         Button backButton = new Button("Back");
@@ -82,8 +102,8 @@ public class RegisterScreen extends VBox {
         this.setAlignment(Pos.CENTER);
     }
 
-    public static void show(Stage primaryStage, ScreenController screenController, UserController controller) {
-        Scene scene = new Scene(new RegisterScreen(primaryStage, screenController, controller), 300, 250);
+    public static void show(Stage primaryStage, ScreenController screenController, UserController userController) {
+        Scene scene = new Scene(new RegisterScreen(primaryStage, screenController, userController), 300, 500);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Register");
         primaryStage.show();

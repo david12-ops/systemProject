@@ -4,11 +4,14 @@ import com.example.model.User;
 
 public interface AuthManagement {
 
-    public void register(String emailAccount, String password);
+    void register(String emailAccount, String password);
 
-    public void login(String emailAccount, String password);
+    void login(String emailAccount, String password);
 
-    public void logOut();
+    void logOut();
 
-    public User getLoggedUser();
+    User getLoggedUser();
+
+    void updateNotLoggedAccount(String emailAccount, String password, String newPassword, String confirmationPassword);
+
 }

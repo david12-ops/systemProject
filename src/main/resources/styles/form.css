@@ -20,6 +20,7 @@
 .error-label {
     -fx-text-fill: red;
     -fx-font-size: 12px;
+    -fx-padding: 5px 0 10px 0;
 }
 
 .button {

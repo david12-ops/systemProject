@@ -13,17 +13,20 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
     private UserModel model = new UserModel();
-    private UserController controller = new UserController(model);
+    private UserController userController = new UserController(model);
     private ScreenController screenController;
 
     @Override
     public void start(Stage primaryStage) {
-        Scene scene = new Scene(new LoginScreen(primaryStage, null, controller), 400, 300);
-        screenController = new ScreenController(scene);
+        screenController = new ScreenController(null);
 
-        screenController.addScreen("login", new LoginScreen(primaryStage, screenController, controller));
-        screenController.addScreen("register", new RegisterScreen(primaryStage, screenController, controller));
-        screenController.addScreen("reset", new ForgotCredentialsScreen(primaryStage, screenController, controller));
+        Scene scene = new Scene(new LoginScreen(primaryStage, screenController, userController), 400, 300);
+        screenController.setScene(scene);
+
+        screenController.addScreen("login", new LoginScreen(primaryStage, screenController, userController));
+        screenController.addScreen("register", new RegisterScreen(primaryStage, screenController, userController));
+        screenController.addScreen("reset", new ForgotCredentialsScreen(primaryStage, screenController, userController,
+                userController.getLoggedUser()));
 
         scene.getStylesheets().add(getClass().getResource("/styles/form.css").toExternalForm());
 

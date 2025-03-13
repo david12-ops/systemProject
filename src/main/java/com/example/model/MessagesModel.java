@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import utils.AplicationService;
 import utils.JsonStorage;
@@ -15,8 +15,8 @@ public class MessagesModel extends JsonStorage<Message> {
 
     static Dotenv dotenv = Dotenv.load();
 
-    private List<Map.Entry<String, String>> errorList = new ArrayList<>();
-    AplicationService service = AplicationService.getInstance(this.errorList);
+    private HashMap<String, String> errorMap = new HashMap<>();
+    AplicationService service = AplicationService.getInstance(this.errorMap);
     private List<Message> listOfMessages;
 
     public MessagesModel() {
