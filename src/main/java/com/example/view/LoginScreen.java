@@ -40,7 +40,7 @@ public class LoginScreen extends VBox {
         }
 
         if (valid) {
-            if (userController.login(emailField.getText(), passwordField.getText()) != null) {
+            if (userController.login(emailField.getText(), passwordField.getText())) {
                 // screenController.activate("mainApp");
                 System.out.println("Logged");
             } else {

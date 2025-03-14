@@ -16,8 +16,6 @@ import utils.AplicationService;
 
 public class UserModel extends JsonStorage<User> {
 
-    // TODO - test registration
-
     static Dotenv dotenv = Dotenv.load();
     private HashMap<String, String> errorMap = new HashMap<>();
     AplicationService service = AplicationService.getInstance(errorMap);
@@ -46,22 +44,22 @@ public class UserModel extends JsonStorage<User> {
         }
     }
 
-    public User updateUser(User user, String newPassword, String confirmationPassword) {
-
-        User updatedUser = null;
+    public void updateUser(User user, String newPassword, String confirmationPassword) {
 
         if (user != null) {
             if (service.getValidationHandler().confirmedPassword(newPassword, confirmationPassword)) {
+                if (confirmationPassword.equals(user.getPassword())) {
+                    service.getErrHandler().logError(new AbstractMap.SimpleEntry<>("confirmPassword",
+                            "New password have to be different then old password"));
+                } else {
+                    User newUser = new User(user.getId(), user.getMailAccount(),
+                            BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
-                User newUser = new User(user.getId(), user.getMailAccount(),
-                        BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
-                updateItem(user, newUser);
+                    updateItem(user, newUser);
 
-                updatedUser = getUserByCredentials(newUser.getMailAccount(), newUser.getPassword());
+                }
             }
         }
-
-        return updatedUser;
     }
 
     private boolean validateData(Operation operation, String email, String password) {
@@ -81,8 +79,10 @@ public class UserModel extends JsonStorage<User> {
                     return user;
                 }
             }
+            return null;
+        } else {
+            return null;
         }
-        return null;
     }
 
     private boolean comparePassword(String enteredPassword, String storedHash) {

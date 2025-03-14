@@ -57,8 +57,7 @@ public class ForgotCredentialsScreen extends VBox {
         if (valid) {
             if (loggedUser != null) {
 
-                if (userController.updateLoggedInAccount(newPasswordField.getText(),
-                        confirmPasswordField.getText()) != null) {
+                if (userController.updateLoggedInAccount(newPasswordField.getText(), confirmPasswordField.getText())) {
                     screenController.activate("login");
                 } else {
                     labelError.setText("Password update failed, user was not logged or something failed");
@@ -66,7 +65,8 @@ public class ForgotCredentialsScreen extends VBox {
             } else {
 
                 if (userController.updateNotLoggedAccount(emailField.getText(), passwordField.getText(),
-                        newPasswordField.getText(), confirmPasswordField.getText()) != null) {
+                        newPasswordField.getText(), confirmPasswordField.getText())) {
+
                     screenController.activate("login");
                 } else {
                     labelError.setText("Password update failed, user was not found or something failed");
@@ -105,6 +105,7 @@ public class ForgotCredentialsScreen extends VBox {
                 newPasswordError.setText("");
                 labelError.setText("");
                 errors.remove("newPassword");
+                errors.remove("confirmPassword");
             }
         });
 

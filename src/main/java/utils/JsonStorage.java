@@ -70,7 +70,7 @@ public abstract class JsonStorage<T> {
         for (int i = 0; i < items.size(); i++) {
             if (items.get(i).equals(item)) {
                 this.items.set(i, updatedItem);
-                return;
+                break;
             }
         }
         saveToFile();

@@ -43,7 +43,7 @@ public class RegisterScreen extends VBox {
         }
 
         if (valid) {
-            if (userController.register(emailField.getText(), passwordField.getText()) != null) {
+            if (userController.register(emailField.getText(), passwordField.getText())) {
                 screenController.activate("login");
             }
         }

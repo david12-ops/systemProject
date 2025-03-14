@@ -32,34 +32,35 @@ public class UserController implements AuthManagement, UserManagement {
 
     // Auth
     @Override
-    public User register(String emailAccount, String password) {
+    public boolean register(String emailAccount, String password) {
         model.addUser(emailAccount, password);
-        return getUser(emailAccount, password);
+        return getUser(emailAccount, password) != null ? true : false;
     }
 
     // TODO - session ???
 
     @Override
-    public User login(String emailAccount, String password) {
+    public boolean login(String emailAccount, String password) {
         User user = getUser(emailAccount, password);
 
         if (user != null && BCrypt.checkpw(password, user.getPassword())) {
             // if (this.service.getUserBySessionId(user.getMailAccount()) == null) {
             // this.sessionId = this.service.createSessionId(user);
             // }
-            return user;
+            return true;
         }
 
-        return null;
+        return false;
     }
 
     @Override
-    public User updateNotLoggedAccount(String emailAccount, String password, String newPassword,
+    public boolean updateNotLoggedAccount(String emailAccount, String password, String newPassword,
             String confirmationPassword) {
 
         User foundUser = getUser(emailAccount, password);
 
-        return model.updateUser(foundUser, newPassword, confirmationPassword);
+        model.updateUser(foundUser, newPassword, confirmationPassword);
+        return getUser(emailAccount, confirmationPassword) != null ? true : false;
     }
 
     @Override
@@ -84,11 +85,11 @@ public class UserController implements AuthManagement, UserManagement {
     }
 
     @Override
-    public User updateLoggedInAccount(String newPassword, String confirmationPassword) {
+    public boolean updateLoggedInAccount(String newPassword, String confirmationPassword) {
 
         User foundUser = getLoggedUser();
 
-        return model.updateUser(foundUser, newPassword, confirmationPassword);
-
+        model.updateUser(foundUser, newPassword, confirmationPassword);
+        return getUser(foundUser.getMailAccount(), confirmationPassword) != null ? true : false;
     }
 }
