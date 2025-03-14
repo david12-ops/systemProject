@@ -24,12 +24,12 @@ public class ForgotCredentialsScreen extends VBox {
 
         boolean valid = true;
 
-        if (emailField.getText().isEmpty()) {
+        if (emailField.getText().isBlank()) {
             emailError.setText("Email is required");
             valid = false;
         }
 
-        if (passwordField.getText().isEmpty()) {
+        if (passwordField.getText().isBlank()) {
             passwordError.setText("Password is required");
             valid = false;
         }
@@ -52,31 +52,28 @@ public class ForgotCredentialsScreen extends VBox {
                 confirmPasswordError.setText(errors.get("confirmPassword"));
                 valid = false;
             }
-
-            if (errors.get("password") != null) {
-                confirmPasswordError.setText(errors.get("password"));
-                valid = false;
-            }
         }
-
-        System.out.println("noo " + valid);
 
         if (valid) {
             if (loggedUser != null) {
-                userController.updateLoggedInAccount(emailField.getText(), newPasswordField.getText(),
-                        confirmPasswordField.getText());
-                screenController.activate("login");
+
+                if (userController.updateLoggedInAccount(newPasswordField.getText(),
+                        confirmPasswordField.getText()) != null) {
+                    screenController.activate("login");
+                } else {
+                    labelError.setText("Password update failed, user was not logged or something failed");
+                }
             } else {
-                userController.updateNotLoggedAccount(emailField.getText(), passwordField.getText(),
-                        newPasswordField.getText(), confirmPasswordField.getText());
-                screenController.activate("login");
+
+                if (userController.updateNotLoggedAccount(emailField.getText(), passwordField.getText(),
+                        newPasswordField.getText(), confirmPasswordField.getText()) != null) {
+                    screenController.activate("login");
+                } else {
+                    labelError.setText("Password update failed, user was not found or something failed");
+                }
+
             }
         }
-
-        if (errors.get("searchUser") != null) {
-            labelError.setText(errors.get("searchUser"));
-        }
-
     }
 
     private VBox createForLogInUserVbox(Label labelError, Label newPasswordLabel, PasswordField newPasswordField,
@@ -91,7 +88,6 @@ public class ForgotCredentialsScreen extends VBox {
             Label confirmPasswordError, Label labelError, HashMap<String, String> errors) {
         emailField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
-                errors.remove("searchUser");
                 labelError.setText("");
                 emailError.setText("");
             }
@@ -99,7 +95,6 @@ public class ForgotCredentialsScreen extends VBox {
 
         passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
-                errors.remove("searchUser");
                 labelError.setText("");
                 passwordError.setText("");
             }
@@ -109,6 +104,7 @@ public class ForgotCredentialsScreen extends VBox {
             if (!newValue.isBlank()) {
                 newPasswordError.setText("");
                 labelError.setText("");
+                errors.remove("newPassword");
             }
         });
 

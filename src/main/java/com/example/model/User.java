@@ -20,13 +20,7 @@ public class User {
     public User(String id, String mailAccount, String password) {
         this.mailAccount = mailAccount;
         this.password = password;
-        this.id = id;
-    }
-
-    public User(String mailAccount, String password) {
-        this.mailAccount = mailAccount;
-        this.password = password;
-        this.id = UUID.randomUUID().toString();
+        this.id = id == null || id.isBlank() ? UUID.randomUUID().toString() : id;
     }
 
     @Override
@@ -37,6 +31,10 @@ public class User {
             return false;
         User user = (User) obj;
         return mailAccount.equals(user.mailAccount);
+    }
+
+    public String getId() {
+        return this.id;
     }
 
     public String getMailAccount() {

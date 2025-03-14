@@ -8,5 +8,5 @@ public interface UserManagement {
 
     void removeAccount(User user);
 
-    void updateLoggedInAccount(String emailAccount, String password, String newPassword);
+    User updateLoggedInAccount(String newPassword, String confirmationPassword);
 }

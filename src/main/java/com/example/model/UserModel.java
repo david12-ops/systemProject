@@ -16,7 +16,7 @@ import utils.AplicationService;
 
 public class UserModel extends JsonStorage<User> {
 
-    // TODO - registration (better comunication with model)
+    // TODO - test registration
 
     static Dotenv dotenv = Dotenv.load();
     private HashMap<String, String> errorMap = new HashMap<>();
@@ -32,7 +32,7 @@ public class UserModel extends JsonStorage<User> {
     public void addUser(String emailAccount, String password) {
         boolean valid = validateData(Operation.CREATE, emailAccount, password);
         if (valid) {
-            User newUser = new User(emailAccount, BCrypt.hashpw(password, BCrypt.gensalt()));
+            User newUser = new User(null, emailAccount, BCrypt.hashpw(password, BCrypt.gensalt()));
             addItem(newUser);
         }
     }
@@ -46,11 +46,22 @@ public class UserModel extends JsonStorage<User> {
         }
     }
 
-    public void updateUser(User user, User updatedUser) {
-        boolean valid = validateData(Operation.UPDATE, updatedUser.getMailAccount(), updatedUser.getPassword());
-        if (valid) {
-            updateItem(user, updatedUser);
+    public User updateUser(User user, String newPassword, String confirmationPassword) {
+
+        User updatedUser = null;
+
+        if (user != null) {
+            if (service.getValidationHandler().confirmedPassword(newPassword, confirmationPassword)) {
+
+                User newUser = new User(user.getId(), user.getMailAccount(),
+                        BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
+                updateItem(user, newUser);
+
+                updatedUser = getUserByCredentials(newUser.getMailAccount(), newUser.getPassword());
+            }
         }
+
+        return updatedUser;
     }
 
     private boolean validateData(Operation operation, String email, String password) {
@@ -63,13 +74,14 @@ public class UserModel extends JsonStorage<User> {
     }
 
     public User getUserByCredentials(String email, String password) {
-        for (User user : this.listOfUsers) {
-            if (user.getMailAccount().equals(email) && comparePassword(password, user.getPassword())) {
-                return user;
+
+        if (this.listOfUsers.size() > 0 && this.listOfUsers != null) {
+            for (User user : this.listOfUsers) {
+                if (user.getMailAccount().equals(email) && comparePassword(password, user.getPassword())) {
+                    return user;
+                }
             }
         }
-        service.getErrHandler()
-                .logError(new AbstractMap.SimpleEntry<>("searchUser", "User not found, invalid email or password"));
         return null;
     }
 

@@ -106,13 +106,28 @@ public class AplicationService {
 
         @Override
         public boolean confirmedPassword(String newPassword, String confirmNewPassword) {
+
+            boolean valid = true;
+
+            if (!PASSWORD_REGEX.matcher(newPassword).matches()) {
+                this.errManager.logError(
+                        new AbstractMap.SimpleEntry<>("newPassword", "Provided password is not in correct format"));
+                valid = false;
+            }
+
+            if (!PASSWORD_REGEX.matcher(confirmNewPassword).matches()) {
+                this.errManager.logError(
+                        new AbstractMap.SimpleEntry<>("confirmPassword", "Provided password is not in correct format"));
+                valid = false;
+            }
+
             if (!newPassword.equals(confirmNewPassword)) {
                 this.errManager.logError(new AbstractMap.SimpleEntry<>("confirmPassword",
                         "Provided new password do not match confirmed"));
-                return false;
+                valid = false;
             }
 
-            return true;
+            return valid;
         }
 
     }

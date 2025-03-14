@@ -32,31 +32,34 @@ public class UserController implements AuthManagement, UserManagement {
 
     // Auth
     @Override
-    public void register(String emailAccount, String password) {
+    public User register(String emailAccount, String password) {
         model.addUser(emailAccount, password);
+        return getUser(emailAccount, password);
     }
 
+    // TODO - session ???
+
     @Override
-    public void login(String emailAccount, String password) {
+    public User login(String emailAccount, String password) {
         User user = getUser(emailAccount, password);
 
         if (user != null && BCrypt.checkpw(password, user.getPassword())) {
-            if (this.service.getUserBySessionId(user.getMailAccount()) == null) {
-                this.sessionId = this.service.createSessionId(user);
-            }
+            // if (this.service.getUserBySessionId(user.getMailAccount()) == null) {
+            // this.sessionId = this.service.createSessionId(user);
+            // }
+            return user;
         }
+
+        return null;
     }
 
     @Override
-    public void updateNotLoggedAccount(String emailAccount, String password, String newPassword,
+    public User updateNotLoggedAccount(String emailAccount, String password, String newPassword,
             String confirmationPassword) {
 
-        User currUser = getUser(emailAccount, password);
-        User updatedUser = new User(emailAccount, password);
+        User foundUser = getUser(emailAccount, password);
 
-        if (currUser != null) {
-            model.updateUser(currUser, updatedUser);
-        }
+        return model.updateUser(foundUser, newPassword, confirmationPassword);
     }
 
     @Override
@@ -81,19 +84,11 @@ public class UserController implements AuthManagement, UserManagement {
     }
 
     @Override
-    public void updateLoggedInAccount(String emailAccount, String password, String newPassword) {
+    public User updateLoggedInAccount(String newPassword, String confirmationPassword) {
 
-        User loggedUser = getLoggedUser();
-        User updatedUser = new User(emailAccount, password);
+        User foundUser = getLoggedUser();
 
-        if (loggedUser != null) {
-            model.updateUser(loggedUser, updatedUser);
-        }
-
-        if (getUser(updatedUser.getMailAccount(), updatedUser.getPassword()) != null) {
-            loggedUser.setMailAccount(emailAccount);
-            loggedUser.setPassword(password);
-        }
+        return model.updateUser(foundUser, newPassword, confirmationPassword);
 
     }
 }

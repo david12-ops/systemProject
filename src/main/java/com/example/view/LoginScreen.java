@@ -40,16 +40,14 @@ public class LoginScreen extends VBox {
         }
 
         if (valid) {
-            userController.login(emailField.getText(), passwordField.getText());
+            if (userController.login(emailField.getText(), passwordField.getText()) != null) {
+                // screenController.activate("mainApp");
+                System.out.println("Logged");
+            } else {
+                labelError.setText("User not found, invalid email or password");
+            }
         }
 
-        if (errors.get("searchUser") != null) {
-            labelError.setText(errors.get("searchUser"));
-
-        } else {
-            // screenController.activate("mainApp");
-            System.out.println("Logged");
-        }
     }
 
     private void onchangeInitialize(TextField emailField, PasswordField passwordField, Label emailError,
@@ -57,7 +55,6 @@ public class LoginScreen extends VBox {
         emailField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
                 emailError.setText("");
-                errors.remove("searchUser");
                 labelError.setText("");
             }
         });
@@ -65,7 +62,6 @@ public class LoginScreen extends VBox {
         passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
                 passwordError.setText("");
-                errors.remove("searchUser");
                 labelError.setText("");
             }
         });
