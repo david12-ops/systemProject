@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 
 public class RegisterScreen extends VBox {
 
-    private void registerButtonAction(TextField emailField, PasswordField passwordField, Label emailError,
+    private void registerButtonAction(Stage stage, TextField emailField, PasswordField passwordField, Label emailError,
             Label passwordError, UserController userController, ScreenController screenController,
             HashMap<String, String> errors) {
 
@@ -44,7 +44,7 @@ public class RegisterScreen extends VBox {
 
         if (valid) {
             if (userController.register(emailField.getText(), passwordField.getText())) {
-                screenController.activate("login");
+                screenController.activate("login", stage);
             }
         }
     }
@@ -85,14 +85,14 @@ public class RegisterScreen extends VBox {
         Button registerButton = new Button("Register");
         registerButton.getStyleClass().add("button");
         registerButton.setOnAction(event -> {
-            registerButtonAction(emailField, passwordField, emailError, passwordError, userController, screenController,
-                    errors);
+            registerButtonAction(stage, emailField, passwordField, emailError, passwordError, userController,
+                    screenController, errors);
         });
 
         Button backButton = new Button("Back");
         backButton.getStyleClass().add("button");
         backButton.setOnAction(event -> {
-            screenController.activate("login");
+            screenController.activate("login", stage);
         });
 
         VBox form = new VBox(5, emailLabel, emailField, emailError, passwordLabel, passwordField, passwordError,
@@ -104,9 +104,8 @@ public class RegisterScreen extends VBox {
     }
 
     public static void show(Stage primaryStage, ScreenController screenController, UserController userController) {
-        Scene scene = new Scene(new RegisterScreen(primaryStage, screenController, userController), 300, 500);
+        Scene scene = new Scene(new RegisterScreen(primaryStage, screenController, userController));
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Register");
         primaryStage.show();
     }
 }

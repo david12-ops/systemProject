@@ -25,14 +25,13 @@ public class Main extends Application {
 
         screenController.addScreen("login", new LoginScreen(primaryStage, screenController, userController));
         screenController.addScreen("register", new RegisterScreen(primaryStage, screenController, userController));
-        screenController.addScreen("reset", new ForgotCredentialsScreen(primaryStage, screenController, userController,
-                userController.getLoggedUser()));
+        screenController.addScreen("reset",
+                new ForgotCredentialsScreen(primaryStage, screenController, userController));
 
         scene.getStylesheets().add(getClass().getResource("/styles/form.css").toExternalForm());
 
-        screenController.activate("login");
+        screenController.activate("login", primaryStage);
 
-        primaryStage.setTitle("Authentication");
         primaryStage.setScene(scene);
         primaryStage.show();
     }

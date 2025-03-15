@@ -37,16 +37,14 @@ public class UserController implements AuthManagement, UserManagement {
         return getUser(emailAccount, password) != null ? true : false;
     }
 
-    // TODO - session ???
-
     @Override
     public boolean login(String emailAccount, String password) {
         User user = getUser(emailAccount, password);
 
         if (user != null && BCrypt.checkpw(password, user.getPassword())) {
-            // if (this.service.getUserBySessionId(user.getMailAccount()) == null) {
-            // this.sessionId = this.service.createSessionId(user);
-            // }
+            if (!this.service.IsUserLoggedIn(this.sessionId)) {
+                this.sessionId = this.service.createSessionId(user);
+            }
             return true;
         }
 

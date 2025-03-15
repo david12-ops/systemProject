@@ -17,10 +17,10 @@ import javafx.stage.Stage;
 
 public class ForgotCredentialsScreen extends VBox {
 
-    private void resetButtonAction(TextField emailField, PasswordField passwordField, PasswordField newPasswordField,
-            PasswordField confirmPasswordField, Label emailError, Label passwordError, Label newPasswordError,
-            Label confirmPasswordError, UserController userController, ScreenController screenController,
-            Label labelError, HashMap<String, String> errors, User loggedUser) {
+    private void resetButtonAction(Stage stage, TextField emailField, PasswordField passwordField,
+            PasswordField newPasswordField, PasswordField confirmPasswordField, Label emailError, Label passwordError,
+            Label newPasswordError, Label confirmPasswordError, UserController userController,
+            ScreenController screenController, Label labelError, HashMap<String, String> errors, User loggedUser) {
 
         boolean valid = true;
 
@@ -58,7 +58,7 @@ public class ForgotCredentialsScreen extends VBox {
             if (loggedUser != null) {
 
                 if (userController.updateLoggedInAccount(newPasswordField.getText(), confirmPasswordField.getText())) {
-                    screenController.activate("login");
+                    screenController.activate("login", stage);
                 } else {
                     labelError.setText("Password update failed, user was not logged or something failed");
                 }
@@ -67,7 +67,7 @@ public class ForgotCredentialsScreen extends VBox {
                 if (userController.updateNotLoggedAccount(emailField.getText(), passwordField.getText(),
                         newPasswordField.getText(), confirmPasswordField.getText())) {
 
-                    screenController.activate("login");
+                    screenController.activate("login", stage);
                 } else {
                     labelError.setText("Password update failed, user was not found or something failed");
                 }
@@ -118,10 +118,10 @@ public class ForgotCredentialsScreen extends VBox {
         });
     }
 
-    public ForgotCredentialsScreen(Stage stage, ScreenController screenController, UserController userController,
-            User loggedUser) {
+    public ForgotCredentialsScreen(Stage stage, ScreenController screenController, UserController userController) {
 
         HashMap<String, String> errors = userController.getInputErrors();
+        User loggedUser = userController.getLoggedUser();
 
         Label labelError = new Label();
         labelError.getStyleClass().add("error-label");
@@ -152,7 +152,7 @@ public class ForgotCredentialsScreen extends VBox {
         Button resetButton = new Button("Reset");
         resetButton.getStyleClass().add("button");
         resetButton.setOnAction(event -> {
-            resetButtonAction(emailField, passwordField, newPasswordField, confirmPasswordField, emailError,
+            resetButtonAction(stage, emailField, passwordField, newPasswordField, confirmPasswordField, emailError,
                     passwordError, newPasswordError, confirmPasswordError, userController, screenController, labelError,
                     errors, loggedUser);
         });
@@ -160,7 +160,7 @@ public class ForgotCredentialsScreen extends VBox {
         Button backButton = new Button("Back");
         backButton.getStyleClass().add("button");
         backButton.setOnAction(event -> {
-            screenController.activate("login");
+            screenController.activate("login", stage);
         });
 
         VBox form = loggedUser != null
@@ -175,12 +175,9 @@ public class ForgotCredentialsScreen extends VBox {
         this.setAlignment(Pos.CENTER);
     }
 
-    public static void show(Stage primaryStage, ScreenController screenController, UserController controller,
-            User loggedUser) {
-        Scene scene = new Scene(new ForgotCredentialsScreen(primaryStage, screenController, controller, loggedUser),
-                300, 500);
+    public static void show(Stage primaryStage, ScreenController screenController, UserController userController) {
+        Scene scene = new Scene(new ForgotCredentialsScreen(primaryStage, screenController, userController));
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Reset password");
         primaryStage.show();
     }
 
