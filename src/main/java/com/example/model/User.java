@@ -23,6 +23,11 @@ public class User {
         this.id = id == null || id.isBlank() ? UUID.randomUUID().toString() : id;
     }
 
+    /*
+     * implementation not needed by created getId method. This method determines how
+     * the objects will be compared.
+     */
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -30,7 +35,7 @@ public class User {
         if (obj == null || getClass() != obj.getClass())
             return false;
         User user = (User) obj;
-        return mailAccount.equals(user.mailAccount);
+        return id.equals(user.id);
     }
 
     public String getId() {

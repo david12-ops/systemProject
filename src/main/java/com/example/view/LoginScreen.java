@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import utils.UserToken;
 
 public class LoginScreen extends VBox {
 
@@ -40,9 +41,11 @@ public class LoginScreen extends VBox {
         }
 
         if (valid) {
-            if (userController.login(emailField.getText(), passwordField.getText())) {
+            userController.login(emailField.getText(), passwordField.getText());
+            UserToken userToken = userController.getLoggedUser();
+            if (userToken != null) {
                 // screenController.activate("mainApp");
-                System.out.println("Logged");
+                System.out.println("Logged" + " " + userToken.getEmail());
             } else {
                 labelError.setText("User not found, invalid email or password");
             }

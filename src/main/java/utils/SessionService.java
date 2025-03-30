@@ -1,23 +1,25 @@
 package utils;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
-
+import java.util.concurrent.ConcurrentHashMap;
 import com.example.model.User;
 
 public class SessionService {
     private static SessionService instance;
-    private Map<String, User> activeSessions;
-    // TODO - need be more like JWT token or something
+    // syncronized getInstance/hasMap for multi acces - prevent race conditions
+    private ConcurrentHashMap<String, UserToken> activeSessions;
 
     private SessionService() {
-        this.activeSessions = new HashMap<>();
+        this.activeSessions = new ConcurrentHashMap<>();
     }
 
     public static SessionService getInstance() {
         if (instance == null) {
-            instance = new SessionService();
+            synchronized (SessionService.class) {
+                if (instance == null) {
+                    instance = new SessionService();
+                }
+            }
         }
 
         return instance;
@@ -25,16 +27,16 @@ public class SessionService {
 
     public String createSessionId(User user) {
         String sessionId = UUID.randomUUID().toString();
-        this.activeSessions.put(sessionId, user);
+        this.activeSessions.put(sessionId, new UserToken(user.getMailAccount(), user.getId()));
         return sessionId;
     }
 
-    public User getUserBySessionId(String id) {
+    public UserToken getUserBySessionId(String id) {
         return this.activeSessions.get(id);
     }
 
-    public boolean IsUserLoggedIn(String id) {
-        return this.activeSessions.containsKey(id);
+    public boolean isUserLoggedIn(String userId) {
+        return this.activeSessions.values().stream().anyMatch(user -> user.getId().equals(userId));
     }
 
     public void clearAllSessions() {

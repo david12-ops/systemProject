@@ -8,14 +8,20 @@ import com.example.model.User;
 import com.example.model.UserModel;
 
 import utils.AuthManagement;
+import utils.SessionContext;
 import utils.SessionService;
 import utils.UserManagement;
+import utils.UserToken;
 
 public class UserController implements AuthManagement, UserManagement {
     private UserModel model;
     private SessionService service;
-    private String sessionId;
+
+    // In this user cannot update email adress only password of account
     // TODO - while removing user, need info about removing accout
+    // TODO - when messages will be done - can add functionality to update email
+    // adress of account
+    // TODO - SessionContext and token move to another package (in utils right now)
 
     public UserController(UserModel model) {
         this.model = model;
@@ -38,17 +44,15 @@ public class UserController implements AuthManagement, UserManagement {
     }
 
     @Override
-    public boolean login(String emailAccount, String password) {
+    public void login(String emailAccount, String password) {
         User user = getUser(emailAccount, password);
 
         if (user != null && BCrypt.checkpw(password, user.getPassword())) {
-            if (!this.service.IsUserLoggedIn(this.sessionId)) {
-                this.sessionId = this.service.createSessionId(user);
+            if (!this.service.isUserLoggedIn(user.getId())) {
+                String sessionId = this.service.createSessionId(user);
+                SessionContext.setSessionId(sessionId);
             }
-            return true;
         }
-
-        return false;
     }
 
     @Override
@@ -63,12 +67,25 @@ public class UserController implements AuthManagement, UserManagement {
 
     @Override
     public void logOut() {
-        this.service.removeSession(sessionId);
+        String sessionId = SessionContext.getSessionId();
+        if (sessionId != null) {
+            this.service.removeSession(sessionId);
+            SessionContext.clear();
+        }
     }
 
     @Override
-    public User getLoggedUser() {
-        return this.service.getUserBySessionId(sessionId);
+    public UserToken getLoggedUser() {
+        try {
+            String sessionId = SessionContext.getSessionId();
+            if (sessionId != null && !sessionId.isBlank()) {
+                return this.service.getUserBySessionId(sessionId);
+            }
+            return null;
+        } catch (Exception e) {
+            System.out.println("Error fetching logged user: " + e);
+            return null;
+        }
     }
 
     // User actions
@@ -85,9 +102,9 @@ public class UserController implements AuthManagement, UserManagement {
     @Override
     public boolean updateLoggedInAccount(String newPassword, String confirmationPassword) {
 
-        User foundUser = getLoggedUser();
+        UserToken userToken = getLoggedUser();
 
-        model.updateUser(foundUser, newPassword, confirmationPassword);
-        return getUser(foundUser.getMailAccount(), confirmationPassword) != null ? true : false;
+        model.updateUser(userToken, newPassword, confirmationPassword);
+        return getUser(userToken.getEmail(), confirmationPassword) != null ? true : false;
     }
 }

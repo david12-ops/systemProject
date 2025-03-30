@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
-import com.example.model.User;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -14,13 +13,14 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import utils.UserToken;
 
 public class ForgotCredentialsScreen extends VBox {
 
     private void resetButtonAction(Stage stage, TextField emailField, PasswordField passwordField,
             PasswordField newPasswordField, PasswordField confirmPasswordField, Label emailError, Label passwordError,
             Label newPasswordError, Label confirmPasswordError, UserController userController,
-            ScreenController screenController, Label labelError, HashMap<String, String> errors, User loggedUser) {
+            ScreenController screenController, Label labelError, HashMap<String, String> errors, UserToken userToken) {
 
         boolean valid = true;
 
@@ -30,7 +30,7 @@ public class ForgotCredentialsScreen extends VBox {
         }
 
         if (passwordField.getText().isBlank()) {
-            passwordError.setText("Password is required");
+            passwordError.setText("Current password is required");
             valid = false;
         }
 
@@ -55,23 +55,22 @@ public class ForgotCredentialsScreen extends VBox {
         }
 
         if (valid) {
-            if (loggedUser != null) {
-
-                if (userController.updateLoggedInAccount(newPasswordField.getText(), confirmPasswordField.getText())) {
-                    screenController.activate("login", stage);
+            if (userToken != null) {
+                boolean updateSuccess = userController.updateLoggedInAccount(newPasswordField.getText(),
+                        confirmPasswordField.getText());
+                if (updateSuccess) {
+                    screenController.activate("login", stage); // Switch to login screen
                 } else {
-                    labelError.setText("Password update failed, user was not logged or something failed");
+                    labelError.setText("Password update failed, user might not be logged in.");
                 }
             } else {
-
-                if (userController.updateNotLoggedAccount(emailField.getText(), passwordField.getText(),
-                        newPasswordField.getText(), confirmPasswordField.getText())) {
-
-                    screenController.activate("login", stage);
+                boolean updateSuccess = userController.updateNotLoggedAccount(emailField.getText(),
+                        passwordField.getText(), newPasswordField.getText(), confirmPasswordField.getText());
+                if (updateSuccess) {
+                    screenController.activate("login", stage); // Switch to login screen
                 } else {
-                    labelError.setText("Password update failed, user was not found or something failed");
+                    labelError.setText("Password update failed, account not found or credentials incorrect.");
                 }
-
             }
         }
     }
@@ -121,7 +120,9 @@ public class ForgotCredentialsScreen extends VBox {
     public ForgotCredentialsScreen(Stage stage, ScreenController screenController, UserController userController) {
 
         HashMap<String, String> errors = userController.getInputErrors();
-        User loggedUser = userController.getLoggedUser();
+        UserToken userToken = userController.getLoggedUser();
+
+        System.out.println("hejj " + userToken);
 
         Label labelError = new Label();
         labelError.getStyleClass().add("error-label");
@@ -154,7 +155,7 @@ public class ForgotCredentialsScreen extends VBox {
         resetButton.setOnAction(event -> {
             resetButtonAction(stage, emailField, passwordField, newPasswordField, confirmPasswordField, emailError,
                     passwordError, newPasswordError, confirmPasswordError, userController, screenController, labelError,
-                    errors, loggedUser);
+                    errors, userToken);
         });
 
         Button backButton = new Button("Back");
@@ -163,12 +164,13 @@ public class ForgotCredentialsScreen extends VBox {
             screenController.activate("login", stage);
         });
 
-        VBox form = loggedUser != null
+        VBox form = userToken != null
                 ? createForLogInUserVbox(labelError, newPasswordLabel, newPasswordField, newPasswordError,
                         confirmPasswordLabel, confirmPasswordField, confirmPasswordError, resetButton, backButton)
                 : new VBox(5, labelError, emailLabel, emailField, emailError, passwordLabel, passwordField,
                         passwordError, newPasswordLabel, newPasswordField, newPasswordError, confirmPasswordLabel,
                         confirmPasswordField, confirmPasswordError, resetButton, backButton);
+
         form.setAlignment(Pos.CENTER);
 
         this.getChildren().add(form);

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public abstract class JsonStorage<T> {
 
@@ -19,6 +20,9 @@ public abstract class JsonStorage<T> {
     private final Path filePath;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final TypeReference<List<T>> typeReference;
+    // syncronized CRUD operations for multi acces - prevent race conditions
+    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+
     private List<T> items;
 
     public JsonStorage(String fileName, TypeReference<List<T>> typeReference) {
@@ -53,27 +57,47 @@ public abstract class JsonStorage<T> {
     }
 
     protected List<T> getItems() {
-        return this.items;
+        rwLock.readLock().lock();
+        try {
+            return this.items;
+        } finally {
+            rwLock.readLock().unlock();
+        }
     }
 
     protected void addItem(T item) {
-        this.items.add(item);
-        saveToFile();
+        rwLock.writeLock().lock();
+        try {
+            this.items.add(item);
+            saveToFile();
+        } finally {
+            rwLock.writeLock().unlock();
+        }
     }
 
     protected void removeItem(T item) {
-        this.items.remove(item);
-        saveToFile();
+        rwLock.writeLock().lock();
+        try {
+            this.items.remove(item);
+            saveToFile();
+        } finally {
+            rwLock.writeLock().unlock();
+        }
     }
 
     protected void updateItem(T item, T updatedItem) {
-        for (int i = 0; i < items.size(); i++) {
-            if (items.get(i).equals(item)) {
-                this.items.set(i, updatedItem);
-                break;
+        rwLock.writeLock().lock();
+        try {
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i).equals(item)) {
+                    this.items.set(i, updatedItem);
+                    break;
+                }
             }
+            saveToFile();
+        } finally {
+            rwLock.writeLock().unlock();
         }
-        saveToFile();
     }
 
     protected abstract List<T> createEmptyList();

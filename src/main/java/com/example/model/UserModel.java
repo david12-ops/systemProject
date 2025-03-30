@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import utils.JsonStorage;
+import utils.UserToken;
 import utils.Enums.Operation;
 import utils.AplicationService;
 
@@ -35,8 +36,8 @@ public class UserModel extends JsonStorage<User> {
         }
     }
 
-    public void removeUser(User activeUser, User user) {
-        if (activeUser != null && !activeUser.getMailAccount().equals(user.getMailAccount())) {
+    public void removeUser(UserToken userToken, User user) {
+        if (userToken != null && !userToken.getEmail().equals(user.getMailAccount())) {
             removeItem(user);
         } else {
             service.getErrHandler().logError(
@@ -44,10 +45,36 @@ public class UserModel extends JsonStorage<User> {
         }
     }
 
+    public void updateUser(UserToken userToken, String newPassword, String confirmationPassword) {
+
+        if (userToken != null) {
+            if (service.getValidationHandler().confirmedPassword(newPassword, confirmationPassword)) {
+
+                try {
+                    User foundUser = listOfUsers.stream().filter(user -> user.getId().equals(userToken.getId()))
+                            .findFirst().get();
+
+                    if (confirmationPassword.equals(foundUser.getPassword())) {
+                        service.getErrHandler().logError(new AbstractMap.SimpleEntry<>("confirmPassword",
+                                "New password have to be different then old password"));
+                    } else {
+                        User newUser = new User(foundUser.getId(), foundUser.getMailAccount(),
+                                BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
+
+                        updateItem(foundUser, newUser);
+                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+    }
+
     public void updateUser(User user, String newPassword, String confirmationPassword) {
 
         if (user != null) {
             if (service.getValidationHandler().confirmedPassword(newPassword, confirmationPassword)) {
+
                 if (confirmationPassword.equals(user.getPassword())) {
                     service.getErrHandler().logError(new AbstractMap.SimpleEntry<>("confirmPassword",
                             "New password have to be different then old password"));
@@ -56,7 +83,6 @@ public class UserModel extends JsonStorage<User> {
                             BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
                     updateItem(user, newUser);
-
                 }
             }
         }
