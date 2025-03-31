@@ -16,7 +16,7 @@ public class LoginScreen extends VBox {
 
     private void loginButtonAction(TextField emailField, PasswordField passwordField, Label emailError,
             Label passwordError, UserController userController, ScreenController screenController,
-            HashMap<String, String> errors, Label labelError) {
+            HashMap<String, String> errors, Label labelError, Stage stage) {
 
         boolean valid = true;
 
@@ -45,7 +45,8 @@ public class LoginScreen extends VBox {
             UserToken userToken = userController.getLoggedUser();
             if (userToken != null) {
                 // screenController.activate("mainApp");
-                System.out.println("Logged" + " " + userToken.getEmail());
+                screenController.updateScreen("reset",
+                        new ForgotCredentialsScreen(stage, screenController, userController));
             } else {
                 labelError.setText("User not found, invalid email or password");
             }
@@ -93,13 +94,15 @@ public class LoginScreen extends VBox {
         loginButton.getStyleClass().add("button");
         loginButton.setOnAction(event -> {
             loginButtonAction(emailField, passwordField, emailError, passwordError, userController, screenController,
-                    errors, labelError);
+                    errors, labelError, stage);
         });
 
         Button logOutButton = new Button("Logout");
         logOutButton.getStyleClass().add("button");
         logOutButton.setOnAction(event -> {
             userController.logOut();
+            screenController.updateScreen("reset",
+                    new ForgotCredentialsScreen(stage, screenController, userController));
             screenController.activate("login", stage);
         });
 

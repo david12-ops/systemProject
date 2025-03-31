@@ -1,6 +1,7 @@
 package com.example.constroller;
 
 import java.util.HashMap;
+
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -29,14 +30,22 @@ public class ScreenController {
         screenMap.remove(name);
     }
 
+    public void updateScreen(String name, Pane newPane) {
+        if (screenMap.containsKey(name)) {
+            screenMap.put(name, newPane);
+        } else {
+            throw new IllegalArgumentException("Screen not found: " + name);
+        }
+    }
+
     public void activate(String name, Stage stage) {
         if (main == null) {
             throw new IllegalStateException("Scene has not been set for ScreenController.");
         }
 
-        Pane pane = screenMap.get(name);
-        if (pane != null) {
-            main.setRoot(pane);
+        Pane screen = screenMap.get(name);
+        if (screen != null) {
+            main.setRoot(screen);
 
             switch (name) {
             case "login":

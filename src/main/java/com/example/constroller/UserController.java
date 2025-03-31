@@ -18,7 +18,6 @@ public class UserController implements AuthManagement, UserManagement {
     private SessionService service;
 
     // In this user cannot update email adress only password of account
-    // TODO - while removing user, need info about removing accout
     // TODO - when messages will be done - can add functionality to update email
     // adress of account
     // TODO - SessionContext and token move to another package (in utils right now)

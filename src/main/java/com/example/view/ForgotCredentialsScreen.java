@@ -24,14 +24,16 @@ public class ForgotCredentialsScreen extends VBox {
 
         boolean valid = true;
 
-        if (emailField.getText().isBlank()) {
-            emailError.setText("Email is required");
-            valid = false;
-        }
+        if (userToken == null) {
+            if (emailField.getText().isBlank()) {
+                emailError.setText("Email is required");
+                valid = false;
+            }
 
-        if (passwordField.getText().isBlank()) {
-            passwordError.setText("Current password is required");
-            valid = false;
+            if (passwordField.getText().isBlank()) {
+                passwordError.setText("Current password is required");
+                valid = false;
+            }
         }
 
         if (newPasswordField.getText().isBlank()) {
@@ -59,7 +61,7 @@ public class ForgotCredentialsScreen extends VBox {
                 boolean updateSuccess = userController.updateLoggedInAccount(newPasswordField.getText(),
                         confirmPasswordField.getText());
                 if (updateSuccess) {
-                    screenController.activate("login", stage); // Switch to login screen
+                    screenController.activate("login", stage);
                 } else {
                     labelError.setText("Password update failed, user might not be logged in.");
                 }
@@ -67,7 +69,7 @@ public class ForgotCredentialsScreen extends VBox {
                 boolean updateSuccess = userController.updateNotLoggedAccount(emailField.getText(),
                         passwordField.getText(), newPasswordField.getText(), confirmPasswordField.getText());
                 if (updateSuccess) {
-                    screenController.activate("login", stage); // Switch to login screen
+                    screenController.activate("login", stage);
                 } else {
                     labelError.setText("Password update failed, account not found or credentials incorrect.");
                 }
@@ -121,8 +123,6 @@ public class ForgotCredentialsScreen extends VBox {
 
         HashMap<String, String> errors = userController.getInputErrors();
         UserToken userToken = userController.getLoggedUser();
-
-        System.out.println("hejj " + userToken);
 
         Label labelError = new Label();
         labelError.getStyleClass().add("error-label");

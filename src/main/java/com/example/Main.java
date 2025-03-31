@@ -20,13 +20,17 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         screenController = new ScreenController(null);
 
-        Scene scene = new Scene(new LoginScreen(primaryStage, screenController, userController), 400, 300);
+        LoginScreen loginScreen = new LoginScreen(primaryStage, screenController, userController);
+        RegisterScreen registerScreen = new RegisterScreen(primaryStage, screenController, userController);
+        ForgotCredentialsScreen resetScreen = new ForgotCredentialsScreen(primaryStage, screenController,
+                userController);
+
+        Scene scene = new Scene(loginScreen, 400, 300);
         screenController.setScene(scene);
 
-        screenController.addScreen("login", new LoginScreen(primaryStage, screenController, userController));
-        screenController.addScreen("register", new RegisterScreen(primaryStage, screenController, userController));
-        screenController.addScreen("reset",
-                new ForgotCredentialsScreen(primaryStage, screenController, userController));
+        screenController.addScreen("login", loginScreen);
+        screenController.addScreen("register", registerScreen);
+        screenController.addScreen("reset", resetScreen);
 
         scene.getStylesheets().add(getClass().getResource("/styles/form.css").toExternalForm());
 
