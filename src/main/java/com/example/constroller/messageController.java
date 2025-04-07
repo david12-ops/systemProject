@@ -1,12 +1,43 @@
 package com.example.constroller;
 
-public class messageController {
-    // private MessagesModel model = new MessagesModel();
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-    // public void addMesssage(String subject, String description, String sender,
-    // String acceptor) {
-    // Message newMessage = new Message(subject, description, sender, acceptor);
-    // model.addMesssage(newMessage);
-    // }
+import com.example.model.Message;
+import com.example.model.MessageModel;
+
+import utils.Enums.MessageType;
+import utils.UserToken;
+
+public class MessageController {
+    private MessageModel model;
+
+    public MessageController(MessageModel model) {
+        this.model = model;
+    }
+
+    public void addMesssage(String subject, String message, String senderId, String recevierId) {
+        Message newMessage = new Message(senderId, recevierId, subject, message, LocalDateTime.now());
+        model.addMesssage(newMessage);
+    }
+
+    public void removeMessage(Message message) {
+        model.removeMessage(message);
+    }
+
+    public List<Message> getMessages(MessageType type, UserToken userToken) {
+        List<Message> messages = new ArrayList<>();
+
+        if (type == MessageType.SENDED) {
+            messages = model.getAllSendedMessagesByUser(userToken.getId());
+        }
+
+        if (type == MessageType.RECEVIED) {
+            messages = model.getAllReceviedMessagesByUser(userToken.getId());
+        }
+
+        return messages;
+    }
 
 }

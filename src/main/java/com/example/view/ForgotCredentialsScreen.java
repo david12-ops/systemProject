@@ -17,6 +17,18 @@ import utils.UserToken;
 
 public class ForgotCredentialsScreen extends VBox {
 
+    private VBox createVbox(UserToken userToken, Label labelError, Label emailLabel, TextField emailField,
+            Label emailError, Label passwordLabel, PasswordField passwordField, Label passwordError,
+            Label newPasswordLabel, PasswordField newPasswordField, Label newPasswordError, Label confirmPasswordLabel,
+            PasswordField confirmPasswordField, Label confirmPasswordError, Button resetButton, Button backButton) {
+        return userToken != null
+                ? new VBox(5, labelError, newPasswordLabel, newPasswordField, newPasswordError, confirmPasswordLabel,
+                        confirmPasswordField, confirmPasswordError, resetButton, backButton)
+                : new VBox(5, labelError, emailLabel, emailField, emailError, passwordLabel, passwordField,
+                        passwordError, newPasswordLabel, newPasswordField, newPasswordError, confirmPasswordLabel,
+                        confirmPasswordField, confirmPasswordError, resetButton, backButton);
+    }
+
     private void resetButtonAction(Stage stage, TextField emailField, PasswordField passwordField,
             PasswordField newPasswordField, PasswordField confirmPasswordField, Label emailError, Label passwordError,
             Label newPasswordError, Label confirmPasswordError, UserController userController,
@@ -75,13 +87,6 @@ public class ForgotCredentialsScreen extends VBox {
                 }
             }
         }
-    }
-
-    private VBox createForLogInUserVbox(Label labelError, Label newPasswordLabel, PasswordField newPasswordField,
-            Label newPasswordError, Label confirmPasswordLabel, PasswordField confirmPasswordField,
-            Label confirmPasswordError, Button resetButton, Button backButton) {
-        return new VBox(5, labelError, newPasswordLabel, newPasswordField, newPasswordError, confirmPasswordLabel,
-                confirmPasswordField, confirmPasswordError, resetButton, backButton);
     }
 
     private void onchangeInitialize(TextField emailField, PasswordField passwordField, PasswordField newPasswordField,
@@ -164,12 +169,9 @@ public class ForgotCredentialsScreen extends VBox {
             screenController.activate("login", stage);
         });
 
-        VBox form = userToken != null
-                ? createForLogInUserVbox(labelError, newPasswordLabel, newPasswordField, newPasswordError,
-                        confirmPasswordLabel, confirmPasswordField, confirmPasswordError, resetButton, backButton)
-                : new VBox(5, labelError, emailLabel, emailField, emailError, passwordLabel, passwordField,
-                        passwordError, newPasswordLabel, newPasswordField, newPasswordError, confirmPasswordLabel,
-                        confirmPasswordField, confirmPasswordError, resetButton, backButton);
+        VBox form = createVbox(userToken, labelError, emailLabel, emailField, emailError, passwordLabel, passwordField,
+                passwordError, newPasswordLabel, newPasswordField, newPasswordError, confirmPasswordLabel,
+                confirmPasswordField, confirmPasswordError, resetButton, backButton);
 
         form.setAlignment(Pos.CENTER);
 

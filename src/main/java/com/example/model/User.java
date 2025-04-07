@@ -24,8 +24,7 @@ public class User {
     }
 
     /*
-     * implementation not needed by created getId method. This method determines how
-     * the objects will be compared.
+     * This method determines how the objects will be compared.
      */
 
     @Override
@@ -39,22 +38,22 @@ public class User {
     }
 
     public String getId() {
-        return this.id;
+        return id;
     }
 
     public String getMailAccount() {
-        return this.mailAccount;
+        return mailAccount;
     }
 
     public String getPassword() {
-        return this.password;
+        return password;
     }
 
     public void setMailAccount(String newMail) {
-        this.mailAccount = newMail;
+        mailAccount = newMail;
     }
 
     public void setPassword(String newPassword) {
-        this.password = newPassword;
+        password = newPassword;
     }
 }

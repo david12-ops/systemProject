@@ -5,6 +5,7 @@ import com.example.constroller.UserController;
 import com.example.model.UserModel;
 import com.example.view.ForgotCredentialsScreen;
 import com.example.view.LoginScreen;
+import com.example.view.MainScreen;
 import com.example.view.RegisterScreen;
 
 import javafx.application.Application;
@@ -24,6 +25,7 @@ public class Main extends Application {
         RegisterScreen registerScreen = new RegisterScreen(primaryStage, screenController, userController);
         ForgotCredentialsScreen resetScreen = new ForgotCredentialsScreen(primaryStage, screenController,
                 userController);
+        MainScreen mainScreen = new MainScreen(primaryStage, screenController, userController);
 
         Scene scene = new Scene(loginScreen, 400, 300);
         screenController.setScene(scene);
@@ -31,6 +33,7 @@ public class Main extends Application {
         screenController.addScreen("login", loginScreen);
         screenController.addScreen("register", registerScreen);
         screenController.addScreen("reset", resetScreen);
+        screenController.addScreen("main", mainScreen);
 
         scene.getStylesheets().add(getClass().getResource("/styles/form.css").toExternalForm());
 

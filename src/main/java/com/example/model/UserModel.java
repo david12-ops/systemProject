@@ -117,7 +117,7 @@ public class UserModel extends JsonStorage<User> {
 
     @Override
     protected List<User> createEmptyList() {
-        this.listOfUsers = new ArrayList<>();
+        listOfUsers = new ArrayList<>();
         return listOfUsers;
     }
 

@@ -16,6 +16,9 @@ public class Message {
     @JsonProperty("receiver_id")
     private String receiverId;
 
+    @JsonProperty("subject")
+    private String subject;
+
     @JsonProperty("message")
     private String message;
 
@@ -25,12 +28,27 @@ public class Message {
     public Message() {
     }
 
-    public Message(String senderId, String receiverId, String message, LocalDateTime timestamp) {
+    public Message(String senderId, String receiverId, String subject, String message, LocalDateTime timestamp) {
         this.id = UUID.randomUUID().toString();
         this.senderId = senderId;
         this.receiverId = receiverId;
+        this.subject = subject;
         this.message = message;
         this.timestamp = timestamp;
+    }
+
+    /*
+     * This method determines how the objects will be compared.
+     */
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        Message message = (Message) obj;
+        return id.equals(message.id);
     }
 
     public String getMessageId() {
@@ -43,6 +61,10 @@ public class Message {
 
     public String getReceiverId() {
         return receiverId;
+    }
+
+    public String getSubject() {
+        return subject;
     }
 
     public String getMessage() {

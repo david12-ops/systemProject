@@ -44,7 +44,7 @@ public class LoginScreen extends VBox {
             userController.login(emailField.getText(), passwordField.getText());
             UserToken userToken = userController.getLoggedUser();
             if (userToken != null) {
-                // screenController.activate("mainApp");
+                screenController.activate("main", stage);
                 screenController.updateScreen("reset",
                         new ForgotCredentialsScreen(stage, screenController, userController));
             } else {
