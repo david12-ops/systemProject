@@ -97,15 +97,6 @@ public class LoginScreen extends VBox {
                     errors, labelError, stage);
         });
 
-        Button logOutButton = new Button("Logout");
-        logOutButton.getStyleClass().add("button");
-        logOutButton.setOnAction(event -> {
-            userController.logOut();
-            screenController.updateScreen("reset",
-                    new ForgotCredentialsScreen(stage, screenController, userController));
-            screenController.activate("login", stage);
-        });
-
         Hyperlink registerLink = new Hyperlink("Don't have an account? Register");
         registerLink.setOnAction(event -> screenController.activate("register", stage));
 
@@ -113,7 +104,7 @@ public class LoginScreen extends VBox {
         resetLink.setOnAction(event -> screenController.activate("reset", stage));
 
         VBox form = new VBox(5, labelError, emailLabel, emailField, emailError, passwordLabel, passwordField,
-                passwordError, loginButton, logOutButton, registerLink, resetLink);
+                passwordError, loginButton, registerLink, resetLink);
         form.setAlignment(Pos.CENTER);
 
         this.getChildren().add(form);

@@ -14,6 +14,9 @@ public class User {
     @JsonProperty("password")
     private String password;
 
+    @JsonProperty("profileImage")
+    private String profileImage;
+
     public User() {
     }
 
@@ -21,6 +24,7 @@ public class User {
         this.mailAccount = mailAccount;
         this.password = password;
         this.id = id == null || id.isBlank() ? UUID.randomUUID().toString() : id;
+        this.profileImage = null;
     }
 
     /*
@@ -49,11 +53,19 @@ public class User {
         return password;
     }
 
+    public String getProfileImage() {
+        return profileImage;
+    }
+
     public void setMailAccount(String newMail) {
         mailAccount = newMail;
     }
 
     public void setPassword(String newPassword) {
         password = newPassword;
+    }
+
+    public void setImage(String image) {
+        profileImage = image;
     }
 }

@@ -1,23 +1,35 @@
 package com.example.view;
 
+import com.example.constroller.MessageController;
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
 import com.example.model.Message;
 
+import components.AppBar;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import java.util.ArrayList;
+import java.util.List;
+import utils.UserToken;
+import utils.Enums.MessageType;
 
-public class MainScreen extends VBox {
+public class MainScreen extends BorderPane {
 
-    public MainScreen(Stage stage, ScreenController screenController, UserController userController) {
+    public MainScreen(Stage stage, ScreenController screenController, UserController userController,
+            MessageController messageController) {
 
-        // messageListView.setCellFactory(lv -> new ListCell<Message>() {
+        UserToken userToken = userController.getLoggedUser();
+
+        List<Message> receviedMessages = messageController.getMessages(MessageType.RECEVIED, userToken);
+
+        // listView.setCellFactory(lv -> new ListCell<>() {
         // @Override
         // protected void updateItem(Message msg, boolean empty) {
         // super.updateItem(msg, empty);
@@ -29,18 +41,24 @@ public class MainScreen extends VBox {
         // }
         // });
 
-        ObservableList<String> items = FXCollections.observableArrayList("One", "Two", "Three");
+        ObservableList<Message> items = FXCollections.observableList(receviedMessages);
         ListView<String> listView = new ListView(items);
 
-        VBox list = new VBox(listView);
-        list.setAlignment(Pos.CENTER);
+        AppBar appBar = new AppBar("Send It!");
+        appBar.getLogoutButton().setOnAction(event -> {
+            userController.logOut();
+            screenController.updateScreen("reset",
+                    new ForgotCredentialsScreen(stage, screenController, userController));
+            screenController.activate("login", stage);
+        });
 
-        this.getChildren().add(list);
-        this.setAlignment(Pos.CENTER);
+        this.setTop(appBar);
+        this.setCenter(listView);
     }
 
-    public static void show(Stage primaryStage, ScreenController screenController, UserController userController) {
-        Scene scene = new Scene(new MainScreen(primaryStage, screenController, userController));
+    public static void show(Stage primaryStage, ScreenController screenController, UserController userController,
+            MessageController messageController) {
+        Scene scene = new Scene(new MainScreen(primaryStage, screenController, userController, messageController));
         primaryStage.setScene(scene);
         primaryStage.show();
     }

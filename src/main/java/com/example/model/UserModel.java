@@ -50,22 +50,27 @@ public class UserModel extends JsonStorage<User> {
         if (userToken != null) {
             if (service.getValidationHandler().confirmedPassword(newPassword, confirmationPassword)) {
 
-                try {
-                    User foundUser = listOfUsers.stream().filter(user -> user.getId().equals(userToken.getId()))
-                            .findFirst().get();
+                // try {
+                // User foundUser = listOfUsers.stream().filter(user ->
+                // user.getId().equals(userToken.getId())
+                // && user.getMailAccount().equals(userToken.getEmail())).findFirst().get();
 
-                    if (confirmationPassword.equals(foundUser.getPassword())) {
-                        service.getErrHandler().logError(new AbstractMap.SimpleEntry<>("confirmPassword",
-                                "New password have to be different then old password"));
-                    } else {
-                        User newUser = new User(foundUser.getId(), foundUser.getMailAccount(),
+                User foundUser = getUserByToken(userToken);
+
+                if (confirmationPassword.equals(foundUser.getPassword())) {
+                    service.getErrHandler().logError(new AbstractMap.SimpleEntry<>("confirmPassword",
+                            "New password have to be different then old password"));
+                } else {
+                    if (foundUser != null) {
+                        User updatedUser = new User(foundUser.getId(), foundUser.getMailAccount(),
                                 BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
-                        updateItem(foundUser, newUser);
+                        updateItem(foundUser, updatedUser);
                     }
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
                 }
+                // } catch (Exception e) {
+                // System.out.println(e.getMessage());
+                // }
             }
         }
     }
@@ -79,11 +84,21 @@ public class UserModel extends JsonStorage<User> {
                     service.getErrHandler().logError(new AbstractMap.SimpleEntry<>("confirmPassword",
                             "New password have to be different then old password"));
                 } else {
-                    User newUser = new User(user.getId(), user.getMailAccount(),
+                    User updatedUser = new User(user.getId(), user.getMailAccount(),
                             BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
-                    updateItem(user, newUser);
+                    updateItem(user, updatedUser);
                 }
+            }
+        }
+    }
+
+    public void updateUser(UserToken userToken, String base64) {
+        if (userToken != null) {
+            User user = getUserByToken(userToken);
+            if (user != null) {
+                user.setImage(base64);
+                updateItem(user, user);
             }
         }
     }
@@ -97,22 +112,38 @@ public class UserModel extends JsonStorage<User> {
         return service.getErrHandler().getErrors();
     }
 
-    public User getUserByCredentials(String email, String password) {
-
+    public User getUserByCredentials(String email, String password, UserToken userToken) {
         if (this.listOfUsers.size() > 0 && this.listOfUsers != null) {
-            for (User user : this.listOfUsers) {
-                if (user.getMailAccount().equals(email) && comparePassword(password, user.getPassword())) {
-                    return user;
-                }
+            if (email != null && password != null && userToken == null) {
+                return getUserByEmailAndPassword(email, password);
             }
+
+            if (email == null && password == null && userToken != null) {
+                return getUserByToken(userToken);
+            }
+
             return null;
         } else {
             return null;
         }
     }
 
-    private boolean comparePassword(String enteredPassword, String storedHash) {
-        return BCrypt.checkpw(enteredPassword, storedHash);
+    private User getUserByEmailAndPassword(String email, String password) {
+        for (User user : this.listOfUsers) {
+            if (user.getMailAccount().equals(email) && BCrypt.checkpw(password, user.getPassword())) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    private User getUserByToken(UserToken userToken) {
+        for (User user : this.listOfUsers) {
+            if (user.getId().equals(userToken.getId()) && user.getMailAccount().equals(userToken.getEmail())) {
+                return user;
+            }
+        }
+        return null;
     }
 
     @Override

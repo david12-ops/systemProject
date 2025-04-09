@@ -1,7 +1,9 @@
 package com.example;
 
+import com.example.constroller.MessageController;
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
+import com.example.model.MessageModel;
 import com.example.model.UserModel;
 import com.example.view.ForgotCredentialsScreen;
 import com.example.view.LoginScreen;
@@ -13,8 +15,10 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-    private UserModel model = new UserModel();
-    private UserController userController = new UserController(model);
+    private UserModel userModel = new UserModel();
+    private MessageModel messageModel = new MessageModel();
+    private UserController userController = new UserController(userModel);
+    private MessageController messageController = new MessageController(messageModel);
     private ScreenController screenController;
 
     @Override
@@ -25,7 +29,7 @@ public class Main extends Application {
         RegisterScreen registerScreen = new RegisterScreen(primaryStage, screenController, userController);
         ForgotCredentialsScreen resetScreen = new ForgotCredentialsScreen(primaryStage, screenController,
                 userController);
-        MainScreen mainScreen = new MainScreen(primaryStage, screenController, userController);
+        MainScreen mainScreen = new MainScreen(primaryStage, screenController, userController, messageController);
 
         Scene scene = new Scene(loginScreen, 400, 300);
         screenController.setScene(scene);

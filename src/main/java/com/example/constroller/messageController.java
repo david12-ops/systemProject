@@ -29,11 +29,11 @@ public class MessageController {
     public List<Message> getMessages(MessageType type, UserToken userToken) {
         List<Message> messages = new ArrayList<>();
 
-        if (type == MessageType.SENDED) {
+        if (type == MessageType.SENDED && userToken != null) {
             messages = model.getAllSendedMessagesByUser(userToken.getId());
         }
 
-        if (type == MessageType.RECEVIED) {
+        if (type == MessageType.RECEVIED && userToken != null) {
             messages = model.getAllReceviedMessagesByUser(userToken.getId());
         }
 
