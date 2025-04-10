@@ -1,4 +1,4 @@
-package utils;
+package com.example.utils;
 
 public class Enums {
     public enum Operation {

@@ -45,6 +45,8 @@ public class RegisterScreen extends VBox {
         if (valid) {
             boolean registerSuccess = userController.register(emailField.getText(), passwordField.getText());
             if (registerSuccess) {
+                emailField.clear();
+                passwordField.clear();
                 screenController.activate("login", stage);
             }
         }

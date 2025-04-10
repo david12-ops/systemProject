@@ -1,9 +1,9 @@
-package components;
+package com.example.components;
 
 import com.example.constroller.UserController;
+import com.example.utils.UserToken;
 
 import javafx.scene.image.Image;
-import utils.UserToken;
 
 public class Avatar {
 

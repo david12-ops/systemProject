@@ -8,14 +8,14 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import com.example.model.User;
 import com.example.model.UserModel;
+import com.example.utils.AuthManagement;
+import com.example.utils.ImageConvertor;
+import com.example.utils.SessionContext;
+import com.example.utils.SessionService;
+import com.example.utils.UserManagement;
+import com.example.utils.UserToken;
 
 import javafx.scene.image.Image;
-import utils.AuthManagement;
-import utils.ImageConvertor;
-import utils.SessionContext;
-import utils.SessionService;
-import utils.UserManagement;
-import utils.UserToken;
 
 public class UserController implements AuthManagement, UserManagement {
     private UserModel model;
@@ -25,7 +25,6 @@ public class UserController implements AuthManagement, UserManagement {
     // TODO - when messages will be done - can add functionality to update email
     // adress of account
     // TODO - SessionContext and token move to another package (in utils right now)
-    // TODO - ui and clering fields in form after transition to another page
 
     public UserController(UserModel model) {
         this.model = model;

@@ -4,13 +4,13 @@ import java.util.HashMap;
 
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
+import com.example.utils.UserToken;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import utils.UserToken;
 
 public class LoginScreen extends VBox {
 
@@ -44,6 +44,8 @@ public class LoginScreen extends VBox {
             userController.login(emailField.getText(), passwordField.getText());
             UserToken userToken = userController.getLoggedUser();
             if (userToken != null) {
+                emailField.clear();
+                passwordField.clear();
                 screenController.activate("main", stage);
                 screenController.updateScreen("reset",
                         new ForgotCredentialsScreen(stage, screenController, userController));

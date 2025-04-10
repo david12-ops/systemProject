@@ -1,4 +1,4 @@
-package components;
+package com.example.components;
 
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;

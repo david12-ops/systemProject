@@ -7,13 +7,13 @@ import java.util.List;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import com.example.utils.AplicationService;
+import com.example.utils.JsonStorage;
+import com.example.utils.UserToken;
+import com.example.utils.Enums.Operation;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import utils.JsonStorage;
-import utils.UserToken;
-import utils.Enums.Operation;
-import utils.AplicationService;
 
 public class UserModel extends JsonStorage<User> {
 

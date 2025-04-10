@@ -1,5 +1,7 @@
 package com.example.model;
 
+import com.example.utils.AplicationService;
+import com.example.utils.JsonStorage;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -7,9 +9,6 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import utils.AplicationService;
-import utils.JsonStorage;
 
 public class MessageModel extends JsonStorage<Message> {
 

@@ -1,4 +1,4 @@
-package utils;
+package com.example.utils;
 
 public class SessionContext {
     // secure place to hold sessionId

@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
+import com.example.utils.UserToken;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,9 +14,30 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import utils.UserToken;
 
 public class ForgotCredentialsScreen extends VBox {
+
+    private void clearFields(PasswordField newPasswordField, PasswordField confirmPasswordField,
+            PasswordField passwordField, TextField emailField) {
+
+        if (passwordField != null) {
+            passwordField.clear();
+        }
+
+        if (newPasswordField != null) {
+            newPasswordField.clear();
+
+        }
+
+        if (confirmPasswordField != null) {
+            confirmPasswordField.clear();
+        }
+
+        if (emailField != null) {
+            emailField.clear();
+        }
+
+    }
 
     private VBox createVbox(UserToken userToken, Label labelError, Label emailLabel, TextField emailField,
             Label emailError, Label passwordLabel, PasswordField passwordField, Label passwordError,
@@ -73,6 +95,7 @@ public class ForgotCredentialsScreen extends VBox {
                 boolean updateSuccess = userController.updateLoggedInAccount(newPasswordField.getText(),
                         confirmPasswordField.getText());
                 if (updateSuccess) {
+                    clearFields(newPasswordField, confirmPasswordField, null, null);
                     screenController.activate("login", stage);
                 } else {
                     labelError.setText("Password update failed, user might not be logged in.");
@@ -81,6 +104,7 @@ public class ForgotCredentialsScreen extends VBox {
                 boolean updateSuccess = userController.updateNotLoggedAccount(emailField.getText(),
                         passwordField.getText(), newPasswordField.getText(), confirmPasswordField.getText());
                 if (updateSuccess) {
+                    clearFields(newPasswordField, confirmPasswordField, passwordField, emailField);
                     screenController.activate("login", stage);
                 } else {
                     labelError.setText("Password update failed, account not found or credentials incorrect.");

@@ -1,4 +1,4 @@
-package utils;
+package com.example.utils;
 
 import com.example.model.User;
 

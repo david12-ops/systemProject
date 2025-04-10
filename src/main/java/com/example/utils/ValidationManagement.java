@@ -1,10 +1,9 @@
-package utils;
+package com.example.utils;
 
 import java.util.List;
 
 import com.example.model.User;
-
-import utils.Enums.Operation;
+import com.example.utils.Enums.Operation;
 
 public interface ValidationManagement {
 

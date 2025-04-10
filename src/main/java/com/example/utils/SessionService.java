@@ -1,4 +1,4 @@
-package utils;
+package com.example.utils;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;

@@ -1,11 +1,13 @@
 package com.example.view;
 
+import com.example.components.AppBar;
 import com.example.constroller.MessageController;
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
 import com.example.model.Message;
+import com.example.utils.UserToken;
+import com.example.utils.Enums.MessageType;
 
-import components.AppBar;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -17,8 +19,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
-import utils.UserToken;
-import utils.Enums.MessageType;
 
 public class MainScreen extends BorderPane {
 
