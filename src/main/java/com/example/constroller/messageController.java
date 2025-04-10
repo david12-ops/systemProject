@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.example.model.Message;
 import com.example.model.MessageModel;
-import com.example.utils.UserToken;
-import com.example.utils.Enums.MessageType;
+import com.example.model.UserToken;
+import com.example.utils.enums.MessageType;
 
 public class MessageController {
     private MessageModel model;

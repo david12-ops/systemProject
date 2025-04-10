@@ -1,4 +1,4 @@
-package com.example.utils;
+package com.example.model;
 
 public class UserToken {
 

@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
-import com.example.utils.UserToken;
+import com.example.model.UserToken;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

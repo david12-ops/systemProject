@@ -7,10 +7,9 @@ import java.util.List;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-import com.example.utils.AplicationService;
 import com.example.utils.JsonStorage;
-import com.example.utils.UserToken;
-import com.example.utils.Enums.Operation;
+import com.example.utils.enums.Operation;
+import com.example.utils.services.AplicationService;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.github.cdimascio.dotenv.Dotenv;

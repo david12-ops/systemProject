@@ -1,7 +1,7 @@
 package com.example.model;
 
-import com.example.utils.AplicationService;
 import com.example.utils.JsonStorage;
+import com.example.utils.services.AplicationService;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -12,7 +12,6 @@ import java.util.List;
 
 public class MessageModel extends JsonStorage<Message> {
 
-    // Validation of length is missing (maybe not necessary)
     static Dotenv dotenv = Dotenv.load();
 
     private HashMap<String, String> errorMap = new HashMap<>();

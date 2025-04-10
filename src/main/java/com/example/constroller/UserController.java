@@ -8,12 +8,12 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import com.example.model.User;
 import com.example.model.UserModel;
-import com.example.utils.AuthManagement;
+import com.example.model.UserToken;
 import com.example.utils.ImageConvertor;
-import com.example.utils.SessionContext;
-import com.example.utils.SessionService;
-import com.example.utils.UserManagement;
-import com.example.utils.UserToken;
+import com.example.utils.SessionHolder;
+import com.example.utils.interfaces.AuthManagement;
+import com.example.utils.interfaces.UserManagement;
+import com.example.utils.services.SessionService;
 
 import javafx.scene.image.Image;
 
@@ -24,7 +24,6 @@ public class UserController implements AuthManagement, UserManagement {
     // In this user cannot update email adress only password of account
     // TODO - when messages will be done - can add functionality to update email
     // adress of account
-    // TODO - SessionContext and token move to another package (in utils right now)
 
     public UserController(UserModel model) {
         this.model = model;
@@ -53,7 +52,7 @@ public class UserController implements AuthManagement, UserManagement {
         if (user != null && BCrypt.checkpw(password, user.getPassword())) {
             if (!this.service.isUserLoggedIn(user.getId())) {
                 String sessionId = this.service.createSessionId(user);
-                SessionContext.setSessionId(sessionId);
+                SessionHolder.setSessionId(sessionId);
             }
         }
     }
@@ -70,17 +69,17 @@ public class UserController implements AuthManagement, UserManagement {
 
     @Override
     public void logOut() {
-        String sessionId = SessionContext.getSessionId();
+        String sessionId = SessionHolder.getSessionId();
         if (sessionId != null) {
             this.service.removeSession(sessionId);
-            SessionContext.clear();
+            SessionHolder.clear();
         }
     }
 
     @Override
     public UserToken getLoggedUser() {
         try {
-            String sessionId = SessionContext.getSessionId();
+            String sessionId = SessionHolder.getSessionId();
             if (sessionId != null && !sessionId.isBlank()) {
                 return this.service.getUserBySessionId(sessionId);
             }

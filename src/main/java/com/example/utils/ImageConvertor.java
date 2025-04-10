@@ -9,6 +9,9 @@ import javafx.scene.image.Image;
 
 public class ImageConvertor {
 
+    private ImageConvertor() {
+    }
+
     public static String imageToBase64(File file) throws IOException {
         byte[] bytes = Files.readAllBytes(file.toPath());
         return Base64.getEncoder().encodeToString(bytes);

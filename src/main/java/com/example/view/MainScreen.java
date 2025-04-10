@@ -5,8 +5,8 @@ import com.example.constroller.MessageController;
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
 import com.example.model.Message;
-import com.example.utils.UserToken;
-import com.example.utils.Enums.MessageType;
+import com.example.model.UserToken;
+import com.example.utils.enums.MessageType;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

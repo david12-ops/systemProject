@@ -1,4 +1,4 @@
-package com.example.utils;
+package com.example.utils.services;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -8,7 +8,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.example.model.User;
-import com.example.utils.Enums.Operation;
+import com.example.utils.enums.Operation;
+import com.example.utils.interfaces.ErrorManagement;
+import com.example.utils.interfaces.ValidationManagement;
 
 public class AplicationService {
 

@@ -1,6 +1,7 @@
-package com.example.utils;
+package com.example.utils.interfaces;
 
 import com.example.model.User;
+import com.example.model.UserToken;
 
 import javafx.scene.image.Image;
 import java.io.File;

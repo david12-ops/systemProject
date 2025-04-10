@@ -1,9 +1,12 @@
 package com.example.utils;
 
-public class SessionContext {
+public class SessionHolder {
     // secure place to hold sessionId
     private static final ThreadLocal<String> sessionHolder = new ThreadLocal<>();
     // - JavaFX Does Not Guarantee the Same Thread for All Operations
+
+    private SessionHolder() {
+    }
 
     public static void setSessionId(String id) {
         sessionHolder.set(id);

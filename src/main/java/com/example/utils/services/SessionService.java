@@ -1,8 +1,9 @@
-package com.example.utils;
+package com.example.utils.services;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import com.example.model.User;
+import com.example.model.UserToken;
 
 public class SessionService {
     private static SessionService instance;

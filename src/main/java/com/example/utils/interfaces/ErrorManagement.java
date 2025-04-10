@@ -1,4 +1,4 @@
-package com.example.utils;
+package com.example.utils.interfaces;
 
 import java.util.HashMap;
 import java.util.Map.Entry;

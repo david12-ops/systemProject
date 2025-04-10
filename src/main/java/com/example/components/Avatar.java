@@ -1,7 +1,7 @@
 package com.example.components;
 
 import com.example.constroller.UserController;
-import com.example.utils.UserToken;
+import com.example.model.UserToken;
 
 import javafx.scene.image.Image;
 
