@@ -1,12 +1,16 @@
 package com.example.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.UUID;
 
 public class User {
 
     @JsonProperty("user_id")
-    private String id;
+    private final String userId;
+
+    @JsonProperty("group_id")
+    private final String groupId;
 
     @JsonProperty("mailAccount")
     private String mailAccount;
@@ -17,13 +21,22 @@ public class User {
     @JsonProperty("profileImage")
     private String profileImage;
 
-    public User() {
-    }
-
-    public User(String id, String mailAccount, String password) {
+    @JsonCreator
+    public User(@JsonProperty("user_id") String userId, @JsonProperty("group_id") String groupId,
+            @JsonProperty("mailAccount") String mailAccount, @JsonProperty("password") String password,
+            @JsonProperty("profileImage") String profileImage) {
+        this.userId = userId;
+        this.groupId = groupId;
         this.mailAccount = mailAccount;
         this.password = password;
-        this.id = id == null || id.isBlank() ? UUID.randomUUID().toString() : id;
+        this.profileImage = profileImage;
+    }
+
+    public User(String userId, String groupId, String mailAccount, String password) {
+        this.mailAccount = mailAccount;
+        this.password = password;
+        this.userId = (userId == null || userId.isBlank()) ? UUID.randomUUID().toString() : userId;
+        this.groupId = (groupId == null || groupId.isBlank()) ? UUID.randomUUID().toString() : groupId;
         this.profileImage = null;
     }
 
@@ -38,11 +51,15 @@ public class User {
         if (obj == null || getClass() != obj.getClass())
             return false;
         User user = (User) obj;
-        return id.equals(user.id);
+        return userId.equals(user.userId);
     }
 
-    public String getId() {
-        return id;
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getGroupId() {
+        return groupId;
     }
 
     public String getMailAccount() {
@@ -67,5 +84,10 @@ public class User {
 
     public void setImage(String image) {
         profileImage = image;
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" + "userId=" + userId + ", email=" + mailAccount + '}';
     }
 }

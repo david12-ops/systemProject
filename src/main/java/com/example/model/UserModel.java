@@ -8,6 +8,7 @@ import java.util.List;
 import org.mindrot.jbcrypt.BCrypt;
 
 import com.example.utils.JsonStorage;
+import com.example.utils.enums.AddTypeOperation;
 import com.example.utils.enums.Operation;
 import com.example.utils.services.AplicationService;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -27,16 +28,29 @@ public class UserModel extends JsonStorage<User> {
         this.listOfUsers = getItems();
     }
 
-    public void addUser(String emailAccount, String password) {
+    public void addUser(String emailAccount, String password, UserToken userToken, AddTypeOperation addTypeOperation) {
         boolean valid = validateData(Operation.CREATE, emailAccount, password);
-        if (valid) {
-            User newUser = new User(null, emailAccount, BCrypt.hashpw(password, BCrypt.gensalt()));
-            addItem(newUser);
+
+        if (addTypeOperation == AddTypeOperation.NEWACCOUNT) {
+            if (valid) {
+                User newUser = new User(null, null, emailAccount, BCrypt.hashpw(password, BCrypt.gensalt()));
+                addItem(newUser);
+            }
+        }
+
+        if (addTypeOperation == AddTypeOperation.ANOTHERACCOUNT) {
+            User loggedUser = getUserByToken(userToken);
+            if (valid && loggedUser != null) {
+                User newUser = new User(loggedUser.getUserId(), loggedUser.getGroupId(), emailAccount,
+                        BCrypt.hashpw(password, BCrypt.gensalt()));
+                addItem(newUser);
+            }
         }
     }
 
     public void removeUser(UserToken userToken, User user) {
-        if (userToken != null && !userToken.getEmail().equals(user.getMailAccount())) {
+        User loggedUser = getUserByToken(userToken);
+        if (loggedUser != null && !loggedUser.getMailAccount().equals(user.getMailAccount())) {
             removeItem(user);
         } else {
             service.getErrHandler().logError(
@@ -46,31 +60,32 @@ public class UserModel extends JsonStorage<User> {
 
     public void updateUser(UserToken userToken, String newPassword, String confirmationPassword) {
 
-        if (userToken != null) {
-            if (service.getValidationHandler().confirmedPassword(newPassword, confirmationPassword)) {
+        if (service.getValidationHandler().confirmedPassword(newPassword, confirmationPassword)) {
 
-                // try {
-                // User foundUser = listOfUsers.stream().filter(user ->
-                // user.getId().equals(userToken.getId())
-                // && user.getMailAccount().equals(userToken.getEmail())).findFirst().get();
+            // try {
+            // User foundUser = listOfUsers.stream().filter(user ->
+            // user.getId().equals(userToken.getId())
+            // && user.getMailAccount().equals(userToken.getEmail())).findFirst().get();
 
-                User foundUser = getUserByToken(userToken);
+            User foundUser = getUserByToken(userToken);
 
+            if (foundUser != null) {
                 if (confirmationPassword.equals(foundUser.getPassword())) {
                     service.getErrHandler().logError(new AbstractMap.SimpleEntry<>("confirmPassword",
                             "New password have to be different then old password"));
                 } else {
-                    if (foundUser != null) {
-                        User updatedUser = new User(foundUser.getId(), foundUser.getMailAccount(),
-                                BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
+                    User updatedUser = new User(foundUser.getUserId(), foundUser.getGroupId(),
+                            foundUser.getMailAccount(), BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
-                        updateItem(foundUser, updatedUser);
-                    }
+                    updateItem(foundUser, updatedUser);
+
                 }
-                // } catch (Exception e) {
-                // System.out.println(e.getMessage());
-                // }
             }
+
+            // } catch (Exception e) {
+            // System.out.println(e.getMessage());
+            // }
+
         }
     }
 
@@ -83,7 +98,7 @@ public class UserModel extends JsonStorage<User> {
                     service.getErrHandler().logError(new AbstractMap.SimpleEntry<>("confirmPassword",
                             "New password have to be different then old password"));
                 } else {
-                    User updatedUser = new User(user.getId(), user.getMailAccount(),
+                    User updatedUser = new User(user.getUserId(), user.getGroupId(), user.getMailAccount(),
                             BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
                     updateItem(user, updatedUser);
@@ -93,12 +108,10 @@ public class UserModel extends JsonStorage<User> {
     }
 
     public void updateUser(UserToken userToken, String base64) {
-        if (userToken != null) {
-            User user = getUserByToken(userToken);
-            if (user != null) {
-                user.setImage(base64);
-                updateItem(user, user);
-            }
+        User user = getUserByToken(userToken);
+        if (user != null) {
+            user.setImage(base64);
+            updateItem(user, user);
         }
     }
 
@@ -111,13 +124,13 @@ public class UserModel extends JsonStorage<User> {
         return service.getErrHandler().getErrors();
     }
 
-    public User getUserByCredentials(String email, String password, UserToken userToken) {
+    public User getUserByCredentials(String emailAccount, String password, UserToken userToken) {
         if (this.listOfUsers.size() > 0 && this.listOfUsers != null) {
-            if (email != null && password != null && userToken == null) {
-                return getUserByEmailAndPassword(email, password);
+            if (emailAccount != null && password != null && userToken == null) {
+                return getUserByEmailAndPassword(emailAccount, password);
             }
 
-            if (email == null && password == null && userToken != null) {
+            if (emailAccount == null && password == null && userToken != null) {
                 return getUserByToken(userToken);
             }
 
@@ -137,12 +150,25 @@ public class UserModel extends JsonStorage<User> {
     }
 
     private User getUserByToken(UserToken userToken) {
+        if (userToken == null) {
+            return null;
+        }
+
         for (User user : this.listOfUsers) {
-            if (user.getId().equals(userToken.getId()) && user.getMailAccount().equals(userToken.getEmail())) {
+            if (user.getUserId().equals(userToken.getUserId())
+                    && user.getMailAccount().equals(userToken.getMailAccount())) {
                 return user;
             }
         }
         return null;
+    }
+
+    public List<User> getAllUserAccounts(UserToken userToken) {
+        if (getUserByToken(userToken) == null) {
+            return null;
+        }
+
+        return listOfUsers.stream().filter(user -> user.getGroupId().equals(userToken.getGroupId())).toList();
     }
 
     @Override
