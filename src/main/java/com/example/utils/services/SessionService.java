@@ -28,7 +28,7 @@ public class SessionService {
 
     public String createSessionId(User user) {
         String sessionId = UUID.randomUUID().toString();
-        this.activeSessions.put(sessionId, new UserToken(user.getMailAccount(), user.getId()));
+        this.activeSessions.put(sessionId, new UserToken(user.getUserId(), user.getGroupId(), user.getMailAccount()));
         return sessionId;
     }
 
@@ -37,7 +37,7 @@ public class SessionService {
     }
 
     public boolean isUserLoggedIn(String userId) {
-        return this.activeSessions.values().stream().anyMatch(user -> user.getId().equals(userId));
+        return this.activeSessions.values().stream().anyMatch(user -> user.getUserId().equals(userId));
     }
 
     public void clearAllSessions() {

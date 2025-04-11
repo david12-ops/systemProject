@@ -46,13 +46,13 @@ public class AplicationService {
             int atIndex = email.indexOf('@');
             boolean valid = true;
 
-            if (!EMAIL_REGEX.matcher(email).matches()) {
+            if (email == null || !EMAIL_REGEX.matcher(email).matches()) {
                 this.errManager
                         .logError(new AbstractMap.SimpleEntry<>("email", "Provided email is not in correct format"));
                 valid = false;
             }
 
-            if (!PASSWORD_REGEX.matcher(password).matches()) {
+            if (password == null || !PASSWORD_REGEX.matcher(password).matches()) {
                 this.errManager.logError(
                         new AbstractMap.SimpleEntry<>("password", "Provided password is not in correct format"));
                 valid = false;
@@ -72,13 +72,13 @@ public class AplicationService {
         @Override
         public boolean validateMessageData(String sender, String acceptor) {
             boolean valid = true;
-            if (!EMAIL_REGEX.matcher(sender).matches()) {
+            if (sender == null || !EMAIL_REGEX.matcher(sender).matches()) {
                 this.errManager
                         .logError(new AbstractMap.SimpleEntry<>("sender", "Provided sender is not in correct format"));
                 valid = false;
             }
 
-            if (!EMAIL_REGEX.matcher(acceptor).matches()) {
+            if (acceptor == null || !EMAIL_REGEX.matcher(acceptor).matches()) {
                 this.errManager.logError(
                         new AbstractMap.SimpleEntry<>("acceptor", "Provided acceptor is not in correct format"));
                 valid = false;
@@ -110,13 +110,13 @@ public class AplicationService {
 
             boolean valid = true;
 
-            if (!PASSWORD_REGEX.matcher(newPassword).matches()) {
+            if (newPassword == null || !PASSWORD_REGEX.matcher(newPassword).matches()) {
                 this.errManager.logError(
                         new AbstractMap.SimpleEntry<>("newPassword", "Provided password is not in correct format"));
                 valid = false;
             }
 
-            if (!PASSWORD_REGEX.matcher(confirmNewPassword).matches()) {
+            if (confirmNewPassword == null || !PASSWORD_REGEX.matcher(confirmNewPassword).matches()) {
                 this.errManager.logError(
                         new AbstractMap.SimpleEntry<>("confirmPassword", "Provided password is not in correct format"));
                 valid = false;
