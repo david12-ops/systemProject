@@ -22,6 +22,8 @@ public class AppBar extends HBox {
     private final Button logOutButton;
 
     public AppBar(String appTitle) {
+        // Call stage.sizeToScene() after setting the scene - to resize wimdow by
+        // content
         this.setPadding(new Insets(10));
         this.setSpacing(10);
         this.setAlignment(Pos.CENTER_LEFT);
