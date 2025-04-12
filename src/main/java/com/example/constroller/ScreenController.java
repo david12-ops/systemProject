@@ -50,21 +50,28 @@ public class ScreenController {
             switch (name) {
             case "login":
                 stage.setTitle("Log in");
-                stage.setWidth(500);
-                stage.setHeight(550);
+                stage.setWidth(700);
+                stage.setHeight(700);
                 break;
             case "register":
                 stage.setTitle("Registration");
-                stage.setWidth(500);
-                stage.setHeight(400);
+                stage.setWidth(700);
+                stage.setHeight(700);
                 break;
             case "reset":
                 stage.setTitle("Reset Password");
-                stage.setWidth(500);
-                stage.setHeight(650);
+                stage.setWidth(700);
+                stage.setHeight(700);
+                break;
+            case "main":
+                stage.setTitle("Send It!");
+                stage.setWidth(700);
+                stage.setHeight(700);
                 break;
             default:
                 stage.setTitle("Application");
+                stage.setWidth(700);
+                stage.setHeight(700);
             }
         } else {
             throw new IllegalArgumentException("Screen not found: " + name);

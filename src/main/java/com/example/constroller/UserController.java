@@ -19,37 +19,37 @@ import com.example.utils.services.SessionService;
 import javafx.scene.image.Image;
 
 public class UserController implements AuthManagement, UserManagement {
-    private UserModel model;
-    private SessionService service;
+    private UserModel userModel;
+    private SessionService sessionService;
 
     // TODOD - support switching - yes - implement group Id - need gui
     // TODO - app bar - (logo - search bar - Avatar (drop menu) - log out)
 
-    public UserController(UserModel model) {
-        this.model = model;
-        this.service = SessionService.getInstance();
+    public UserController(UserModel userModel) {
+        this.userModel = userModel;
+        this.sessionService = SessionService.getInstance();
     }
 
     private User getUser(String emailAccount, String password, GetUserTypeOperation getUserTypeOperation) {
         if (getUserTypeOperation == GetUserTypeOperation.CURRENT) {
             UserToken userToken = getLoggedUser();
-            return model.getUserByCredentials(null, null, userToken);
+            return userModel.getUserByCredentials(null, null, userToken);
         }
 
         if (getUserTypeOperation == GetUserTypeOperation.BYCREDENTIALS) {
-            return model.getUserByCredentials(emailAccount, password, null);
+            return userModel.getUserByCredentials(emailAccount, password, null);
         }
         return null;
     }
 
     public HashMap<String, String> getInputErrors() {
-        return model.getErrors();
+        return userModel.getErrors();
     }
 
     // Auth
     @Override
     public boolean register(String emailAccount, String password) {
-        model.addUser(emailAccount, password, null, AddTypeOperation.NEWACCOUNT);
+        userModel.addUser(emailAccount, password, null, AddTypeOperation.NEWACCOUNT);
         return getUser(emailAccount, password, GetUserTypeOperation.BYCREDENTIALS) != null ? true : false;
     }
 
@@ -57,8 +57,8 @@ public class UserController implements AuthManagement, UserManagement {
     public void login(String emailAccount, String password) {
         User user = getUser(emailAccount, password, GetUserTypeOperation.BYCREDENTIALS);
 
-        if (user != null && !this.service.isUserLoggedIn(user.getUserId())) {
-            String sessionId = this.service.createSessionId(user);
+        if (user != null && !this.sessionService.isUserLoggedIn(user.getUserId())) {
+            String sessionId = this.sessionService.createSessionId(user);
             SessionHolder.setSessionId(sessionId);
         }
     }
@@ -69,7 +69,7 @@ public class UserController implements AuthManagement, UserManagement {
 
         User foundUser = getUser(emailAccount, password, GetUserTypeOperation.BYCREDENTIALS);
 
-        model.updateUser(foundUser, newPassword, confirmationPassword);
+        userModel.updateUser(foundUser, newPassword, confirmationPassword);
         return getUser(emailAccount, confirmationPassword, GetUserTypeOperation.BYCREDENTIALS) != null ? true : false;
     }
 
@@ -77,7 +77,7 @@ public class UserController implements AuthManagement, UserManagement {
     public void logOut() {
         String sessionId = SessionHolder.getSessionId();
         if (sessionId != null) {
-            this.service.removeSession(sessionId);
+            this.sessionService.removeSession(sessionId);
             SessionHolder.clear();
         }
     }
@@ -87,7 +87,7 @@ public class UserController implements AuthManagement, UserManagement {
         try {
             String sessionId = SessionHolder.getSessionId();
             if (sessionId != null && !sessionId.isBlank()) {
-                return this.service.getUserBySessionId(sessionId);
+                return this.sessionService.getUserBySessionId(sessionId);
             }
             return null;
         } catch (Exception e) {
@@ -110,7 +110,7 @@ public class UserController implements AuthManagement, UserManagement {
     @Override
     public void removeAccount(User user) {
         UserToken userToken = getLoggedUser();
-        model.removeUser(userToken, user);
+        userModel.removeUser(userToken, user);
     }
 
     @Override
@@ -118,18 +118,18 @@ public class UserController implements AuthManagement, UserManagement {
         UserToken userToken = getLoggedUser();
         System.out.println(userToken.getMailAccount());
 
-        model.updateUser(userToken, newPassword, confirmationPassword);
+        userModel.updateUser(userToken, newPassword, confirmationPassword);
         return getUser(userToken.getMailAccount(), confirmationPassword, GetUserTypeOperation.BYCREDENTIALS) != null
                 ? true
                 : false;
     }
 
     @Override
-    public void AddImageProfile(File file) {
+    public void updateImageProfile(File file) {
         try {
             UserToken userToken = getLoggedUser();
             String base64 = ImageConvertor.imageToBase64(file);
-            model.updateUser(userToken, base64);
+            userModel.updateUser(userToken, base64);
         } catch (IOException e) {
             System.err.println("Error converting image: " + e.getMessage());
             // Optionally show Alert dialog here
@@ -139,27 +139,30 @@ public class UserController implements AuthManagement, UserManagement {
     @Override
     public void addAnotherAccount(String emailAccount, String password) {
         UserToken userToken = getLoggedUser();
-        model.addUser(emailAccount, password, userToken, AddTypeOperation.ANOTHERACCOUNT);
+        userModel.addUser(emailAccount, password, userToken, AddTypeOperation.ANOTHERACCOUNT);
     }
 
     @Override
-    public void switchAccount(User switchtoUser) {
+    public boolean switchAccount(User switchtoUser) {
         UserToken userToken = getLoggedUser();
 
         if (userToken != null && switchtoUser != null
                 && !userToken.getMailAccount().equals(switchtoUser.getMailAccount())) {
-            SessionHolder.setSessionId(null);
-            String sessionId = this.service.createSessionId(switchtoUser);
+            logOut();
+            String sessionId = this.sessionService.createSessionId(switchtoUser);
             SessionHolder.setSessionId(sessionId);
+            return true;
 
             // after this view - screenController will reload and active mainScreen with new
             // session
         }
+
+        return false;
     }
 
     @Override
     public List<User> getAllUserAccounts() {
         UserToken userToken = getLoggedUser();
-        return model.getAllUserAccounts(userToken);
+        return userModel.getAllUserAccounts(userToken);
     }
 }

@@ -10,15 +10,15 @@ import com.example.model.UserToken;
 import com.example.utils.enums.MessageType;
 
 public class MessageController {
-    private MessageModel model;
+    private MessageModel messageModel;
 
-    public MessageController(MessageModel model) {
-        this.model = model;
+    public MessageController(MessageModel messageModel) {
+        this.messageModel = messageModel;
     }
 
     public void sendMessage(String subject, String message, String senderId, String recevierId) {
         Message newMessage = new Message(null, senderId, recevierId, subject, message, LocalDateTime.now());
-        model.addMesssage(newMessage);
+        messageModel.addMesssage(newMessage);
     }
 
     public void responseToMessage() {
@@ -26,18 +26,18 @@ public class MessageController {
     }
 
     public void removeMessage(Message message) {
-        model.removeMessage(message);
+        messageModel.removeMessage(message);
     }
 
     public List<Message> getMessages(MessageType type, UserToken userToken) {
         List<Message> messages = new ArrayList<>();
 
         if (type == MessageType.SENDED && userToken != null) {
-            messages = model.getAllSendedMessagesByUser(userToken.getUserId());
+            messages = messageModel.getAllSendedMessagesByUser(userToken.getUserId());
         }
 
         if (type == MessageType.RECEVIED && userToken != null) {
-            messages = model.getAllReceviedMessagesByUser(userToken.getUserId());
+            messages = messageModel.getAllReceviedMessagesByUser(userToken.getUserId());
         }
 
         return messages;
