@@ -9,11 +9,11 @@ public interface UserManagement {
 
     void addAnotherAccount(String emailAccount, String password);
 
-    void switchAccount(User switchtoUser);
+    boolean switchAccount(User switchtoUser);
 
     void removeAccount(User user);
 
     boolean updateLoggedInAccount(String newPassword, String confirmationPassword);
 
-    void AddImageProfile(File file) throws IOException;
+    void updateImageProfile(File file) throws IOException;
 }
