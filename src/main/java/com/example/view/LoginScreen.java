@@ -2,6 +2,7 @@ package com.example.view;
 
 import java.util.HashMap;
 
+import com.example.constroller.MessageController;
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
 import com.example.model.UserToken;
@@ -14,9 +15,17 @@ import javafx.stage.Stage;
 
 public class LoginScreen extends VBox {
 
+    private void updateScreens(ScreenController screenController, UserController userController,
+            MessageController messageController, Stage stage) {
+        screenController.updateScreen("main",
+                new MainScreen(stage, screenController, userController, messageController));
+
+        screenController.updateScreen("reset", new ForgotCredentialsScreen(stage, screenController, userController));
+    }
+
     private void loginButtonAction(TextField emailField, PasswordField passwordField, Label emailError,
             Label passwordError, UserController userController, ScreenController screenController,
-            HashMap<String, String> errors, Label labelError, Stage stage) {
+            MessageController messageController, HashMap<String, String> errors, Label labelError, Stage stage) {
 
         boolean valid = true;
 
@@ -46,9 +55,8 @@ public class LoginScreen extends VBox {
             if (userToken != null) {
                 emailField.clear();
                 passwordField.clear();
+                updateScreens(screenController, userController, messageController, stage);
                 screenController.activate("main", stage);
-                screenController.updateScreen("reset",
-                        new ForgotCredentialsScreen(stage, screenController, userController));
             } else {
                 labelError.setText("User not found, invalid email or password");
             }
@@ -73,7 +81,8 @@ public class LoginScreen extends VBox {
         });
     }
 
-    public LoginScreen(Stage stage, ScreenController screenController, UserController userController) {
+    public LoginScreen(Stage stage, ScreenController screenController, UserController userController,
+            MessageController messageController) {
 
         HashMap<String, String> errors = userController.getInputErrors();
 
@@ -96,7 +105,7 @@ public class LoginScreen extends VBox {
         loginButton.getStyleClass().add("button");
         loginButton.setOnAction(event -> {
             loginButtonAction(emailField, passwordField, emailError, passwordError, userController, screenController,
-                    errors, labelError, stage);
+                    messageController, errors, labelError, stage);
         });
 
         Hyperlink registerLink = new Hyperlink("Don't have an account? Register");
@@ -113,8 +122,9 @@ public class LoginScreen extends VBox {
         this.setAlignment(Pos.CENTER);
     }
 
-    public static void show(Stage primaryStage, ScreenController screenController, UserController userController) {
-        Scene scene = new Scene(new LoginScreen(primaryStage, screenController, userController));
+    public static void show(Stage primaryStage, ScreenController screenController, UserController userController,
+            MessageController messageController) {
+        Scene scene = new Scene(new LoginScreen(primaryStage, screenController, userController, messageController));
         primaryStage.setScene(scene);
         primaryStage.show();
     }

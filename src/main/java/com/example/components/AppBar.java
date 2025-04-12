@@ -1,44 +1,45 @@
 package com.example.components;
 
-import com.example.constroller.ScreenController;
-import com.example.constroller.UserController;
-import com.example.view.ForgotCredentialsScreen;
+import java.io.File;
 
-import javafx.geometry.Insets;
+import com.example.constroller.UserController;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
 
 public class AppBar extends HBox {
     private final Label title;
-
+    private final Avatar avatar;
     private final Button logOutButton;
 
-    public AppBar(String appTitle) {
-        // Call stage.sizeToScene() after setting the scene - to resize wimdow by
-        // content
-        this.setPadding(new Insets(10));
+    public AppBar(String appTitle, UserController userController) {
         this.setSpacing(10);
         this.setAlignment(Pos.CENTER_LEFT);
-        this.setStyle("-fx-background-color: #2C3E50;");
+        this.getStyleClass().add("appBar");
 
         title = new Label(appTitle);
         title.setTextFill(Color.WHITE);
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        title.getStyleClass().add("title");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
+        avatar = new Avatar(userController);
+        avatar.setImage(userController.getImageProfile());
+
         logOutButton = new Button("Logout");
-        // logOutButton.getStyleClass().add("button");
-        this.getChildren().addAll(title, spacer, logOutButton);
+        logOutButton.getStyleClass().add("button");
+        this.getChildren().addAll(title, spacer, avatar, logOutButton);
+    }
+
+    public void setAvatarImage(Image newImage) {
+        avatar.setImage(newImage);
     }
 
     public Button getLogoutButton() {

@@ -25,7 +25,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         screenController = new ScreenController(null);
 
-        LoginScreen loginScreen = new LoginScreen(primaryStage, screenController, userController);
+        LoginScreen loginScreen = new LoginScreen(primaryStage, screenController, userController, messageController);
         RegisterScreen registerScreen = new RegisterScreen(primaryStage, screenController, userController);
         ForgotCredentialsScreen resetScreen = new ForgotCredentialsScreen(primaryStage, screenController,
                 userController);
@@ -40,6 +40,7 @@ public class Main extends Application {
         screenController.addScreen("main", mainScreen);
 
         scene.getStylesheets().add(getClass().getResource("/styles/form.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/styles/appBar.css").toExternalForm());
 
         screenController.activate("login", primaryStage);
 
