@@ -9,6 +9,7 @@ import com.example.view.ForgotCredentialsScreen;
 import com.example.view.LoginScreen;
 import com.example.view.MainScreen;
 import com.example.view.RegisterScreen;
+import com.example.view.UpdateAvatar;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -30,6 +31,8 @@ public class Main extends Application {
         ForgotCredentialsScreen resetScreen = new ForgotCredentialsScreen(primaryStage, screenController,
                 userController);
         MainScreen mainScreen = new MainScreen(primaryStage, screenController, userController, messageController);
+        UpdateAvatar updateAvatarScreen = new UpdateAvatar(primaryStage, screenController, userController,
+                messageController);
 
         Scene scene = new Scene(loginScreen, 400, 300);
         screenController.setScene(scene);
@@ -38,6 +41,7 @@ public class Main extends Application {
         screenController.addScreen("register", registerScreen);
         screenController.addScreen("reset", resetScreen);
         screenController.addScreen("main", mainScreen);
+        screenController.addScreen("updateAvatarImage", updateAvatarScreen);
 
         scene.getStylesheets().add(getClass().getResource("/styles/form.css").toExternalForm());
         scene.getStylesheets().add(getClass().getResource("/styles/appBar.css").toExternalForm());

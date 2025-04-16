@@ -1,16 +1,10 @@
 package com.example.components;
 
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.input.DragEvent;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.util.function.Consumer;
@@ -18,8 +12,9 @@ import java.util.function.Consumer;
 public class ImageDropZone extends StackPane {
 
     private final ImageView imageView = new ImageView();
+    private Consumer<Image> onImageDropped;
 
-    public ImageDropZone(Consumer<Image> onImageDropped) {
+    public ImageDropZone() {
         setPrefSize(300, 200);
         setStyle("-fx-border-color: #999; -fx-border-width: 2; -fx-border-style: dashed; -fx-alignment: center;");
 
@@ -65,28 +60,12 @@ public class ImageDropZone extends StackPane {
         imageView.setImage(image);
     }
 
-    // MenuBar menuBar = new MenuBar();
-    // Menu fileMenu = new Menu("File");
-    // MenuItem uploadItem = new MenuItem("Upload Image");
+    public void setOnImageDropped(Consumer<Image> handler) {
+        this.onImageDropped = handler;
+    }
 
-    // // File chooser logic
-    // uploadItem.setOnAction(e -> {
-    // FileChooser fileChooser = new FileChooser();
-    // fileChooser.setTitle("Select Image");
-    // fileChooser.getExtensionFilters().addAll(
-    // new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg",
-    // "*.gif")
-    // );
-    // File selectedFile = fileChooser.showOpenDialog(stage);
-    // if (selectedFile != null) {
-    // Image image = new Image(selectedFile.toURI().toString());
-    // // show in ImageView or attach to a message, etc.
-    // }
-    // });
-
-    // fileMenu.getItems().add(uploadItem);
-    // menuBar.getMenus().add(fileMenu);
-
-    // VBox topContainer = new VBox(appBar, menuBar);
-    // this.setTop(topContainer);
+    public void clear() {
+        setImage(null);
+        imageView.setVisible(false);
+    }
 }

@@ -53,6 +53,11 @@ public class ScreenController {
                 stage.setWidth(700);
                 stage.setHeight(700);
                 break;
+            case "updateAvatarImage":
+                stage.setTitle("Avatar Image update");
+                stage.setWidth(700);
+                stage.setHeight(700);
+                break;
             case "register":
                 stage.setTitle("Registration");
                 stage.setWidth(700);
@@ -65,8 +70,7 @@ public class ScreenController {
                 break;
             case "main":
                 stage.setTitle("Send It!");
-                stage.setWidth(700);
-                stage.setHeight(700);
+                stage.setMaximized(true);
                 break;
             default:
                 stage.setTitle("Application");

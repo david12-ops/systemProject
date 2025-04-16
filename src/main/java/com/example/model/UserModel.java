@@ -58,53 +58,57 @@ public class UserModel extends JsonStorage<User> {
         }
     }
 
-    public void updateUser(UserToken userToken, String newPassword, String confirmationPassword) {
+    public boolean updateUser(UserToken userToken, String newPassword, String confirmationPassword) {
 
         if (service.getValidationHandler().confirmedPassword(newPassword, confirmationPassword)) {
-
-            // try {
-            // User foundUser = listOfUsers.stream().filter(user ->
-            // user.getId().equals(userToken.getId())
-            // && user.getMailAccount().equals(userToken.getEmail())).findFirst().get();
 
             User foundUser = getUserByToken(userToken);
 
             if (foundUser != null) {
-                if (confirmationPassword.equals(foundUser.getPassword())) {
+                if (BCrypt.checkpw(confirmationPassword, foundUser.getPassword())) {
                     service.getErrHandler().logError(new AbstractMap.SimpleEntry<>("confirmPassword",
-                            "New password have to be different then old password"));
+                            "New password must be different from the old password"));
+                    return false;
                 } else {
                     User updatedUser = new User(foundUser.getUserId(), foundUser.getGroupId(),
                             foundUser.getMailAccount(), BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
                     updateItem(foundUser, updatedUser);
+                    return getUserByCredentials(updatedUser.getMailAccount(), confirmationPassword, null) != null ? true
+                            : false;
 
                 }
             }
 
-            // } catch (Exception e) {
-            // System.out.println(e.getMessage());
-            // }
-
+            return false;
         }
+
+        return false;
     }
 
-    public void updateUser(User user, String newPassword, String confirmationPassword) {
+    public boolean updateUser(User user, String newPassword, String confirmationPassword) {
 
         if (user != null) {
             if (service.getValidationHandler().confirmedPassword(newPassword, confirmationPassword)) {
 
-                if (confirmationPassword.equals(user.getPassword())) {
+                if (BCrypt.checkpw(confirmationPassword, user.getPassword())) {
                     service.getErrHandler().logError(new AbstractMap.SimpleEntry<>("confirmPassword",
-                            "New password have to be different then old password"));
+                            "New password must be different from the old password"));
+                    return false;
                 } else {
                     User updatedUser = new User(user.getUserId(), user.getGroupId(), user.getMailAccount(),
                             BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
                     updateItem(user, updatedUser);
+                    return getUserByCredentials(updatedUser.getMailAccount(), confirmationPassword, null) != null ? true
+                            : false;
                 }
             }
+
+            return false;
         }
+
+        return false;
     }
 
     public void updateUser(UserToken userToken, String base64) {

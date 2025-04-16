@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -42,13 +43,13 @@ public class ForgotCredentialsScreen extends VBox {
     private VBox createVbox(UserToken userToken, Label labelError, Label emailLabel, TextField emailField,
             Label emailError, Label passwordLabel, PasswordField passwordField, Label passwordError,
             Label newPasswordLabel, PasswordField newPasswordField, Label newPasswordError, Label confirmPasswordLabel,
-            PasswordField confirmPasswordField, Label confirmPasswordError, Button resetButton, Button backButton) {
+            PasswordField confirmPasswordField, Label confirmPasswordError, HBox buttonBox) {
         return userToken != null
                 ? new VBox(5, labelError, newPasswordLabel, newPasswordField, newPasswordError, confirmPasswordLabel,
-                        confirmPasswordField, confirmPasswordError, resetButton, backButton)
+                        confirmPasswordField, confirmPasswordError, buttonBox)
                 : new VBox(5, labelError, emailLabel, emailField, emailError, passwordLabel, passwordField,
                         passwordError, newPasswordLabel, newPasswordField, newPasswordError, confirmPasswordLabel,
-                        confirmPasswordField, confirmPasswordError, resetButton, backButton);
+                        confirmPasswordField, confirmPasswordError, buttonBox);
     }
 
     private void resetButtonAction(Stage stage, TextField emailField, PasswordField passwordField,
@@ -58,6 +59,7 @@ public class ForgotCredentialsScreen extends VBox {
 
         boolean valid = true;
 
+        // TODO - bug - after second click errors from input appears
         if (userToken == null) {
             if (emailField.getText().isBlank()) {
                 emailError.setText("Email is required");
@@ -73,22 +75,24 @@ public class ForgotCredentialsScreen extends VBox {
         if (newPasswordField.getText().isBlank()) {
             newPasswordError.setText("New password is required");
             valid = false;
-        } else {
-            if (errors.get("password") != null) {
-                newPasswordError.setText(errors.get("password"));
-                valid = false;
-            }
+        }
+
+        if (errors.get("password") != null) {
+            newPasswordError.setText(errors.get("password"));
+            valid = false;
         }
 
         if (confirmPasswordField.getText().isBlank()) {
             confirmPasswordError.setText("Confirmation password is required");
             valid = false;
-        } else {
-            if (errors.get("confirmPassword") != null) {
-                confirmPasswordError.setText(errors.get("confirmPassword"));
-                valid = false;
-            }
         }
+
+        if (errors.get("confirmPassword") != null) {
+            confirmPasswordError.setText(errors.get("confirmPassword"));
+            valid = false;
+        }
+
+        System.out.println("hejjj" + " " + valid);
 
         if (valid) {
             if (userToken != null) {
@@ -96,6 +100,7 @@ public class ForgotCredentialsScreen extends VBox {
                         confirmPasswordField.getText());
                 if (updateSuccess) {
                     clearFields(newPasswordField, confirmPasswordField, null, null);
+                    userController.logOut();
                     screenController.activate("login", stage);
                 } else {
                     labelError.setText("Password update failed, user might not be logged in.");
@@ -190,12 +195,19 @@ public class ForgotCredentialsScreen extends VBox {
         Button backButton = new Button("Back");
         backButton.getStyleClass().add("button");
         backButton.setOnAction(event -> {
-            screenController.activate("login", stage);
+            if (userToken != null) {
+                screenController.activate("main", stage);
+            } else {
+                screenController.activate("login", stage);
+            }
         });
+
+        HBox buttonBox = new HBox(20, backButton, resetButton);
+        buttonBox.setAlignment(Pos.CENTER);
 
         VBox form = createVbox(userToken, labelError, emailLabel, emailField, emailError, passwordLabel, passwordField,
                 passwordError, newPasswordLabel, newPasswordField, newPasswordError, confirmPasswordLabel,
-                confirmPasswordField, confirmPasswordError, resetButton, backButton);
+                confirmPasswordField, confirmPasswordError, buttonBox);
 
         form.setAlignment(Pos.CENTER);
 

@@ -1,7 +1,6 @@
 package com.example.components;
 
-import java.io.File;
-
+import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
 
 import javafx.geometry.Pos;
@@ -12,13 +11,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 public class AppBar extends HBox {
     private final Label title;
     private final Avatar avatar;
     private final Button logOutButton;
+    private final Button burgerButton;
 
-    public AppBar(String appTitle, UserController userController) {
+    public AppBar(Stage stage, String appTitle, UserController userController, ScreenController screenController) {
         this.setSpacing(10);
         this.setAlignment(Pos.CENTER_LEFT);
         this.getStyleClass().add("appBar");
@@ -30,12 +31,15 @@ public class AppBar extends HBox {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        avatar = new Avatar(userController);
-        avatar.setImage(userController.getImageProfile());
+        this.avatar = new Avatar(stage, userController, screenController);
 
         logOutButton = new Button("Logout");
         logOutButton.getStyleClass().add("button");
-        this.getChildren().addAll(title, spacer, avatar, logOutButton);
+
+        burgerButton = new Button("☰");
+        burgerButton.getStyleClass().add("button");
+
+        this.getChildren().addAll(burgerButton, title, spacer, avatar, logOutButton);
     }
 
     public void setAvatarImage(Image newImage) {
@@ -44,6 +48,10 @@ public class AppBar extends HBox {
 
     public Button getLogoutButton() {
         return logOutButton;
+    }
+
+    public Button getBurgerButton() {
+        return burgerButton;
     }
 
     public void setTitle(String newTitle) {

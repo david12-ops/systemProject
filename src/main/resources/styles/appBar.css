@@ -4,8 +4,6 @@
     -fx-font-size: 25px;
 }
 
-.appBarButton {}
-
 .appBar {
     -fx-background-color: rgba(255, 255, 255, 0.971);
     -fx-padding: 10px;

@@ -1,42 +1,37 @@
 package com.example.view;
 
 import com.example.components.AppBar;
-import com.example.components.ImageDropZone;
+import com.example.components.Avatar;
+import com.example.components.SideBar;
 import com.example.constroller.MessageController;
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
 import com.example.model.Message;
 import com.example.model.UserToken;
+import com.example.utils.SessionHolder;
 import com.example.utils.enums.MessageType;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
+
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainScreen extends BorderPane {
-
+public class MainScreen extends VBox {
     // TODO - styling
-    // TODO - drop down menu
 
     public MainScreen(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
-
         UserToken userToken = userController.getLoggedUser();
 
         List<Message> receviedMessages = messageController.getMessages(MessageType.RECEVIED, userToken);
@@ -56,7 +51,8 @@ public class MainScreen extends BorderPane {
         ObservableList<Message> items = FXCollections.observableList(receviedMessages);
         ListView<String> listView = new ListView(items);
 
-        AppBar appBar = new AppBar("Send It!", userController);
+        AppBar appBar = new AppBar(stage, "Send It!", userController, screenController);
+        appBar.setAvatarImage(userController.getImageProfile());
         appBar.getLogoutButton().setOnAction(event -> {
             userController.logOut();
             screenController.updateScreen("reset",
@@ -64,18 +60,33 @@ public class MainScreen extends BorderPane {
             screenController.activate("login", stage);
         });
 
-        ImageDropZone dropZone = new ImageDropZone(image -> {
-            try {
-                File file = new File(new java.net.URI(image.getUrl()));
-                userController.updateImageProfile(file);
-                appBar.setAvatarImage(userController.getImageProfile());
-            } catch (Exception ex) {
-                ex.printStackTrace();
+        SideBar sideBar = new SideBar();
+
+        appBar.getBurgerButton().setOnAction(e -> {
+            if (sideBar.isVisible()) {
+                sideBar.setVisible(false);
+                sideBar.setManaged(false);
+            } else {
+                sideBar.setVisible(true);
+                sideBar.setManaged(true);
             }
         });
 
-        VBox topContainer = new VBox(appBar, dropZone);
-        this.setTop(topContainer);
+        Button button = new Button("Update profile");
+        button.setOnAction(event -> {
+            screenController.activate("updateAvatarImage", stage);
+        });
+
+        VBox contentBox = new VBox(20, button, listView);
+        contentBox.setAlignment(Pos.TOP_CENTER);
+        contentBox.setSpacing(20);
+
+        HBox mainContent = new HBox(sideBar, contentBox);
+        mainContent.setAlignment(Pos.TOP_LEFT);
+
+        this.getChildren().addAll(appBar, mainContent);
+        this.setSpacing(0);
+
     }
 
     public static void show(Stage primaryStage, ScreenController screenController, UserController userController,

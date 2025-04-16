@@ -23,7 +23,6 @@ public class UserController implements AuthManagement, UserManagement {
     private SessionService sessionService;
 
     // TODOD - support switching - yes - implement group Id - need gui
-    // TODO - app bar - (logo - search bar - Avatar (drop menu) - log out)
 
     public UserController(UserModel userModel) {
         this.userModel = userModel;
@@ -69,8 +68,7 @@ public class UserController implements AuthManagement, UserManagement {
 
         User foundUser = getUser(emailAccount, password, GetUserTypeOperation.BYCREDENTIALS);
 
-        userModel.updateUser(foundUser, newPassword, confirmationPassword);
-        return getUser(emailAccount, confirmationPassword, GetUserTypeOperation.BYCREDENTIALS) != null ? true : false;
+        return userModel.updateUser(foundUser, newPassword, confirmationPassword);
     }
 
     @Override
@@ -116,23 +114,22 @@ public class UserController implements AuthManagement, UserManagement {
     @Override
     public boolean updateLoggedInAccount(String newPassword, String confirmationPassword) {
         UserToken userToken = getLoggedUser();
-        System.out.println(userToken.getMailAccount());
-
-        userModel.updateUser(userToken, newPassword, confirmationPassword);
-        return getUser(userToken.getMailAccount(), confirmationPassword, GetUserTypeOperation.BYCREDENTIALS) != null
-                ? true
-                : false;
+        return userModel.updateUser(userToken, newPassword, confirmationPassword);
     }
 
     @Override
     public void updateImageProfile(File file) {
         try {
             UserToken userToken = getLoggedUser();
-            String base64 = ImageConvertor.imageToBase64(file);
-            userModel.updateUser(userToken, base64);
+            if (file == null) {
+                userModel.updateUser(userToken, null);
+
+            } else {
+                String base64 = ImageConvertor.imageToBase64(file);
+                userModel.updateUser(userToken, base64);
+            }
         } catch (IOException e) {
             System.err.println("Error converting image: " + e.getMessage());
-            // Optionally show Alert dialog here
         }
     }
 
