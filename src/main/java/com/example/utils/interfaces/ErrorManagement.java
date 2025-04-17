@@ -1,6 +1,5 @@
 package com.example.utils.interfaces;
 
-import java.util.HashMap;
 import java.util.Map.Entry;
 
 public interface ErrorManagement {
@@ -9,8 +8,7 @@ public interface ErrorManagement {
 
     boolean retryOperation(Runnable operation, int maxRetries);
 
-    HashMap<String, String> getErrors();
+    void removeError(String errorName);
 
-    void clearErrorList();
-
+    String getError(String errorName);
 }
