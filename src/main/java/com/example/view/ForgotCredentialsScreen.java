@@ -1,10 +1,9 @@
 package com.example.view;
 
-import java.util.HashMap;
-
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
 import com.example.model.UserToken;
+import com.example.utils.interfaces.ErrorManagement;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -19,24 +18,34 @@ import javafx.stage.Stage;
 public class ForgotCredentialsScreen extends VBox {
 
     private void clearFields(PasswordField newPasswordField, PasswordField confirmPasswordField,
-            PasswordField passwordField, TextField emailField) {
+            PasswordField passwordField, TextField emailField, ErrorManagement errorHandler, Label emailError,
+            Label passwordError, Label newPasswordError, Label confirmPasswordError, Label labelError) {
 
-        if (passwordField != null) {
+        if (passwordError != null && passwordField != null) {
             passwordField.clear();
+            passwordError.setText("");
+            errorHandler.removeError("password");
         }
 
-        if (newPasswordField != null) {
+        if (newPasswordError != null && newPasswordField != null) {
             newPasswordField.clear();
-
+            newPasswordError.setText("");
+            errorHandler.removeError("newPassword");
         }
 
-        if (confirmPasswordField != null) {
+        if (confirmPasswordError != null && confirmPasswordField != null) {
             confirmPasswordField.clear();
+            confirmPasswordError.setText("");
+            errorHandler.removeError("confirmPassword");
         }
 
-        if (emailField != null) {
+        if (emailError != null && emailField != null) {
             emailField.clear();
+            emailError.setText("");
+            errorHandler.removeError("email");
         }
+
+        labelError.setText("");
 
     }
 
@@ -55,72 +64,95 @@ public class ForgotCredentialsScreen extends VBox {
     private void resetButtonAction(Stage stage, TextField emailField, PasswordField passwordField,
             PasswordField newPasswordField, PasswordField confirmPasswordField, Label emailError, Label passwordError,
             Label newPasswordError, Label confirmPasswordError, UserController userController,
-            ScreenController screenController, Label labelError, HashMap<String, String> errors, UserToken userToken) {
+            ScreenController screenController, Label labelError, ErrorManagement errorHandler, UserToken userToken) {
 
+        boolean isBlankField = false;
         boolean valid = true;
 
-        // TODO - bug - after second click errors from input appears
         if (userToken == null) {
             if (emailField.getText().isBlank()) {
                 emailError.setText("Email is required");
+                isBlankField = true;
                 valid = false;
             }
 
             if (passwordField.getText().isBlank()) {
                 passwordError.setText("Current password is required");
+                isBlankField = true;
                 valid = false;
             }
         }
 
         if (newPasswordField.getText().isBlank()) {
             newPasswordError.setText("New password is required");
-            valid = false;
-        }
-
-        if (errors.get("password") != null) {
-            newPasswordError.setText(errors.get("password"));
+            isBlankField = true;
             valid = false;
         }
 
         if (confirmPasswordField.getText().isBlank()) {
             confirmPasswordError.setText("Confirmation password is required");
+            isBlankField = true;
             valid = false;
         }
 
-        if (errors.get("confirmPassword") != null) {
-            confirmPasswordError.setText(errors.get("confirmPassword"));
-            valid = false;
-        }
+        if (userToken != null) {
+            boolean updateSuccess = userController.updateLoggedInAccount(newPasswordField.getText(),
+                    confirmPasswordField.getText());
 
-        System.out.println("hejjj" + " " + valid);
+            if (!isBlankField && errorHandler.getError("newPassword") != null) {
+                newPasswordError.setText(errorHandler.getError("newPassword"));
+                isBlankField = false;
+                valid = false;
+            }
 
-        if (valid) {
-            if (userToken != null) {
-                boolean updateSuccess = userController.updateLoggedInAccount(newPasswordField.getText(),
-                        confirmPasswordField.getText());
-                if (updateSuccess) {
-                    clearFields(newPasswordField, confirmPasswordField, null, null);
-                    userController.logOut();
-                    screenController.activate("login", stage);
-                } else {
-                    labelError.setText("Password update failed, user might not be logged in.");
-                }
-            } else {
-                boolean updateSuccess = userController.updateNotLoggedAccount(emailField.getText(),
-                        passwordField.getText(), newPasswordField.getText(), confirmPasswordField.getText());
-                if (updateSuccess) {
-                    clearFields(newPasswordField, confirmPasswordField, passwordField, emailField);
-                    screenController.activate("login", stage);
-                } else {
-                    labelError.setText("Password update failed, account not found or credentials incorrect.");
-                }
+            if (!isBlankField && errorHandler.getError("confirmPassword") != null) {
+                confirmPasswordError.setText(errorHandler.getError("confirmPassword"));
+                isBlankField = false;
+                valid = false;
+            }
+
+            if (valid && updateSuccess) {
+                clearFields(newPasswordField, confirmPasswordField, null, null, errorHandler, null, null,
+                        newPasswordError, confirmPasswordError, labelError);
+                userController.logOut();
+                screenController.activate("login", stage);
+            }
+
+            if (valid && !updateSuccess) {
+                labelError.setText("Password update failed, user might not be logged in.");
+            }
+        } else {
+            boolean updateSuccess = userController.updateNotLoggedAccount(emailField.getText(), passwordField.getText(),
+                    newPasswordField.getText(), confirmPasswordField.getText());
+
+            if (!isBlankField && errorHandler.getError("newPassword") != null) {
+                newPasswordError.setText(errorHandler.getError("newPassword"));
+                isBlankField = false;
+                valid = false;
+            }
+
+            if (!isBlankField && errorHandler.getError("confirmPassword") != null) {
+                confirmPasswordError.setText(errorHandler.getError("confirmPassword"));
+                isBlankField = false;
+                valid = false;
+            }
+
+            if (valid && updateSuccess) {
+                clearFields(newPasswordField, confirmPasswordField, passwordField, emailField, errorHandler, emailError,
+                        passwordError, newPasswordError, confirmPasswordError, labelError);
+                screenController.activate("login", stage);
+            }
+
+            if (valid && !updateSuccess) {
+                labelError.setText("Password update failed, user might not be logged in.");
             }
         }
+
     }
 
     private void onchangeInitialize(TextField emailField, PasswordField passwordField, PasswordField newPasswordField,
             PasswordField confirmPasswordField, Label emailError, Label passwordError, Label newPasswordError,
-            Label confirmPasswordError, Label labelError, HashMap<String, String> errors) {
+            Label confirmPasswordError, Label labelError, ErrorManagement errorHandler) {
         emailField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
                 labelError.setText("");
@@ -139,8 +171,8 @@ public class ForgotCredentialsScreen extends VBox {
             if (!newValue.isBlank()) {
                 newPasswordError.setText("");
                 labelError.setText("");
-                errors.remove("newPassword");
-                errors.remove("confirmPassword");
+                errorHandler.removeError("newPassword");
+                errorHandler.removeError("confirmPassword");
             }
         });
 
@@ -148,14 +180,14 @@ public class ForgotCredentialsScreen extends VBox {
             if (!newValue.isBlank()) {
                 confirmPasswordError.setText("");
                 labelError.setText("");
-                errors.remove("confirmPassword");
+                errorHandler.removeError("confirmPassword");
             }
         });
     }
 
     public ForgotCredentialsScreen(Stage stage, ScreenController screenController, UserController userController) {
 
-        HashMap<String, String> errors = userController.getInputErrors();
+        ErrorManagement errorHandler = userController.getErrorHandler();
         UserToken userToken = userController.getLoggedUser();
 
         Label labelError = new Label();
@@ -182,22 +214,26 @@ public class ForgotCredentialsScreen extends VBox {
         confirmPasswordError.getStyleClass().add("error-label");
 
         onchangeInitialize(emailField, passwordField, newPasswordField, confirmPasswordField, emailError, passwordError,
-                newPasswordError, confirmPasswordError, labelError, errors);
+                newPasswordError, confirmPasswordError, labelError, errorHandler);
 
         Button resetButton = new Button("Reset");
         resetButton.getStyleClass().add("button");
         resetButton.setOnAction(event -> {
             resetButtonAction(stage, emailField, passwordField, newPasswordField, confirmPasswordField, emailError,
                     passwordError, newPasswordError, confirmPasswordError, userController, screenController, labelError,
-                    errors, userToken);
+                    errorHandler, userToken);
         });
 
         Button backButton = new Button("Back");
         backButton.getStyleClass().add("button");
         backButton.setOnAction(event -> {
             if (userToken != null) {
+                clearFields(newPasswordField, confirmPasswordField, null, null, errorHandler, null, null,
+                        newPasswordError, confirmPasswordError, labelError);
                 screenController.activate("main", stage);
             } else {
+                clearFields(newPasswordField, confirmPasswordField, passwordField, emailField, errorHandler, emailError,
+                        passwordError, newPasswordError, confirmPasswordError, labelError);
                 screenController.activate("login", stage);
             }
         });

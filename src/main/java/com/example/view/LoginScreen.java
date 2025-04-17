@@ -1,7 +1,5 @@
 package com.example.view;
 
-import java.util.HashMap;
-
 import com.example.constroller.MessageController;
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
@@ -26,28 +24,18 @@ public class LoginScreen extends VBox {
 
     private void loginButtonAction(TextField emailField, PasswordField passwordField, Label emailError,
             Label passwordError, UserController userController, ScreenController screenController,
-            MessageController messageController, HashMap<String, String> errors, Label labelError, Stage stage) {
+            MessageController messageController, Label labelError, Stage stage) {
 
         boolean valid = true;
 
         if (emailField.getText().isBlank()) {
             emailError.setText("Email is required");
             valid = false;
-        } else {
-            if (errors.get("email") != null) {
-                emailError.setText(errors.get("email"));
-                valid = false;
-            }
         }
 
         if (passwordField.getText().isBlank()) {
             passwordError.setText("Password is required");
             valid = false;
-        } else {
-            if (errors.get("password") != null) {
-                passwordError.setText(errors.get("password"));
-                valid = false;
-            }
         }
 
         if (valid) {
@@ -66,7 +54,7 @@ public class LoginScreen extends VBox {
     }
 
     private void onchangeInitialize(TextField emailField, PasswordField passwordField, Label emailError,
-            Label passwordError, HashMap<String, String> errors, Label labelError) {
+            Label passwordError, Label labelError) {
         emailField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
                 emailError.setText("");
@@ -85,8 +73,6 @@ public class LoginScreen extends VBox {
     public LoginScreen(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
 
-        HashMap<String, String> errors = userController.getInputErrors();
-
         Label labelError = new Label();
         labelError.getStyleClass().add("error-label");
 
@@ -100,13 +86,13 @@ public class LoginScreen extends VBox {
         Label passwordError = new Label();
         passwordError.getStyleClass().add("error-label");
 
-        onchangeInitialize(emailField, passwordField, emailError, passwordError, errors, labelError);
+        onchangeInitialize(emailField, passwordField, emailError, passwordError, labelError);
 
         Button loginButton = new Button("Login");
         loginButton.getStyleClass().add("button");
         loginButton.setOnAction(event -> {
             loginButtonAction(emailField, passwordField, emailError, passwordError, userController, screenController,
-                    messageController, errors, labelError, stage);
+                    messageController, labelError, stage);
         });
 
         Hyperlink registerLink = new Hyperlink("Don't have an account? Register");
