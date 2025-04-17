@@ -143,7 +143,7 @@ public class AplicationService {
 
         @Override
         public void logError(Entry<String, String> error) {
-            this.errorMap.put(error.getKey(), error.getValue());
+            errorMap.put(error.getKey(), error.getValue());
         }
 
         @Override
@@ -161,13 +161,13 @@ public class AplicationService {
         }
 
         @Override
-        public HashMap<String, String> getErrors() {
-            return this.errorMap;
+        public void removeError(String errorName) {
+            errorMap.remove(errorName);
         }
 
         @Override
-        public void clearErrorList() {
-            this.errorMap.clear();
+        public String getError(String errorName) {
+            return errorMap.get(errorName);
         }
 
     }
