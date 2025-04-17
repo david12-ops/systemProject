@@ -2,7 +2,6 @@ package com.example.constroller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 import com.example.model.User;
@@ -13,6 +12,7 @@ import com.example.utils.SessionHolder;
 import com.example.utils.enums.AddTypeOperation;
 import com.example.utils.enums.GetUserTypeOperation;
 import com.example.utils.interfaces.AuthManagement;
+import com.example.utils.interfaces.ErrorManagement;
 import com.example.utils.interfaces.UserManagement;
 import com.example.utils.services.SessionService;
 
@@ -41,8 +41,8 @@ public class UserController implements AuthManagement, UserManagement {
         return null;
     }
 
-    public HashMap<String, String> getInputErrors() {
-        return userModel.getErrors();
+    public ErrorManagement getErrorHandler() {
+        return userModel.getErrorHandler();
     }
 
     // Auth
