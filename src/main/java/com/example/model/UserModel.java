@@ -10,6 +10,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import com.example.utils.JsonStorage;
 import com.example.utils.enums.AddTypeOperation;
 import com.example.utils.enums.Operation;
+import com.example.utils.interfaces.ErrorManagement;
 import com.example.utils.services.AplicationService;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -124,8 +125,8 @@ public class UserModel extends JsonStorage<User> {
                 && service.getValidationHandler().nonDuplicateUserWithEmail(operation, email, this.listOfUsers);
     }
 
-    public HashMap<String, String> getErrors() {
-        return service.getErrHandler().getErrors();
+    public ErrorManagement getErrorHandler() {
+        return service.getErrHandler();
     }
 
     public User getUserByCredentials(String emailAccount, String password, UserToken userToken) {
