@@ -29,8 +29,9 @@ public class UserModel extends JsonStorage<User> {
         this.listOfUsers = getItems();
     }
 
-    public void addUser(String emailAccount, String password, UserToken userToken, AddTypeOperation addTypeOperation) {
-        boolean valid = validateData(Operation.CREATE, emailAccount, password);
+    public void addUser(String emailAccount, String password, String confirmationPassword, UserToken userToken,
+            AddTypeOperation addTypeOperation) {
+        boolean valid = validateData(Operation.CREATE, emailAccount, password, confirmationPassword);
 
         if (addTypeOperation == AddTypeOperation.NEWACCOUNT) {
             if (valid) {
@@ -42,7 +43,7 @@ public class UserModel extends JsonStorage<User> {
         if (addTypeOperation == AddTypeOperation.ANOTHERACCOUNT) {
             User loggedUser = getUserByToken(userToken);
             if (valid && loggedUser != null) {
-                User newUser = new User(loggedUser.getUserId(), loggedUser.getGroupId(), emailAccount,
+                User newUser = new User(null, loggedUser.getGroupId(), emailAccount,
                         BCrypt.hashpw(password, BCrypt.gensalt()));
                 addItem(newUser);
             }
@@ -120,9 +121,11 @@ public class UserModel extends JsonStorage<User> {
         }
     }
 
-    private boolean validateData(Operation operation, String email, String password) {
+    private boolean validateData(Operation operation, String email, String password, String confirmationPassword) {
         return service.getValidationHandler().validateUserData(email, password)
+                && service.getValidationHandler().confirmedPassword(password, confirmationPassword)
                 && service.getValidationHandler().nonDuplicateUserWithEmail(operation, email, this.listOfUsers);
+
     }
 
     public ErrorManagement getErrorHandler() {

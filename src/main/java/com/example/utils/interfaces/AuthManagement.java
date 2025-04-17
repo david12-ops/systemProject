@@ -9,7 +9,7 @@ import javafx.scene.image.Image;
 
 public interface AuthManagement {
 
-    boolean register(String emailAccount, String password);
+    boolean register(String emailAccount, String password, String confirmationPassword);
 
     void login(String emailAccount, String password);
 

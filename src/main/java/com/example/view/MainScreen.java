@@ -29,6 +29,8 @@ import java.util.List;
 
 public class MainScreen extends VBox {
     // TODO - styling
+    // TODO - style switch user page, do functions to switch user
+    // account
 
     public MainScreen(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
@@ -89,12 +91,12 @@ public class MainScreen extends VBox {
 
     }
 
-    public static void show(Stage primaryStage, ScreenController screenController, UserController userController,
+    public static void show(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
-        Scene scene = new Scene(new MainScreen(primaryStage, screenController, userController, messageController));
+        Scene scene = new Scene(new MainScreen(stage, screenController, userController, messageController));
         scene.setFill(Color.WHITE);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        stage.setScene(scene);
+        stage.show();
     }
 
 }

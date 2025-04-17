@@ -68,6 +68,15 @@ public class ScreenController {
                 stage.setWidth(700);
                 stage.setHeight(700);
                 break;
+            case "addAnotherAccount":
+                stage.setTitle("Add another account");
+                stage.setWidth(700);
+                stage.setHeight(700);
+                break;
+            case "switchUser":
+                stage.setTitle("Switch user");
+                stage.setMaximized(true);
+                break;
             case "main":
                 stage.setTitle("Send It!");
                 stage.setMaximized(true);

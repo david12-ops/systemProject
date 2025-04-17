@@ -109,10 +109,10 @@ public class LoginScreen extends VBox {
         this.setAlignment(Pos.CENTER);
     }
 
-    public static void show(Stage primaryStage, ScreenController screenController, UserController userController,
+    public static void show(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
-        Scene scene = new Scene(new LoginScreen(primaryStage, screenController, userController, messageController));
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        Scene scene = new Scene(new LoginScreen(stage, screenController, userController, messageController));
+        stage.setScene(scene);
+        stage.show();
     }
 }

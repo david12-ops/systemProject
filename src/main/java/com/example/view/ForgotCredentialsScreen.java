@@ -251,10 +251,10 @@ public class ForgotCredentialsScreen extends VBox {
         this.setAlignment(Pos.CENTER);
     }
 
-    public static void show(Stage primaryStage, ScreenController screenController, UserController userController) {
-        Scene scene = new Scene(new ForgotCredentialsScreen(primaryStage, screenController, userController));
-        primaryStage.setScene(scene);
-        primaryStage.show();
+    public static void show(Stage stage, ScreenController screenController, UserController userController) {
+        Scene scene = new Scene(new ForgotCredentialsScreen(stage, screenController, userController));
+        stage.setScene(scene);
+        stage.show();
     }
 
 }

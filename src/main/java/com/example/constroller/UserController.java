@@ -47,8 +47,8 @@ public class UserController implements AuthManagement, UserManagement {
 
     // Auth
     @Override
-    public boolean register(String emailAccount, String password) {
-        userModel.addUser(emailAccount, password, null, AddTypeOperation.NEWACCOUNT);
+    public boolean register(String emailAccount, String password, String confirmationPassword) {
+        userModel.addUser(emailAccount, password, confirmationPassword, null, AddTypeOperation.NEWACCOUNT);
         return getUser(emailAccount, password, GetUserTypeOperation.BYCREDENTIALS) != null ? true : false;
     }
 
@@ -134,9 +134,9 @@ public class UserController implements AuthManagement, UserManagement {
     }
 
     @Override
-    public void addAnotherAccount(String emailAccount, String password) {
+    public void addAnotherAccount(String emailAccount, String password, String confirmationPassword) {
         UserToken userToken = getLoggedUser();
-        userModel.addUser(emailAccount, password, userToken, AddTypeOperation.ANOTHERACCOUNT);
+        userModel.addUser(emailAccount, password, confirmationPassword, userToken, AddTypeOperation.ANOTHERACCOUNT);
     }
 
     @Override

@@ -14,10 +14,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class RegisterScreen extends VBox {
+public class AddAnotherAccountScreen extends VBox {
 
-    private void clearFields(Label emailError, Label passwordError, TextField emailField, PasswordField passwordField,
-            PasswordField confirmPasswordField, Label confirmPasswordError, ErrorManagement errorHandler) {
+    private void clearFields(Label emailError, Label passwordError, Label confirmPasswordError, TextField emailField,
+            PasswordField passwordField, PasswordField confirmPasswordField, ErrorManagement errorHandler) {
         emailError.setText("");
         passwordError.setText("");
         emailField.clear();
@@ -29,7 +29,7 @@ public class RegisterScreen extends VBox {
         errorHandler.removeError("password");
     }
 
-    private void registerButtonAction(Stage stage, TextField emailField, PasswordField passwordField,
+    private void addButtonAction(Stage stage, TextField emailField, PasswordField passwordField,
             PasswordField confirmPasswordField, Label confirmPasswordError, Label emailError, Label passwordError,
             UserController userController, ScreenController screenController, ErrorManagement errorHandler,
             Label labelError) {
@@ -55,8 +55,7 @@ public class RegisterScreen extends VBox {
             valid = false;
         }
 
-        boolean registerSuccess = userController.register(emailField.getText(), passwordField.getText(),
-                confirmPasswordField.getText());
+        userController.addAnotherAccount(emailField.getText(), passwordField.getText(), confirmPasswordField.getText());
 
         if (!isBlankField && errorHandler.getError("password") != null) {
             passwordError.setText(errorHandler.getError("password"));
@@ -76,14 +75,10 @@ public class RegisterScreen extends VBox {
             valid = false;
         }
 
-        if (valid && registerSuccess) {
-            clearFields(emailError, passwordError, emailField, passwordField, confirmPasswordField,
-                    confirmPasswordError, errorHandler);
-            screenController.activate("login", stage);
-        }
-
-        if (valid && !registerSuccess) {
-            labelError.setText("Password update failed, user might not be logged in.");
+        if (valid) {
+            clearFields(emailError, passwordError, confirmPasswordError, emailField, passwordField,
+                    confirmPasswordField, errorHandler);
+            screenController.activate("main", stage);
         }
     }
 
@@ -115,8 +110,7 @@ public class RegisterScreen extends VBox {
         });
     }
 
-    public RegisterScreen(Stage stage, ScreenController screenController, UserController userController) {
-
+    public AddAnotherAccountScreen(Stage stage, ScreenController screenController, UserController userController) {
         ErrorManagement errorHandler = userController.getErrorHandler();
 
         Label labelError = new Label();
@@ -132,7 +126,7 @@ public class RegisterScreen extends VBox {
         Label passwordError = new Label();
         passwordError.getStyleClass().add("error-label");
 
-        Label confirmPasswordLabel = new Label("Confirm new password:");
+        Label confirmPasswordLabel = new Label("Confirm password:");
         PasswordField confirmPasswordField = new PasswordField();
         Label confirmPasswordError = new Label();
         confirmPasswordError.getStyleClass().add("error-label");
@@ -140,26 +134,27 @@ public class RegisterScreen extends VBox {
         onchangeInitialize(emailField, passwordField, confirmPasswordField, confirmPasswordError, emailError,
                 passwordError, errorHandler, labelError);
 
-        Button registerButton = new Button("Register");
-        registerButton.getStyleClass().add("button");
-        registerButton.setOnAction(event -> {
-            registerButtonAction(stage, emailField, passwordField, confirmPasswordField, confirmPasswordError,
-                    emailError, passwordError, userController, screenController, errorHandler, labelError);
+        Button addButton = new Button("Add");
+        addButton.getStyleClass().add("button");
+        addButton.setOnAction(e -> {
+            addButtonAction(stage, emailField, passwordField, confirmPasswordField, confirmPasswordError, emailError,
+                    passwordError, userController, screenController, errorHandler, labelError);
         });
 
         Button backButton = new Button("Back");
         backButton.getStyleClass().add("button");
-        backButton.setOnAction(event -> {
-            clearFields(emailError, passwordError, emailField, passwordField, confirmPasswordField,
-                    confirmPasswordError, errorHandler);
-            screenController.activate("login", stage);
+        backButton.setOnAction(e -> {
+            clearFields(emailError, passwordError, confirmPasswordError, emailField, passwordField,
+                    confirmPasswordField, errorHandler);
+            screenController.activate("main", stage);
         });
 
-        HBox buttonBox = new HBox(20, backButton, registerButton);
+        HBox buttonBox = new HBox(20, backButton, addButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        VBox form = new VBox(5, emailLabel, emailField, emailError, passwordLabel, passwordField, passwordError,
-                confirmPasswordLabel, confirmPasswordField, confirmPasswordError, buttonBox);
+        VBox form = new VBox(5, labelError, emailLabel, emailField, emailError, passwordLabel, passwordField,
+                passwordError, confirmPasswordLabel, confirmPasswordField, confirmPasswordError, buttonBox);
+
         form.setAlignment(Pos.CENTER);
 
         this.getChildren().add(form);
@@ -167,8 +162,9 @@ public class RegisterScreen extends VBox {
     }
 
     public static void show(Stage stage, ScreenController screenController, UserController userController) {
-        Scene scene = new Scene(new RegisterScreen(stage, screenController, userController));
+        Scene scene = new Scene(new AddAnotherAccountScreen(stage, screenController, userController));
         stage.setScene(scene);
         stage.show();
     }
+
 }

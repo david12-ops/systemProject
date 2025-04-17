@@ -76,10 +76,10 @@ public class UpdateAvatar extends VBox {
         this.setSpacing(10);
     }
 
-    public static void show(Stage primaryStage, ScreenController screenController, UserController userController,
+    public static void show(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
-        Scene scene = new Scene(new UpdateAvatar(primaryStage, screenController, userController, messageController));
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        Scene scene = new Scene(new UpdateAvatar(stage, screenController, userController, messageController));
+        stage.setScene(scene);
+        stage.show();
     }
 }

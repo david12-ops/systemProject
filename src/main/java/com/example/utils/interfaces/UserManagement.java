@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public interface UserManagement {
 
-    void addAnotherAccount(String emailAccount, String password);
+    void addAnotherAccount(String emailAccount, String password, String confirmationPassword);
 
     boolean switchAccount(User switchtoUser);
 

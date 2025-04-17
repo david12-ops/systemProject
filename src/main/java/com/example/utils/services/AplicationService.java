@@ -47,14 +47,14 @@ public class AplicationService {
             boolean valid = true;
 
             if (email == null || !EMAIL_REGEX.matcher(email).matches()) {
-                this.errManager
-                        .logError(new AbstractMap.SimpleEntry<>("email", "Provided email is not in correct format"));
+                this.errManager.logError(new AbstractMap.SimpleEntry<>("email",
+                        "Please enter a valid email address (e.g., user@example.com)."));
                 valid = false;
             }
 
             if (password == null || !PASSWORD_REGEX.matcher(password).matches()) {
-                this.errManager.logError(
-                        new AbstractMap.SimpleEntry<>("password", "Provided password is not in correct format"));
+                this.errManager.logError(new AbstractMap.SimpleEntry<>("password",
+                        "Password must include uppercase, lowercase, number, and special character, and be at least 8 characters."));
                 valid = false;
             }
 
@@ -73,14 +73,14 @@ public class AplicationService {
         public boolean validateMessageData(String sender, String acceptor) {
             boolean valid = true;
             if (sender == null || !EMAIL_REGEX.matcher(sender).matches()) {
-                this.errManager
-                        .logError(new AbstractMap.SimpleEntry<>("sender", "Provided sender is not in correct format"));
+                this.errManager.logError(new AbstractMap.SimpleEntry<>("sender",
+                        "Please enter a valid email address (e.g., user@example.com)."));
                 valid = false;
             }
 
             if (acceptor == null || !EMAIL_REGEX.matcher(acceptor).matches()) {
-                this.errManager.logError(
-                        new AbstractMap.SimpleEntry<>("acceptor", "Provided acceptor is not in correct format"));
+                this.errManager.logError(new AbstractMap.SimpleEntry<>("acceptor",
+                        "Please enter a valid email address (e.g., user@example.com)."));
                 valid = false;
             }
             return valid;
@@ -111,14 +111,8 @@ public class AplicationService {
             boolean valid = true;
 
             if (newPassword == null || !PASSWORD_REGEX.matcher(newPassword).matches()) {
-                this.errManager.logError(
-                        new AbstractMap.SimpleEntry<>("newPassword", "Provided password is not in correct format"));
-                valid = false;
-            }
-
-            if (confirmNewPassword == null || !PASSWORD_REGEX.matcher(confirmNewPassword).matches()) {
-                this.errManager.logError(
-                        new AbstractMap.SimpleEntry<>("confirmPassword", "Provided password is not in correct format"));
+                this.errManager.logError(new AbstractMap.SimpleEntry<>("newPassword",
+                        "Password must include uppercase, lowercase, number, and special character, and be at least 8 characters."));
                 valid = false;
             }
 

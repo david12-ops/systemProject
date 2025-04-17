@@ -5,10 +5,12 @@ import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
 import com.example.model.MessageModel;
 import com.example.model.UserModel;
+import com.example.view.AddAnotherAccountScreen;
 import com.example.view.ForgotCredentialsScreen;
 import com.example.view.LoginScreen;
 import com.example.view.MainScreen;
 import com.example.view.RegisterScreen;
+import com.example.view.SwitchUserScreen;
 import com.example.view.UpdateAvatar;
 
 import javafx.application.Application;
@@ -30,6 +32,9 @@ public class Main extends Application {
         RegisterScreen registerScreen = new RegisterScreen(primaryStage, screenController, userController);
         ForgotCredentialsScreen resetScreen = new ForgotCredentialsScreen(primaryStage, screenController,
                 userController);
+        AddAnotherAccountScreen anotherAccountScreen = new AddAnotherAccountScreen(primaryStage, screenController,
+                userController);
+        SwitchUserScreen switchUserScreen = new SwitchUserScreen(primaryStage, screenController, userController);
         MainScreen mainScreen = new MainScreen(primaryStage, screenController, userController, messageController);
         UpdateAvatar updateAvatarScreen = new UpdateAvatar(primaryStage, screenController, userController,
                 messageController);
@@ -40,8 +45,10 @@ public class Main extends Application {
         screenController.addScreen("login", loginScreen);
         screenController.addScreen("register", registerScreen);
         screenController.addScreen("reset", resetScreen);
+        screenController.addScreen("addAnotherAccount", anotherAccountScreen);
         screenController.addScreen("main", mainScreen);
         screenController.addScreen("updateAvatarImage", updateAvatarScreen);
+        screenController.addScreen("switchUser", switchUserScreen);
 
         scene.getStylesheets().add(getClass().getResource("/styles/form.css").toExternalForm());
         scene.getStylesheets().add(getClass().getResource("/styles/appBar.css").toExternalForm());
