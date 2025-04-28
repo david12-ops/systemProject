@@ -17,22 +17,21 @@ import javafx.stage.Stage;
 public class AddAnotherAccountScreen extends VBox {
 
     private void clearFields(Label emailError, Label passwordError, Label confirmPasswordError, TextField emailField,
-            PasswordField passwordField, PasswordField confirmPasswordField, ErrorManagement errorHandler) {
+            PasswordField passwordField, PasswordField confirmPasswordField, UserController userController) {
         emailError.setText("");
         passwordError.setText("");
         emailField.clear();
         passwordField.clear();
         confirmPasswordError.setText("");
         confirmPasswordField.setText("");
-        errorHandler.removeError("confirmPassword");
-        errorHandler.removeError("email");
-        errorHandler.removeError("password");
+        userController.clearError("confirmPassword");
+        userController.clearError("email");
+        userController.clearError("password");
     }
 
     private void addButtonAction(Stage stage, TextField emailField, PasswordField passwordField,
             PasswordField confirmPasswordField, Label confirmPasswordError, Label emailError, Label passwordError,
-            UserController userController, ScreenController screenController, ErrorManagement errorHandler,
-            Label labelError) {
+            UserController userController, ScreenController screenController, Label labelError) {
 
         boolean isBlankField = false;
         boolean valid = true;
@@ -57,39 +56,39 @@ public class AddAnotherAccountScreen extends VBox {
 
         userController.addAnotherAccount(emailField.getText(), passwordField.getText(), confirmPasswordField.getText());
 
-        if (!isBlankField && errorHandler.getError("password") != null) {
-            passwordError.setText(errorHandler.getError("password"));
+        if (!isBlankField && userController.getError("password") != null) {
+            passwordError.setText(userController.getError("password"));
             isBlankField = false;
             valid = false;
         }
 
-        if (!isBlankField && errorHandler.getError("confirmPassword") != null) {
-            confirmPasswordError.setText(errorHandler.getError("confirmPassword"));
+        if (!isBlankField && userController.getError("confirmPassword") != null) {
+            confirmPasswordError.setText(userController.getError("confirmPassword"));
             isBlankField = false;
             valid = false;
         }
 
-        if (!isBlankField && errorHandler.getError("email") != null) {
-            emailError.setText(errorHandler.getError("email"));
+        if (!isBlankField && userController.getError("email") != null) {
+            emailError.setText(userController.getError("email"));
             isBlankField = false;
             valid = false;
         }
 
         if (valid) {
             clearFields(emailError, passwordError, confirmPasswordError, emailField, passwordField,
-                    confirmPasswordField, errorHandler);
+                    confirmPasswordField, userController);
             screenController.activate("main", stage);
         }
     }
 
     private void onchangeInitialize(TextField emailField, PasswordField passwordField,
             PasswordField confirmPasswordField, Label confirmPasswordError, Label emailError, Label passwordError,
-            ErrorManagement errorHandler, Label labelError) {
+            UserController userController, Label labelError) {
         emailField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
                 emailError.setText("");
                 labelError.setText("");
-                errorHandler.removeError("email");
+                userController.clearError("email");
             }
         });
 
@@ -97,7 +96,8 @@ public class AddAnotherAccountScreen extends VBox {
             if (!newValue.isBlank()) {
                 passwordError.setText("");
                 labelError.setText("");
-                errorHandler.removeError("password");
+                userController.clearError("password");
+                userController.clearError("confirmPassword");
             }
         });
 
@@ -105,13 +105,12 @@ public class AddAnotherAccountScreen extends VBox {
             if (!newValue.isBlank()) {
                 confirmPasswordError.setText("");
                 labelError.setText("");
-                errorHandler.removeError("confirmPassword");
+                userController.clearError("confirmPassword");
             }
         });
     }
 
     public AddAnotherAccountScreen(Stage stage, ScreenController screenController, UserController userController) {
-        ErrorManagement errorHandler = userController.getErrorHandler();
 
         Label labelError = new Label();
         labelError.getStyleClass().add("error-label");
@@ -132,20 +131,20 @@ public class AddAnotherAccountScreen extends VBox {
         confirmPasswordError.getStyleClass().add("error-label");
 
         onchangeInitialize(emailField, passwordField, confirmPasswordField, confirmPasswordError, emailError,
-                passwordError, errorHandler, labelError);
+                passwordError, userController, labelError);
 
         Button addButton = new Button("Add");
         addButton.getStyleClass().add("button");
         addButton.setOnAction(e -> {
             addButtonAction(stage, emailField, passwordField, confirmPasswordField, confirmPasswordError, emailError,
-                    passwordError, userController, screenController, errorHandler, labelError);
+                    passwordError, userController, screenController, labelError);
         });
 
         Button backButton = new Button("Back");
         backButton.getStyleClass().add("button");
         backButton.setOnAction(e -> {
             clearFields(emailError, passwordError, confirmPasswordError, emailField, passwordField,
-                    confirmPasswordField, errorHandler);
+                    confirmPasswordField, userController);
             screenController.activate("main", stage);
         });
 

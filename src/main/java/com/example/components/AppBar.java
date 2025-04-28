@@ -2,7 +2,6 @@ package com.example.components;
 
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
-import com.example.utils.enums.AvatarCompPosition;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -32,7 +31,8 @@ public class AppBar extends HBox {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        this.avatar = new Avatar(stage, userController, screenController, 20, AvatarCompPosition.APPBAR);
+        this.avatar = new Avatar(stage, userController, screenController);
+        ;
 
         logOutButton = new Button("Logout");
         logOutButton.getStyleClass().add("button");

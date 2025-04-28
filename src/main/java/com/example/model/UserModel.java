@@ -7,11 +7,12 @@ import java.util.List;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import com.example.utils.ErrorToolManager;
 import com.example.utils.JsonStorage;
 import com.example.utils.enums.AddTypeOperation;
 import com.example.utils.enums.Operation;
 import com.example.utils.interfaces.ErrorManagement;
-import com.example.utils.services.AplicationService;
+import com.example.utils.services.ValidationService;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -20,7 +21,8 @@ public class UserModel extends JsonStorage<User> {
 
     static Dotenv dotenv = Dotenv.load();
     private HashMap<String, String> errorMap = new HashMap<>();
-    AplicationService service = AplicationService.getInstance(errorMap);
+    ErrorToolManager errorToolManager = new ErrorToolManager(errorMap);
+    ValidationService validationService = new ValidationService(errorToolManager);
     private List<User> listOfUsers;
 
     public UserModel() {
@@ -55,20 +57,20 @@ public class UserModel extends JsonStorage<User> {
         if (loggedUser != null && !loggedUser.getMailAccount().equals(user.getMailAccount())) {
             removeItem(user);
         } else {
-            service.getErrHandler().logError(
-                    new AbstractMap.SimpleEntry<>("removeAccount", "User is not logged or removing active account"));
+            errorToolManager.logError(
+                    new AbstractMap.SimpleEntry<>("removedAccount", "User is not logged or removing active account"));
         }
     }
 
     public boolean updateUser(UserToken userToken, String newPassword, String confirmationPassword) {
 
-        if (service.getValidationHandler().confirmedPassword(newPassword, confirmationPassword)) {
+        if (validationService.confirmedPassword(newPassword, confirmationPassword)) {
 
             User foundUser = getUserByToken(userToken);
 
             if (foundUser != null) {
                 if (BCrypt.checkpw(confirmationPassword, foundUser.getPassword())) {
-                    service.getErrHandler().logError(new AbstractMap.SimpleEntry<>("confirmPassword",
+                    errorToolManager.logError(new AbstractMap.SimpleEntry<>("confirmPassword",
                             "New password must be different from the old password"));
                     return false;
                 } else {
@@ -91,10 +93,10 @@ public class UserModel extends JsonStorage<User> {
     public boolean updateUser(User user, String newPassword, String confirmationPassword) {
 
         if (user != null) {
-            if (service.getValidationHandler().confirmedPassword(newPassword, confirmationPassword)) {
+            if (validationService.confirmedPassword(newPassword, confirmationPassword)) {
 
                 if (BCrypt.checkpw(confirmationPassword, user.getPassword())) {
-                    service.getErrHandler().logError(new AbstractMap.SimpleEntry<>("confirmPassword",
+                    errorToolManager.logError(new AbstractMap.SimpleEntry<>("confirmPassword",
                             "New password must be different from the old password"));
                     return false;
                 } else {
@@ -122,18 +124,22 @@ public class UserModel extends JsonStorage<User> {
     }
 
     private boolean validateData(Operation operation, String email, String password, String confirmationPassword) {
-        return service.getValidationHandler().validateUserData(email, password)
-                && service.getValidationHandler().confirmedPassword(password, confirmationPassword)
-                && service.getValidationHandler().nonDuplicateUserWithEmail(operation, email, this.listOfUsers);
+        return validationService.validateUserData(email, password)
+                && validationService.confirmedPassword(password, confirmationPassword)
+                && validationService.nonDuplicateUserWithEmail(operation, email, listOfUsers);
 
     }
 
-    public ErrorManagement getErrorHandler() {
-        return service.getErrHandler();
+    public String getError(String errorName) {
+        return errorToolManager.getError(errorName);
+    }
+
+    public void clearError(String errorName) {
+        errorToolManager.removeError(errorName);
     }
 
     public User getUserByCredentials(String emailAccount, String password, UserToken userToken) {
-        if (this.listOfUsers.size() > 0 && this.listOfUsers != null) {
+        if (listOfUsers != null && listOfUsers.size() > 0) {
             if (emailAccount != null && password != null && userToken == null) {
                 return getUserByEmailAndPassword(emailAccount, password);
             }
@@ -149,7 +155,7 @@ public class UserModel extends JsonStorage<User> {
     }
 
     private User getUserByEmailAndPassword(String email, String password) {
-        for (User user : this.listOfUsers) {
+        for (User user : listOfUsers) {
             if (user.getMailAccount().equals(email) && BCrypt.checkpw(password, user.getPassword())) {
                 return user;
             }
@@ -162,7 +168,7 @@ public class UserModel extends JsonStorage<User> {
             return null;
         }
 
-        for (User user : this.listOfUsers) {
+        for (User user : listOfUsers) {
             if (user.getUserId().equals(userToken.getUserId())
                     && user.getMailAccount().equals(userToken.getMailAccount())) {
                 return user;

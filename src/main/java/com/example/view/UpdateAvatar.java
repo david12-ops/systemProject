@@ -2,7 +2,6 @@ package com.example.view;
 
 import java.io.File;
 
-import com.example.components.AppBar;
 import com.example.components.ImageDropZone;
 import com.example.constroller.MessageController;
 import com.example.constroller.ScreenController;
@@ -20,16 +19,6 @@ import javafx.stage.Stage;
 public class UpdateAvatar extends VBox {
     public UpdateAvatar(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
-        AppBar appBar = new AppBar(stage, "Send It!", userController, screenController);
-        appBar.getLogoutButton().setOnAction(event -> {
-            userController.logOut();
-            screenController.updateScreen("reset",
-                    new ForgotCredentialsScreen(stage, screenController, userController));
-            screenController.activate("login", stage);
-        });
-
-        appBar.setAvatarImage(userController.getImageProfile());
-
         Label dropDownLabel = new Label("Drop new image profile");
         dropDownLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
@@ -39,8 +28,11 @@ public class UpdateAvatar extends VBox {
             try {
                 File file = new File(new java.net.URI(image.getUrl()));
                 userController.updateImageProfile(file);
-                appBar.setAvatarImage(userController.getImageProfile());
                 dropZone.clear();
+                screenController.updateScreen("main",
+                        new MainScreen(stage, screenController, userController, messageController));
+                screenController.updateScreen("switchUser",
+                        new SwitchUserScreen(stage, screenController, userController, messageController));
                 screenController.activate("main", stage);
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -51,7 +43,10 @@ public class UpdateAvatar extends VBox {
         defaultButton.getStyleClass().add("button");
         defaultButton.setOnAction(event -> {
             userController.updateImageProfile(null);
-            appBar.setAvatarImage(userController.getImageProfile());
+            screenController.updateScreen("main",
+                    new MainScreen(stage, screenController, userController, messageController));
+            screenController.updateScreen("switchUser",
+                    new SwitchUserScreen(stage, screenController, userController, messageController));
             screenController.activate("main", stage);
         });
 
@@ -71,7 +66,7 @@ public class UpdateAvatar extends VBox {
         imageBox.setAlignment(Pos.CENTER);
         VBox.setVgrow(imageBox, Priority.ALWAYS);
 
-        this.getChildren().addAll(appBar, imageBox);
+        this.getChildren().add(imageBox);
         this.setAlignment(Pos.CENTER);
         this.setSpacing(10);
     }

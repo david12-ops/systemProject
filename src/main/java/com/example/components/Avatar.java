@@ -2,8 +2,9 @@ package com.example.components;
 
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
+import com.example.model.User;
 import com.example.model.UserToken;
-import com.example.utils.enums.AvatarCompPosition;
+import com.example.utils.ImageConvertor;
 import com.example.utils.services.StateEventService;
 
 import javafx.application.Platform;
@@ -23,25 +24,52 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 public class Avatar extends VBox {
-    private final Circle circle;
-    private final String firstLetter;
 
-    public Avatar(Stage stage, UserController userController, ScreenController screenController, Integer size,
-            AvatarCompPosition position) {
+    public Avatar(Stage stage, User user) {
 
-        UserToken currUserToken = userController.getLoggedUser();
-        firstLetter = currUserToken != null ? currUserToken.getMailAccount().substring(0, 1).toUpperCase() : null;
-        Popup dropdown = new Popup();
-        VBox dropdownContent = new VBox(10);
+        Image imgaeProfile = ImageConvertor.Base64ToImage(user.getProfileImage());
+        String firstLetter = user != null ? user.getMailAccount().substring(0, 1).toUpperCase() : null;
 
-        circle = new Circle(size);
+        Circle circle = new Circle(30);
         circle.setStroke(Color.DARKGRAY);
         circle.setFill(Color.CORNFLOWERBLUE);
         circle.setStrokeWidth(2);
 
         Text letter = new Text(firstLetter);
         letter.setFill(Color.WHITE);
-        letter.setFont(Font.font(size));
+        letter.setFont(Font.font(25));
+
+        StackPane avatarStack = new StackPane(circle, letter);
+
+        if (imgaeProfile != null) {
+            circle.setFill(new ImagePattern(imgaeProfile));
+            letter.setVisible(false);
+        } else {
+            circle.setFill(Color.CORNFLOWERBLUE);
+            letter.setVisible(true);
+        }
+
+        this.getChildren().add(avatarStack);
+
+    }
+
+    public Avatar(Stage stage, UserController userController, ScreenController screenController) {
+
+        UserToken currUserToken = userController.getLoggedUser();
+        String firstLetter = currUserToken != null ? currUserToken.getMailAccount().substring(0, 1).toUpperCase()
+                : null;
+
+        Popup dropdown = new Popup();
+        VBox dropdownContent = new VBox(10);
+
+        Circle circle = new Circle(20);
+        circle.setStroke(Color.DARKGRAY);
+        circle.setFill(Color.CORNFLOWERBLUE);
+        circle.setStrokeWidth(2);
+
+        Text letter = new Text(firstLetter);
+        letter.setFill(Color.WHITE);
+        letter.setFont(Font.font(20));
 
         Button switchUserButton = new Button("Switch user");
         switchUserButton.setOnAction(e -> {
@@ -67,46 +95,44 @@ public class Avatar extends VBox {
             screenController.activate("reset", stage);
         });
 
-        if (position == AvatarCompPosition.APPBAR) {
-            dropdownContent.setStyle(
-                    "-fx-background-color: whitesmoke; -fx-border-color: #D8DAC2; -fx-border-radius: 10; -fx-background-radius: 10;");
-            dropdownContent.setPadding(new Insets(10));
+        dropdownContent.setStyle(
+                "-fx-background-color: whitesmoke; -fx-border-color: #D8DAC2; -fx-border-radius: 10; -fx-background-radius: 10;");
+        dropdownContent.setPadding(new Insets(10));
 
-            dropdownContent.getChildren().addAll(addAnotherAccountButton, updateProfileImageButton, switchUserButton,
-                    resetPasswordButton);
-            dropdownContent.setAlignment(Pos.CENTER);
-            dropdown.getContent().add(dropdownContent);
-        }
+        dropdownContent.getChildren().addAll(addAnotherAccountButton, updateProfileImageButton, switchUserButton,
+                resetPasswordButton);
+        dropdownContent.setAlignment(Pos.CENTER);
+        dropdown.getContent().add(dropdownContent);
 
         StackPane avatarStack = new StackPane(circle, letter);
 
-        if (position == AvatarCompPosition.APPBAR) {
-            avatarStack.setOnMouseClicked(e -> {
-                if (dropdown.isShowing()) {
-                    dropdown.hide();
-                } else {
-                    Platform.runLater(() -> {
-                        Bounds avatarBounds = avatarStack.localToScreen(avatarStack.getBoundsInLocal());
-                        double x = avatarBounds.getMinX() + (avatarBounds.getWidth() / 2)
-                                - (dropdownContent.getWidth() / 2);
-                        double y = avatarBounds.getMaxY() + 10;
+        avatarStack.setOnMouseClicked(e -> {
+            if (dropdown.isShowing()) {
+                dropdown.hide();
+            } else {
+                Platform.runLater(() -> {
+                    Bounds avatarBounds = avatarStack.localToScreen(avatarStack.getBoundsInLocal());
+                    double x = avatarBounds.getMinX() + (avatarBounds.getWidth() / 2)
+                            - (dropdownContent.getWidth() / 2);
+                    double y = avatarBounds.getMaxY() + 10;
 
-                        dropdown.show(avatarStack, x, y);
-                    });
-                }
-            });
-        }
+                    dropdown.show(avatarStack, x, y);
+                });
+            }
+        });
 
+        // TODO - didnt update avatar
         StateEventService.getInstance().subscribe("updateAvatar", playload -> {
             if (playload == null || playload instanceof Image) {
-                updateAvatarImage((Image) playload, letter);
+                System.out.println("hejjj more");
+                updateAvatarImage(circle, (Image) playload, letter);
             }
         });
 
         this.getChildren().add(avatarStack);
     }
 
-    private void updateAvatarImage(Image newImage, Text letter) {
+    private void updateAvatarImage(Circle circle, Image newImage, Text letter) {
         if (newImage != null) {
             circle.setFill(new ImagePattern(newImage));
             letter.setVisible(false);

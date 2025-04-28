@@ -74,16 +74,16 @@ public class User {
         return profileImage;
     }
 
-    public void setMailAccount(String newMail) {
-        mailAccount = newMail;
+    public void setMailAccount(String mailAccount) {
+        this.mailAccount = mailAccount;
     }
 
-    public void setPassword(String newPassword) {
-        password = newPassword;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public void setImage(String image) {
-        profileImage = image;
+    public void setImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 
     @Override

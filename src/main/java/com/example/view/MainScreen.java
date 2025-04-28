@@ -2,6 +2,7 @@ package com.example.view;
 
 import com.example.components.AppBar;
 import com.example.components.Avatar;
+import com.example.components.Layout;
 import com.example.components.SideBar;
 import com.example.constroller.MessageController;
 import com.example.constroller.ScreenController;
@@ -27,13 +28,17 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.UIDefaults.LazyInputMap;
+
 public class MainScreen extends VBox {
     // TODO - styling
-    // TODO - style switch user page, do functions to switch user
+    // TODO - style switch user page
+    // TODO - avatar image update bug
     // account
 
     public MainScreen(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
+
         UserToken userToken = userController.getLoggedUser();
 
         List<Message> receviedMessages = messageController.getMessages(MessageType.RECEVIED, userToken);
@@ -53,48 +58,22 @@ public class MainScreen extends VBox {
         ObservableList<Message> items = FXCollections.observableList(receviedMessages);
         ListView<String> listView = new ListView(items);
 
-        AppBar appBar = new AppBar(stage, "Send It!", userController, screenController);
-        appBar.setAvatarImage(userController.getImageProfile());
-        appBar.getLogoutButton().setOnAction(event -> {
-            userController.logOut();
-            screenController.updateScreen("reset",
-                    new ForgotCredentialsScreen(stage, screenController, userController));
-            screenController.activate("login", stage);
-        });
-
-        SideBar sideBar = new SideBar();
-
-        appBar.getBurgerButton().setOnAction(e -> {
-            if (sideBar.isVisible()) {
-                sideBar.setVisible(false);
-                sideBar.setManaged(false);
-            } else {
-                sideBar.setVisible(true);
-                sideBar.setManaged(true);
-            }
-        });
-
         Button button = new Button("Update profile");
         button.setOnAction(event -> {
             screenController.activate("updateAvatarImage", stage);
         });
 
-        VBox contentBox = new VBox(20, button, listView);
-        contentBox.setAlignment(Pos.TOP_CENTER);
-        contentBox.setSpacing(20);
+        VBox mainBox = new VBox(button);
 
-        HBox mainContent = new HBox(sideBar, contentBox);
-        mainContent.setAlignment(Pos.TOP_LEFT);
+        Layout layout = new Layout(stage, mainBox, screenController, userController, messageController);
 
-        this.getChildren().addAll(appBar, mainContent);
-        this.setSpacing(0);
+        this.getChildren().add(layout);
 
     }
 
     public static void show(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
         Scene scene = new Scene(new MainScreen(stage, screenController, userController, messageController));
-        scene.setFill(Color.WHITE);
         stage.setScene(scene);
         stage.show();
     }

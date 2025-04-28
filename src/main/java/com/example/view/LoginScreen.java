@@ -18,8 +18,8 @@ public class LoginScreen extends VBox {
         screenController.updateScreen("main",
                 new MainScreen(stage, screenController, userController, messageController));
         screenController.updateScreen("reset", new ForgotCredentialsScreen(stage, screenController, userController));
-        screenController.updateScreen("updateAvatarImage",
-                new UpdateAvatar(stage, screenController, userController, messageController));
+        screenController.updateScreen("switchUser",
+                new SwitchUserScreen(stage, screenController, userController, messageController));
     }
 
     private void loginButtonAction(TextField emailField, PasswordField passwordField, Label emailError,

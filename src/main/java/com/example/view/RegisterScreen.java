@@ -17,22 +17,21 @@ import javafx.stage.Stage;
 public class RegisterScreen extends VBox {
 
     private void clearFields(Label emailError, Label passwordError, TextField emailField, PasswordField passwordField,
-            PasswordField confirmPasswordField, Label confirmPasswordError, ErrorManagement errorHandler) {
+            PasswordField confirmPasswordField, Label confirmPasswordError, UserController userController) {
         emailError.setText("");
         passwordError.setText("");
         emailField.clear();
         passwordField.clear();
         confirmPasswordError.setText("");
         confirmPasswordField.setText("");
-        errorHandler.removeError("confirmPassword");
-        errorHandler.removeError("email");
-        errorHandler.removeError("password");
+        userController.clearError("confirmPassword");
+        userController.clearError("email");
+        userController.clearError("password");
     }
 
     private void registerButtonAction(Stage stage, TextField emailField, PasswordField passwordField,
             PasswordField confirmPasswordField, Label confirmPasswordError, Label emailError, Label passwordError,
-            UserController userController, ScreenController screenController, ErrorManagement errorHandler,
-            Label labelError) {
+            UserController userController, ScreenController screenController, Label labelError) {
 
         boolean isBlankField = false;
         boolean valid = true;
@@ -58,27 +57,27 @@ public class RegisterScreen extends VBox {
         boolean registerSuccess = userController.register(emailField.getText(), passwordField.getText(),
                 confirmPasswordField.getText());
 
-        if (!isBlankField && errorHandler.getError("password") != null) {
-            passwordError.setText(errorHandler.getError("password"));
+        if (!isBlankField && userController.getError("password") != null) {
+            passwordError.setText(userController.getError("password"));
             isBlankField = false;
             valid = false;
         }
 
-        if (!isBlankField && errorHandler.getError("confirmPassword") != null) {
-            confirmPasswordError.setText(errorHandler.getError("confirmPassword"));
+        if (!isBlankField && userController.getError("confirmPassword") != null) {
+            confirmPasswordError.setText(userController.getError("confirmPassword"));
             isBlankField = false;
             valid = false;
         }
 
-        if (!isBlankField && errorHandler.getError("email") != null) {
-            emailError.setText(errorHandler.getError("email"));
+        if (!isBlankField && userController.getError("email") != null) {
+            emailError.setText(userController.getError("email"));
             isBlankField = false;
             valid = false;
         }
 
         if (valid && registerSuccess) {
             clearFields(emailError, passwordError, emailField, passwordField, confirmPasswordField,
-                    confirmPasswordError, errorHandler);
+                    confirmPasswordError, userController);
             screenController.activate("login", stage);
         }
 
@@ -89,12 +88,12 @@ public class RegisterScreen extends VBox {
 
     private void onchangeInitialize(TextField emailField, PasswordField passwordField,
             PasswordField confirmPasswordField, Label confirmPasswordError, Label emailError, Label passwordError,
-            ErrorManagement errorHandler, Label labelError) {
+            UserController userController, Label labelError) {
         emailField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
                 emailError.setText("");
                 labelError.setText("");
-                errorHandler.removeError("email");
+                userController.clearError("email");
             }
         });
 
@@ -102,7 +101,7 @@ public class RegisterScreen extends VBox {
             if (!newValue.isBlank()) {
                 passwordError.setText("");
                 labelError.setText("");
-                errorHandler.removeError("password");
+                userController.clearError("password");
             }
         });
 
@@ -110,14 +109,12 @@ public class RegisterScreen extends VBox {
             if (!newValue.isBlank()) {
                 confirmPasswordError.setText("");
                 labelError.setText("");
-                errorHandler.removeError("confirmPassword");
+                userController.clearError("confirmPassword");
             }
         });
     }
 
     public RegisterScreen(Stage stage, ScreenController screenController, UserController userController) {
-
-        ErrorManagement errorHandler = userController.getErrorHandler();
 
         Label labelError = new Label();
         labelError.getStyleClass().add("error-label");
@@ -138,20 +135,20 @@ public class RegisterScreen extends VBox {
         confirmPasswordError.getStyleClass().add("error-label");
 
         onchangeInitialize(emailField, passwordField, confirmPasswordField, confirmPasswordError, emailError,
-                passwordError, errorHandler, labelError);
+                passwordError, userController, labelError);
 
         Button registerButton = new Button("Register");
         registerButton.getStyleClass().add("button");
         registerButton.setOnAction(event -> {
             registerButtonAction(stage, emailField, passwordField, confirmPasswordField, confirmPasswordError,
-                    emailError, passwordError, userController, screenController, errorHandler, labelError);
+                    emailError, passwordError, userController, screenController, labelError);
         });
 
         Button backButton = new Button("Back");
         backButton.getStyleClass().add("button");
         backButton.setOnAction(event -> {
             clearFields(emailError, passwordError, emailField, passwordField, confirmPasswordField,
-                    confirmPasswordError, errorHandler);
+                    confirmPasswordError, userController);
             screenController.activate("login", stage);
         });
 

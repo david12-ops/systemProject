@@ -1,7 +1,8 @@
 package com.example.model;
 
+import com.example.utils.ErrorToolManager;
 import com.example.utils.JsonStorage;
-import com.example.utils.services.AplicationService;
+import com.example.utils.services.ValidationService;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -13,9 +14,9 @@ import java.util.List;
 public class MessageModel extends JsonStorage<Message> {
 
     static Dotenv dotenv = Dotenv.load();
-
     private HashMap<String, String> errorMap = new HashMap<>();
-    AplicationService service = AplicationService.getInstance(this.errorMap);
+    ErrorToolManager errorToolManager = new ErrorToolManager(errorMap);
+    ValidationService validationService = new ValidationService(errorToolManager);
     private List<Message> listOfMessages;
 
     public MessageModel() {

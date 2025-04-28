@@ -18,7 +18,18 @@ public class ImageConvertor {
     }
 
     public static Image Base64ToImage(String base64) {
-        byte[] decodedBytes = Base64.getDecoder().decode(base64);
-        return new Image(new ByteArrayInputStream(decodedBytes));
+
+        if (base64 == null || base64.trim().isEmpty()) {
+            return null;
+        }
+
+        try {
+            byte[] decodedBytes = Base64.getDecoder().decode(base64);
+            return new Image(new ByteArrayInputStream(decodedBytes));
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid Base64 string: " + e.getMessage());
+            return null;
+        }
+
     }
 }

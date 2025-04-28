@@ -30,7 +30,7 @@ public class UserController implements AuthManagement, UserManagement {
     }
 
     private User getUser(String emailAccount, String password, GetUserTypeOperation getUserTypeOperation) {
-        if (getUserTypeOperation == GetUserTypeOperation.CURRENT) {
+        if (getUserTypeOperation == GetUserTypeOperation.BYTOKEN) {
             UserToken userToken = getLoggedUser();
             return userModel.getUserByCredentials(null, null, userToken);
         }
@@ -41,8 +41,12 @@ public class UserController implements AuthManagement, UserManagement {
         return null;
     }
 
-    public ErrorManagement getErrorHandler() {
-        return userModel.getErrorHandler();
+    public String getError(String errorName) {
+        return userModel.getError(errorName);
+    }
+
+    public void clearError(String errorName) {
+        userModel.clearError(errorName);
     }
 
     // Auth
@@ -56,8 +60,8 @@ public class UserController implements AuthManagement, UserManagement {
     public void login(String emailAccount, String password) {
         User user = getUser(emailAccount, password, GetUserTypeOperation.BYCREDENTIALS);
 
-        if (user != null && !this.sessionService.isUserLoggedIn(user.getUserId())) {
-            String sessionId = this.sessionService.createSessionId(user);
+        if (user != null && !sessionService.isUserLoggedIn(user.getUserId())) {
+            String sessionId = sessionService.createSessionId(user);
             SessionHolder.setSessionId(sessionId);
         }
     }
@@ -75,7 +79,7 @@ public class UserController implements AuthManagement, UserManagement {
     public void logOut() {
         String sessionId = SessionHolder.getSessionId();
         if (sessionId != null) {
-            this.sessionService.removeSession(sessionId);
+            sessionService.removeSession(sessionId);
             SessionHolder.clear();
         }
     }
@@ -85,7 +89,7 @@ public class UserController implements AuthManagement, UserManagement {
         try {
             String sessionId = SessionHolder.getSessionId();
             if (sessionId != null && !sessionId.isBlank()) {
-                return this.sessionService.getUserBySessionId(sessionId);
+                return sessionService.getUserBySessionId(sessionId);
             }
             return null;
         } catch (Exception e) {
@@ -96,7 +100,7 @@ public class UserController implements AuthManagement, UserManagement {
 
     @Override
     public Image getImageProfile() {
-        User user = getUser(null, null, GetUserTypeOperation.CURRENT);
+        User user = getUser(null, null, GetUserTypeOperation.BYTOKEN);
 
         if (user != null && user.getProfileImage() != null) {
             return ImageConvertor.Base64ToImage(user.getProfileImage());
@@ -146,12 +150,9 @@ public class UserController implements AuthManagement, UserManagement {
         if (userToken != null && switchtoUser != null
                 && !userToken.getMailAccount().equals(switchtoUser.getMailAccount())) {
             logOut();
-            String sessionId = this.sessionService.createSessionId(switchtoUser);
+            String sessionId = sessionService.createSessionId(switchtoUser);
             SessionHolder.setSessionId(sessionId);
             return true;
-
-            // after this view - screenController will reload and active mainScreen with new
-            // session
         }
 
         return false;
@@ -160,6 +161,11 @@ public class UserController implements AuthManagement, UserManagement {
     @Override
     public List<User> getAllUserAccounts() {
         UserToken userToken = getLoggedUser();
-        return userModel.getAllUserAccounts(userToken);
+        List<User> users = userModel.getAllUserAccounts(userToken);
+        if (users != null && users.size() > 0) {
+            return users.stream().filter(user -> !user.getUserId().equals(userToken.getUserId())
+                    && !user.getMailAccount().equals(userToken.getMailAccount())).toList();
+        }
+        return null;
     }
 }
