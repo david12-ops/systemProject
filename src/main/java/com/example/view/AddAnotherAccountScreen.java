@@ -2,7 +2,6 @@ package com.example.view;
 
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
-import com.example.utils.interfaces.ErrorManagement;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

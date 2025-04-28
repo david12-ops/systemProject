@@ -12,7 +12,6 @@ import com.example.utils.SessionHolder;
 import com.example.utils.enums.AddTypeOperation;
 import com.example.utils.enums.GetUserTypeOperation;
 import com.example.utils.interfaces.AuthManagement;
-import com.example.utils.interfaces.ErrorManagement;
 import com.example.utils.interfaces.UserManagement;
 import com.example.utils.services.SessionService;
 
