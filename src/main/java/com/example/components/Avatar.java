@@ -121,10 +121,8 @@ public class Avatar extends VBox {
             }
         });
 
-        // TODO - didnt update avatar
         StateEventService.getInstance().subscribe("updateAvatar", playload -> {
             if (playload == null || playload instanceof Image) {
-                System.out.println("hejjj more");
                 updateAvatarImage(circle, (Image) playload, letter);
             }
         });

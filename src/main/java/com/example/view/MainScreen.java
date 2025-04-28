@@ -32,9 +32,7 @@ import javax.swing.UIDefaults.LazyInputMap;
 
 public class MainScreen extends VBox {
     // TODO - styling
-    // TODO - style switch user page
-    // TODO - avatar image update bug
-    // account
+    // TODO - style switch user page account
 
     public MainScreen(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
