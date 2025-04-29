@@ -9,7 +9,6 @@ import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
 import com.example.model.Message;
 import com.example.model.UserToken;
-import com.example.utils.SessionHolder;
 import com.example.utils.enums.MessageType;
 
 import javafx.collections.FXCollections;

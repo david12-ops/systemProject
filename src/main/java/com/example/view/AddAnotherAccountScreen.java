@@ -1,5 +1,6 @@
 package com.example.view;
 
+import com.example.constroller.MessageController;
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
 
@@ -30,7 +31,8 @@ public class AddAnotherAccountScreen extends VBox {
 
     private void addButtonAction(Stage stage, TextField emailField, PasswordField passwordField,
             PasswordField confirmPasswordField, Label confirmPasswordError, Label emailError, Label passwordError,
-            UserController userController, ScreenController screenController, Label labelError) {
+            UserController userController, ScreenController screenController, MessageController messageControll,
+            Label labelError) {
 
         boolean isBlankField = false;
         boolean valid = true;
@@ -76,6 +78,8 @@ public class AddAnotherAccountScreen extends VBox {
         if (valid) {
             clearFields(emailError, passwordError, confirmPasswordError, emailField, passwordField,
                     confirmPasswordField, userController);
+            screenController.updateScreen("switchUser",
+                    new SwitchUserScreen(stage, screenController, userController, messageControll));
             screenController.activate("main", stage);
         }
     }
@@ -109,7 +113,8 @@ public class AddAnotherAccountScreen extends VBox {
         });
     }
 
-    public AddAnotherAccountScreen(Stage stage, ScreenController screenController, UserController userController) {
+    public AddAnotherAccountScreen(Stage stage, ScreenController screenController, UserController userController,
+            MessageController messageControll) {
 
         Label labelError = new Label();
         labelError.getStyleClass().add("error-label");
@@ -136,7 +141,7 @@ public class AddAnotherAccountScreen extends VBox {
         addButton.getStyleClass().add("button");
         addButton.setOnAction(e -> {
             addButtonAction(stage, emailField, passwordField, confirmPasswordField, confirmPasswordError, emailError,
-                    passwordError, userController, screenController, labelError);
+                    passwordError, userController, screenController, messageControll, labelError);
         });
 
         Button backButton = new Button("Back");
@@ -159,8 +164,9 @@ public class AddAnotherAccountScreen extends VBox {
         this.setAlignment(Pos.CENTER);
     }
 
-    public static void show(Stage stage, ScreenController screenController, UserController userController) {
-        Scene scene = new Scene(new AddAnotherAccountScreen(stage, screenController, userController));
+    public static void show(Stage stage, ScreenController screenController, UserController userController,
+            MessageController messageControll) {
+        Scene scene = new Scene(new AddAnotherAccountScreen(stage, screenController, userController, messageControll));
         stage.setScene(scene);
         stage.show();
     }

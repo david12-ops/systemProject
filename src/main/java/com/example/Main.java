@@ -34,7 +34,7 @@ public class Main extends Application {
                 ForgotCredentialsScreen resetScreen = new ForgotCredentialsScreen(primaryStage, screenController,
                                 userController);
                 AddAnotherAccountScreen anotherAccountScreen = new AddAnotherAccountScreen(primaryStage,
-                                screenController, userController);
+                                screenController, userController, messageController);
                 SwitchUserScreen switchUserScreen = new SwitchUserScreen(primaryStage, screenController, userController,
                                 messageController);
                 MainScreen mainScreen = new MainScreen(primaryStage, screenController, userController,

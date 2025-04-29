@@ -48,7 +48,7 @@ public class SwitchUserScreen extends VBox {
         textTitle.setFill(Color.web("rgb(244, 160, 4)"));
         textTitle.setFont(Font.font(30));
 
-        if (users != null && users.size() > 0) {
+        if (users.size() > 0) {
             TilePane tilePane = new TilePane();
             tilePane.setPrefColumns(4);
             tilePane.setHgap(10);

@@ -8,7 +8,6 @@ import com.example.model.User;
 import com.example.model.UserModel;
 import com.example.model.UserToken;
 import com.example.utils.ImageConvertor;
-import com.example.utils.SessionHolder;
 import com.example.utils.enums.AddTypeOperation;
 import com.example.utils.enums.GetUserTypeOperation;
 import com.example.utils.interfaces.AuthManagement;
@@ -20,8 +19,7 @@ import javafx.scene.image.Image;
 public class UserController implements AuthManagement, UserManagement {
     private UserModel userModel;
     private SessionService sessionService;
-
-    // TODOD - support switching - yes - implement group Id - need gui
+    private String currentSessionId;
 
     public UserController(UserModel userModel) {
         this.userModel = userModel;
@@ -60,8 +58,7 @@ public class UserController implements AuthManagement, UserManagement {
         User user = getUser(emailAccount, password, GetUserTypeOperation.BYCREDENTIALS);
 
         if (user != null && !sessionService.isUserLoggedIn(user.getUserId())) {
-            String sessionId = sessionService.createSessionId(user);
-            SessionHolder.setSessionId(sessionId);
+            currentSessionId = sessionService.createSessionId(user);
         }
     }
 
@@ -76,25 +73,13 @@ public class UserController implements AuthManagement, UserManagement {
 
     @Override
     public void logOut() {
-        String sessionId = SessionHolder.getSessionId();
-        if (sessionId != null) {
-            sessionService.removeSession(sessionId);
-            SessionHolder.clear();
-        }
+        sessionService.removeSession(currentSessionId);
+        currentSessionId = null;
     }
 
     @Override
     public UserToken getLoggedUser() {
-        try {
-            String sessionId = SessionHolder.getSessionId();
-            if (sessionId != null && !sessionId.isBlank()) {
-                return sessionService.getUserBySessionId(sessionId);
-            }
-            return null;
-        } catch (Exception e) {
-            System.out.println("Error fetching logged user: " + e);
-            return null;
-        }
+        return sessionService.getUserTokenBySessionId(currentSessionId);
     }
 
     @Override
@@ -149,8 +134,7 @@ public class UserController implements AuthManagement, UserManagement {
         if (userToken != null && switchtoUser != null
                 && !userToken.getMailAccount().equals(switchtoUser.getMailAccount())) {
             logOut();
-            String sessionId = sessionService.createSessionId(switchtoUser);
-            SessionHolder.setSessionId(sessionId);
+            currentSessionId = sessionService.createSessionId(switchtoUser);
             return true;
         }
 
@@ -161,10 +145,12 @@ public class UserController implements AuthManagement, UserManagement {
     public List<User> getAllUserAccounts() {
         UserToken userToken = getLoggedUser();
         List<User> users = userModel.getAllUserAccounts(userToken);
-        if (users != null && users.size() > 0) {
-            return users.stream().filter(user -> !user.getUserId().equals(userToken.getUserId())
-                    && !user.getMailAccount().equals(userToken.getMailAccount())).toList();
+
+        if (users == null || users.size() == 0) {
+            return List.of();
         }
-        return null;
+
+        return users.stream().filter(user -> !user.getUserId().equals(userToken.getUserId())
+                && !user.getMailAccount().equals(userToken.getMailAccount())).toList();
     }
 }
