@@ -138,14 +138,14 @@ public class AddAnotherAccountScreen extends VBox {
                 passwordError, userController, labelError);
 
         Button addButton = new Button("Add");
-        addButton.getStyleClass().add("button");
+        addButton.getStyleClass().add("addButton");
         addButton.setOnAction(e -> {
             addButtonAction(stage, emailField, passwordField, confirmPasswordField, confirmPasswordError, emailError,
                     passwordError, userController, screenController, messageControll, labelError);
         });
 
         Button backButton = new Button("Back");
-        backButton.getStyleClass().add("button");
+        backButton.getStyleClass().add("appButton");
         backButton.setOnAction(e -> {
             clearFields(emailError, passwordError, confirmPasswordError, emailField, passwordField,
                     confirmPasswordField, userController);

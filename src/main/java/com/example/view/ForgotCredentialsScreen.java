@@ -214,7 +214,7 @@ public class ForgotCredentialsScreen extends VBox {
                 newPasswordError, confirmPasswordError, labelError, userController);
 
         Button resetButton = new Button("Reset");
-        resetButton.getStyleClass().add("button");
+        resetButton.getStyleClass().add("updateButton");
         resetButton.setOnAction(event -> {
             resetButtonAction(stage, emailField, passwordField, newPasswordField, confirmPasswordField, emailError,
                     passwordError, newPasswordError, confirmPasswordError, userController, screenController, labelError,
@@ -222,7 +222,7 @@ public class ForgotCredentialsScreen extends VBox {
         });
 
         Button backButton = new Button("Back");
-        backButton.getStyleClass().add("button");
+        backButton.getStyleClass().add("appButton");
         backButton.setOnAction(event -> {
             if (userToken != null) {
                 clearFields(newPasswordField, confirmPasswordField, null, null, userController, null, null,

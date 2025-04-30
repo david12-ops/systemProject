@@ -40,7 +40,7 @@ public class UpdateAvatar extends VBox {
         });
 
         Button defaultButton = new Button("Default profile");
-        defaultButton.getStyleClass().add("button");
+        defaultButton.getStyleClass().add("updateButton");
         defaultButton.setOnAction(event -> {
             userController.updateImageProfile(null);
             screenController.updateScreen("main",
@@ -51,7 +51,7 @@ public class UpdateAvatar extends VBox {
         });
 
         Button backButton = new Button("Back");
-        backButton.getStyleClass().add("button");
+        backButton.getStyleClass().add("appButton");
         backButton.setOnAction(event -> {
             screenController.activate("main", stage);
         });

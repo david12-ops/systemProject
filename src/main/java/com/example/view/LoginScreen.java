@@ -89,7 +89,7 @@ public class LoginScreen extends VBox {
         onchangeInitialize(emailField, passwordField, emailError, passwordError, labelError);
 
         Button loginButton = new Button("Login");
-        loginButton.getStyleClass().add("button");
+        loginButton.getStyleClass().add("appButton");
         loginButton.setOnAction(event -> {
             loginButtonAction(emailField, passwordField, emailError, passwordError, userController, screenController,
                     messageController, labelError, stage);

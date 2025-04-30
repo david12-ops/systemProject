@@ -13,6 +13,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -40,13 +41,15 @@ public class SwitchUserScreen extends VBox {
         Layout layout = null;
         VBox content = null;
 
-        Text textInfo = new Text("No another accounts found");
-        textInfo.setFill(Color.ORANGERED);
-        textInfo.setFont(Font.font(30));
+        Label textInfo = new Label("No another accounts found");
+        textInfo.setStyle("-fx-text-fill: orangered; -fx-font-size: 30px;");
+        textInfo.setAlignment(Pos.CENTER);
+        textInfo.setMaxWidth(Double.MAX_VALUE);
 
-        Text textTitle = new Text("Your accounts");
-        textTitle.setFill(Color.web("rgb(244, 160, 4)"));
-        textTitle.setFont(Font.font(30));
+        Label textTitle = new Label("Your accounts");
+        textTitle.setStyle("-fx-text-fill: rgb(244, 160, 4); -fx-font-size: 30px;");
+        textTitle.setAlignment(Pos.CENTER);
+        textTitle.setMaxWidth(Double.MAX_VALUE);
 
         if (users.size() > 0) {
             TilePane tilePane = new TilePane();
@@ -63,6 +66,7 @@ public class SwitchUserScreen extends VBox {
                 textEm.setFont(Font.font("Arial", FontWeight.BOLD, 18));
 
                 Button switchUserButton = new Button("switch");
+                switchUserButton.getStyleClass().add("updateButton");
                 switchUserButton.setOnAction(e -> {
                     boolean switched = userController.switchAccount(users.get(index));
                     if (switched) {
@@ -72,6 +76,7 @@ public class SwitchUserScreen extends VBox {
                 });
 
                 Button removeAccountButton = new Button("remove");
+                removeAccountButton.getStyleClass().add("deleteButton");
                 removeAccountButton.setOnAction(e -> {
                     userController.removeAccount(users.get(index));
                     screenController.updateScreen("switchUser",

@@ -53,18 +53,18 @@ public class SideBar extends VBox {
                 Button spamButton = new Button("Spam");
                 Button trashButton = new Button("Trash");
 
-                addButton.getStyleClass().add("button");
-                inboxButton.getStyleClass().add("button");
-                starredButton.getStyleClass().add("button");
-                snoozedButton.getStyleClass().add("button");
-                sentButton.getStyleClass().add("button");
-                draftsButton.getStyleClass().add("button");
-                moreButton.getStyleClass().add("button");
-                importantButton.getStyleClass().add("button");
-                scheduledButton.getStyleClass().add("button");
-                allMailButton.getStyleClass().add("button");
-                spamButton.getStyleClass().add("button");
-                trashButton.getStyleClass().add("button");
+                addButton.getStyleClass().add("addButton");
+                inboxButton.getStyleClass().add("appButton");
+                starredButton.getStyleClass().add("appButton");
+                snoozedButton.getStyleClass().add("appButton");
+                sentButton.getStyleClass().add("appButton");
+                draftsButton.getStyleClass().add("appButton");
+                moreButton.getStyleClass().add("appButton");
+                importantButton.getStyleClass().add("appButton");
+                scheduledButton.getStyleClass().add("appButton");
+                allMailButton.getStyleClass().add("appButton");
+                spamButton.getStyleClass().add("appButton");
+                trashButton.getStyleClass().add("deleteButton");
 
                 VBox extraButtonsBox = new VBox(10, importantButton, scheduledButton, allMailButton, spamButton,
                                 trashButton);

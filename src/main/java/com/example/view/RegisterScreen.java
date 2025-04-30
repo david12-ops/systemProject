@@ -137,14 +137,14 @@ public class RegisterScreen extends VBox {
                 passwordError, userController, labelError);
 
         Button registerButton = new Button("Register");
-        registerButton.getStyleClass().add("button");
+        registerButton.getStyleClass().add("addButton");
         registerButton.setOnAction(event -> {
             registerButtonAction(stage, emailField, passwordField, confirmPasswordField, confirmPasswordError,
                     emailError, passwordError, userController, screenController, labelError);
         });
 
         Button backButton = new Button("Back");
-        backButton.getStyleClass().add("button");
+        backButton.getStyleClass().add("appButton");
         backButton.setOnAction(event -> {
             clearFields(emailError, passwordError, emailField, passwordField, confirmPasswordField,
                     confirmPasswordError, userController);

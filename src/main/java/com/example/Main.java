@@ -55,6 +55,7 @@ public class Main extends Application {
 
                 scene.getStylesheets().add(getClass().getResource("/styles/form.css").toExternalForm());
                 scene.getStylesheets().add(getClass().getResource("/styles/appBar.css").toExternalForm());
+                scene.getStylesheets().add(getClass().getResource("/styles/buttons.css").toExternalForm());
 
                 screenController.activate("login", primaryStage);
 

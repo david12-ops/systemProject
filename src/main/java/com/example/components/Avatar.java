@@ -72,24 +72,28 @@ public class Avatar extends VBox {
         letter.setFont(Font.font(20));
 
         Button switchUserButton = new Button("Switch user");
+        switchUserButton.getStyleClass().add("updateButton");
         switchUserButton.setOnAction(e -> {
             dropdown.hide();
             screenController.activate("switchUser", stage);
         });
 
         Button addAnotherAccountButton = new Button("Add acount");
+        addAnotherAccountButton.getStyleClass().add("addButton");
         addAnotherAccountButton.setOnAction(e -> {
             dropdown.hide();
             screenController.activate("addAnotherAccount", stage);
         });
 
         Button updateProfileImageButton = new Button("Update profile image");
+        updateProfileImageButton.getStyleClass().add("updateButton");
         updateProfileImageButton.setOnAction(e -> {
             dropdown.hide();
             screenController.activate("updateAvatarImage", stage);
         });
 
         Button resetPasswordButton = new Button("Resest password");
+        resetPasswordButton.getStyleClass().add("updateButton");
         resetPasswordButton.setOnAction(e -> {
             dropdown.hide();
             screenController.activate("reset", stage);

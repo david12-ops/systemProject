@@ -35,10 +35,10 @@ public class AppBar extends HBox {
         ;
 
         logOutButton = new Button("Logout");
-        logOutButton.getStyleClass().add("button");
+        logOutButton.getStyleClass().add("appButton");
 
         burgerButton = new Button("☰");
-        burgerButton.getStyleClass().add("button");
+        burgerButton.getStyleClass().add("appButton");
 
         this.getChildren().addAll(burgerButton, title, spacer, avatar, logOutButton);
     }

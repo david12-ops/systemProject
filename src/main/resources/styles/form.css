@@ -23,20 +23,6 @@
     -fx-padding: 5px 0 10px 0;
 }
 
-.button {
-    -fx-background-color: #007bff;
-    -fx-text-fill: white;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-padding: 10px 20px;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-}
-
-.button:hover {
-    -fx-background-color: #0056b3;
-}
-
 .hyperlink {
     -fx-text-fill: #007bff;
     -fx-font-size: 12px;
