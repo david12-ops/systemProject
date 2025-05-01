@@ -19,7 +19,7 @@ public class Layout extends VBox {
             MessageController messageController) {
 
         VBox contentArea = new VBox(content);
-        contentArea.setPadding(new Insets(20));
+        contentArea.setPadding(new Insets(15));
         contentArea.setFillWidth(false);
         contentArea.setAlignment(Pos.CENTER);
 
@@ -40,8 +40,6 @@ public class Layout extends VBox {
             boolean show = !sideBar.isVisible();
             sideBar.setVisible(show);
             sideBar.setManaged(show);
-
-            contentArea.setAlignment(show ? Pos.CENTER_LEFT : Pos.CENTER);
         });
 
         BorderPane root = new BorderPane();

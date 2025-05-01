@@ -80,6 +80,10 @@ public abstract class JsonStorage<T> {
         try {
             this.items.remove(item);
             saveToFile();
+        } catch (Exception e) {
+            System.err.println("Failed to remove item: " + e.getMessage());
+            e.printStackTrace();
+
         } finally {
             rwLock.writeLock().unlock();
         }
@@ -95,6 +99,10 @@ public abstract class JsonStorage<T> {
                 }
             }
             saveToFile();
+        } catch (Exception e) {
+            System.err.println("Failed to update item: " + e.getMessage());
+            e.printStackTrace();
+
         } finally {
             rwLock.writeLock().unlock();
         }

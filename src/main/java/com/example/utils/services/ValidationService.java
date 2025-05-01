@@ -12,7 +12,8 @@ import com.example.utils.interfaces.ValidationManagement;
 
 public class ValidationService implements ValidationManagement {
 
-    private static final Pattern EMAIL_REGEX = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    private static final Pattern EMAIL_REGEX = Pattern
+            .compile("^(?=.{1,254}$)(?=.{1,64}@)[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final Pattern PASSWORD_REGEX = Pattern
             .compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$");
     private ErrorToolManager errorToolManager;

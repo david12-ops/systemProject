@@ -1,9 +1,6 @@
 package com.example.view;
 
-import com.example.components.AppBar;
-import com.example.components.Avatar;
 import com.example.components.Layout;
-import com.example.components.SideBar;
 import com.example.constroller.MessageController;
 import com.example.constroller.ScreenController;
 import com.example.constroller.UserController;
@@ -13,25 +10,18 @@ import com.example.utils.enums.MessageType;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
+
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-
 import javafx.stage.Stage;
-
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.UIDefaults.LazyInputMap;
 
 public class MainScreen extends VBox {
     // TODO - styling
-    // TODO - style switch user page account
+    // TODO - bug in avatar in switchUser - switched but avatar dont updated
+    // TODO - bug in lyout when is shown there are unusefull paddings around content
 
     public MainScreen(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
