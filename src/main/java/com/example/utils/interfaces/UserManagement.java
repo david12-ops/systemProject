@@ -11,7 +11,7 @@ public interface UserManagement {
 
     boolean switchAccount(User switchtoUser);
 
-    void removeAccount(User user);
+    boolean removeAccount(User user);
 
     boolean updateLoggedInAccount(String newPassword, String confirmationPassword);
 

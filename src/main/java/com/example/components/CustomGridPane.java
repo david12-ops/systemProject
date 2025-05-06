@@ -173,8 +173,13 @@ public class CustomGridPane extends HBox {
             Button removeAccountButton = new Button("remove");
             removeAccountButton.getStyleClass().add("deleteButton");
             removeAccountButton.setOnAction(e -> {
-                userController.removeAccount(users.get(index));
-                StateEventService.getInstance().emit("computeGrid", userController.getAllUserAccounts());
+                boolean removed = userController.removeAccount(users.get(index));
+                if (removed) {
+                    if (page > 0 && userLists.size() > page && userLists.get(page).size() == 1) {
+                        page = page - 1;
+                    }
+                    StateEventService.getInstance().emit("computeGrid", userController.getAllUserAccounts());
+                }
             });
 
             VBox boxButton = new VBox(10, removeAccountButton, switchUserButton);
@@ -211,14 +216,13 @@ public class CustomGridPane extends HBox {
         nextButton.getStyleClass().add("circleButton");
         nextButton.setOnAction(e -> {
             if (page < totalPages - 1) {
-                try {
-                    GridDimension gridDimension = getGridDimension(stage.getWidth());
-                    page = page + 1;
+                GridDimension gridDimension = getGridDimension(stage.getWidth());
+                page = page + 1;
+                if (page < gridPanes.size() && page < userLists.size()) {
                     switchGridPane(gridPanes.get(page), userLists.get(page), stage, userController, screenController,
                             messageController, gridDimension.getColumns());
-                } catch (Exception ex) {
-                    System.err.println("Failed to load user accounts: " + ex.getMessage());
-                    ex.printStackTrace();
+                } else {
+                    System.err.println("Failed to load user accounts");
                 }
             }
         });
@@ -229,15 +233,14 @@ public class CustomGridPane extends HBox {
         prevButton.setMaxSize(40, 40);
         prevButton.getStyleClass().add("circleButton");
         prevButton.setOnAction(e -> {
-            if (this.page > 0) {
-                try {
-                    GridDimension gridDimension = getGridDimension(stage.getWidth());
-                    page = page - 1;
+            if (page > 0) {
+                GridDimension gridDimension = getGridDimension(stage.getWidth());
+                page = page - 1;
+                if (page < gridPanes.size() && page < userLists.size()) {
                     switchGridPane(gridPanes.get(page), userLists.get(page), stage, userController, screenController,
                             messageController, gridDimension.getColumns());
-                } catch (Exception ex) {
-                    System.err.println("Failed to load user accounts: " + ex.getMessage());
-                    ex.printStackTrace();
+                } else {
+                    System.err.println("Failed to load user accounts");
                 }
             }
         });

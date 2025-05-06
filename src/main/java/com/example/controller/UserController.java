@@ -94,9 +94,11 @@ public class UserController implements AuthManagement, UserManagement {
 
     // User actions
     @Override
-    public void removeAccount(User user) {
+    public boolean removeAccount(User user) {
         UserToken userToken = getLoggedUser();
         userModel.removeUser(userToken, user);
+        return getUser(user.getMailAccount(), user.getPassword(), GetUserTypeOperation.BYCREDENTIALS) == null ? true
+                : false;
     }
 
     @Override
