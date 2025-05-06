@@ -1,9 +1,9 @@
 package com.example.view;
 
 import com.example.components.Layout;
-import com.example.constroller.MessageController;
-import com.example.constroller.ScreenController;
-import com.example.constroller.UserController;
+import com.example.controller.MessageController;
+import com.example.controller.ScreenController;
+import com.example.controller.UserController;
 import com.example.model.Message;
 import com.example.model.UserToken;
 import com.example.utils.enums.MessageType;

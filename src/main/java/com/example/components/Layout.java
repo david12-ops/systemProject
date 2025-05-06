@@ -1,19 +1,18 @@
 package com.example.components;
 
-import com.example.constroller.MessageController;
-import com.example.constroller.ScreenController;
-import com.example.constroller.UserController;
+import com.example.controller.MessageController;
+import com.example.controller.ScreenController;
+import com.example.controller.UserController;
 import com.example.view.ForgotCredentialsScreen;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class Layout extends VBox {
+public class Layout extends BorderPane {
 
     public Layout(Stage stage, Node content, ScreenController screenController, UserController userController,
             MessageController messageController) {
@@ -21,7 +20,7 @@ public class Layout extends VBox {
         VBox contentArea = new VBox(content);
         contentArea.setPadding(new Insets(15));
         contentArea.setFillWidth(false);
-        contentArea.setAlignment(Pos.CENTER);
+        contentArea.setAlignment(Pos.TOP_CENTER);
 
         AppBar appBar = new AppBar(stage, "Send It!", userController, screenController);
         appBar.setAvatarImage(userController.getImageProfile());
@@ -42,12 +41,9 @@ public class Layout extends VBox {
             sideBar.setManaged(show);
         });
 
-        BorderPane root = new BorderPane();
-        root.setTop(appBar);
-        root.setLeft(sideBar);
-        root.setCenter(contentArea);
-        VBox.setVgrow(root, Priority.ALWAYS);
-        this.getChildren().add(root);
+        this.setTop(appBar);
+        this.setLeft(sideBar);
+        this.setCenter(contentArea);
     }
 
 }

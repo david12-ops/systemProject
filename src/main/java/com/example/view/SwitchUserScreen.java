@@ -2,11 +2,11 @@ package com.example.view;
 
 import java.util.List;
 
-import com.example.components.CostumeGridPane;
+import com.example.components.CustomGridPane;
 import com.example.components.Layout;
-import com.example.constroller.MessageController;
-import com.example.constroller.ScreenController;
-import com.example.constroller.UserController;
+import com.example.controller.MessageController;
+import com.example.controller.ScreenController;
+import com.example.controller.UserController;
 import com.example.model.User;
 
 import javafx.geometry.Pos;
@@ -37,7 +37,7 @@ public class SwitchUserScreen extends VBox {
 
         if (users != null && users.size() > 0) {
 
-            CostumeGridPane gridPane = new CostumeGridPane(screenController, userController, messageController, stage);
+            CustomGridPane gridPane = new CustomGridPane(screenController, userController, messageController, stage);
             content = new VBox(textTitle, gridPane);
 
             layout = new Layout(stage, content, screenController, userController, messageController);

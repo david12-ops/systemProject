@@ -1,7 +1,7 @@
 package com.example.view;
 
-import com.example.constroller.ScreenController;
-import com.example.constroller.UserController;
+import com.example.controller.ScreenController;
+import com.example.controller.UserController;
 import com.example.model.UserToken;
 
 import javafx.geometry.Pos;

@@ -1,4 +1,4 @@
-package com.example.constroller;
+package com.example.controller;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

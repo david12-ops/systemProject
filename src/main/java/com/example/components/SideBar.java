@@ -1,6 +1,6 @@
 package com.example.components;
 
-import com.example.constroller.ScreenController;
+import com.example.controller.ScreenController;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -50,7 +50,6 @@ public class SideBar extends VBox {
                 Button importantButton = new Button("Important");
                 Button scheduledButton = new Button("Scheduled");
                 Button allMailButton = new Button("All Mail");
-                Button spamButton = new Button("Spam");
                 Button trashButton = new Button("Trash");
 
                 addButton.getStyleClass().add("addButton");
@@ -63,11 +62,9 @@ public class SideBar extends VBox {
                 importantButton.getStyleClass().add("appButton");
                 scheduledButton.getStyleClass().add("appButton");
                 allMailButton.getStyleClass().add("appButton");
-                spamButton.getStyleClass().add("appButton");
                 trashButton.getStyleClass().add("deleteButton");
 
-                VBox extraButtonsBox = new VBox(10, importantButton, scheduledButton, allMailButton, spamButton,
-                                trashButton);
+                VBox extraButtonsBox = new VBox(10, importantButton, scheduledButton, allMailButton, trashButton);
                 extraButtonsBox.setAlignment(Pos.CENTER);
                 extraButtonsBox.setVisible(false);
                 extraButtonsBox.setManaged(false);

@@ -1,7 +1,7 @@
 package com.example.components;
 
-import com.example.constroller.ScreenController;
-import com.example.constroller.UserController;
+import com.example.controller.ScreenController;
+import com.example.controller.UserController;
 import com.example.model.User;
 import com.example.model.UserToken;
 import com.example.utils.ImageConvertor;
@@ -125,9 +125,9 @@ public class Avatar extends VBox {
             }
         });
 
-        StateEventService.getInstance().subscribe("updateAvatar", playload -> {
-            if (playload == null || playload instanceof Image) {
-                updateAvatarImage(circle, (Image) playload, letter);
+        StateEventService.getInstance().subscribe("updateAvatar", payload -> {
+            if (payload == null || payload instanceof Image) {
+                updateAvatarImage(circle, (Image) payload, letter);
             }
         });
 
