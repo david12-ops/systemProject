@@ -81,12 +81,28 @@ public class CustomGridPane extends HBox {
 
     private void refreshLayout(UserController userController, ScreenController screenController,
             MessageController messageController, Stage stage) {
+
         GridDimension gridDimension = getGridDimension(stage.getWidth());
         computeGridPanesAndList(userController.getAllUserAccounts(), gridDimension);
-        if (page >= totalPages)
+
+        if (page >= totalPages) {
             page = Math.max(0, totalPages - 1);
-        switchGridPane(gridPanes.get(page), userLists.get(page), stage, userController, screenController,
-                messageController, gridDimension.getColumns());
+        }
+
+        if (userLists.isEmpty()) {
+            Label textInfo = new Label("No accounts found");
+            textInfo.setStyle("-fx-text-fill: orangered; -fx-font-size: 30px;");
+            textInfo.setAlignment(Pos.CENTER);
+
+            VBox emptyBox = new VBox(textInfo);
+            emptyBox.setAlignment(Pos.CENTER);
+            emptyBox.setPrefSize(stage.getWidth(), 650);
+
+            contentBox.getChildren().setAll(emptyBox, buttonBox);
+        } else if (page < gridPanes.size() && page < userLists.size()) {
+            switchGridPane(gridPanes.get(page), userLists.get(page), stage, userController, screenController,
+                    messageController, gridDimension.getColumns());
+        }
     }
 
     private void computeGridPanesAndList(List<User> users, GridDimension gridDimension) {
@@ -149,6 +165,8 @@ public class CustomGridPane extends HBox {
     private void switchGridPane(GridPane gridPane, List<User> users, Stage stage, UserController userController,
             ScreenController screenController, MessageController messageController, int columns) {
 
+        gridPane.getChildren().clear();
+
         for (int i = 0; i < users.size(); i++) {
             int index = i;
             int col = i % columns;
@@ -175,9 +193,6 @@ public class CustomGridPane extends HBox {
             removeAccountButton.setOnAction(e -> {
                 boolean removed = userController.removeAccount(users.get(index));
                 if (removed) {
-                    if (page > 0 && userLists.size() > page && userLists.get(page).size() == 1) {
-                        page = page - 1;
-                    }
                     StateEventService.getInstance().emit("computeGrid", userController.getAllUserAccounts());
                 }
             });
