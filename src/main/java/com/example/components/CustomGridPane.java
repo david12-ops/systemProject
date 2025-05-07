@@ -96,9 +96,8 @@ public class CustomGridPane extends HBox {
 
             VBox emptyBox = new VBox(textInfo);
             emptyBox.setAlignment(Pos.CENTER);
-            emptyBox.setPrefSize(stage.getWidth(), 650);
 
-            contentBox.getChildren().setAll(emptyBox, buttonBox);
+            contentBox.getChildren().setAll(emptyBox);
         } else if (page < gridPanes.size() && page < userLists.size()) {
             switchGridPane(gridPanes.get(page), userLists.get(page), stage, userController, screenController,
                     messageController, gridDimension.getColumns());
