@@ -64,25 +64,28 @@ public class CustomGridPane extends HBox {
         }
     }
 
-    private GridDimension getGridDimension(double stageWidth) {
+    private GridDimension getGridDimension(double stageWidth, double stageHeight) {
         LayoutMode mode = getLayoutMode(stageWidth);
+        int rows = stageHeight < 795 ? 1 : 2;
 
         switch (mode) {
         case MOBILE:
-            return new GridDimension(2, 1);
+            return new GridDimension(rows, 1);
         case TABLET:
-            return new GridDimension(2, 2);
+            return new GridDimension(rows, 2);
         case DESKTOP:
-            return new GridDimension(2, 3);
+            return new GridDimension(rows, 3);
         default:
-            return new GridDimension(2, 3);
+            return new GridDimension(rows, 3);
         }
     }
 
     private void refreshLayout(UserController userController, ScreenController screenController,
             MessageController messageController, Stage stage) {
 
-        GridDimension gridDimension = getGridDimension(stage.getWidth());
+        System.out.println(stage.getHeight());
+
+        GridDimension gridDimension = getGridDimension(stage.getWidth(), stage.getHeight());
         computeGridPanesAndList(userController.getAllUserAccounts(), gridDimension);
 
         if (page >= totalPages) {
@@ -114,19 +117,24 @@ public class CustomGridPane extends HBox {
         userLists = new ArrayList<>();
         gridPanes = new ArrayList<>();
 
+        if (gridDimension.getRows() == 1) {
+            gridHeight = 370;
+        }
+
+        if (gridDimension.getRows() == 2) {
+            gridHeight = 650;
+        }
+
         if (gridDimension.getColumns() == 3) {
             gridWidth = 870;
-            gridHeight = 650;
         }
 
         if (gridDimension.getColumns() == 1) {
             gridWidth = 320;
-            gridHeight = 650;
         }
 
         if (gridDimension.getColumns() == 2) {
             gridWidth = 620;
-            gridHeight = 650;
         }
 
         for (int i = 0; i < totalPages; i++) {
@@ -230,7 +238,7 @@ public class CustomGridPane extends HBox {
         nextButton.getStyleClass().add("circleButton");
         nextButton.setOnAction(e -> {
             if (page < totalPages - 1) {
-                GridDimension gridDimension = getGridDimension(stage.getWidth());
+                GridDimension gridDimension = getGridDimension(stage.getWidth(), stage.getHeight());
                 page = page + 1;
                 if (page < gridPanes.size() && page < userLists.size()) {
                     switchGridPane(gridPanes.get(page), userLists.get(page), stage, userController, screenController,
@@ -248,7 +256,7 @@ public class CustomGridPane extends HBox {
         prevButton.getStyleClass().add("circleButton");
         prevButton.setOnAction(e -> {
             if (page > 0) {
-                GridDimension gridDimension = getGridDimension(stage.getWidth());
+                GridDimension gridDimension = getGridDimension(stage.getWidth(), stage.getHeight());
                 page = page - 1;
                 if (page < gridPanes.size() && page < userLists.size()) {
                     switchGridPane(gridPanes.get(page), userLists.get(page), stage, userController, screenController,
@@ -269,6 +277,7 @@ public class CustomGridPane extends HBox {
                 payload -> refreshLayout(userController, screenController, messageController, stage));
 
         stage.widthProperty().addListener((obs, oldVal, newVal) -> resizeDelay.playFromStart());
+        stage.heightProperty().addListener((obs, oldVal, newVal) -> resizeDelay.playFromStart());
 
         StateEventService.getInstance().emit("computeGrid", userController.getAllUserAccounts());
         this.getChildren().setAll(contentBox);
