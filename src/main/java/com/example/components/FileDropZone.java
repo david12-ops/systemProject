@@ -9,12 +9,12 @@ import javafx.scene.layout.StackPane;
 import java.io.File;
 import java.util.function.Consumer;
 
-public class ImageDropZone extends StackPane {
+public class FileDropZone extends StackPane {
 
     private final ImageView imageView = new ImageView();
     private Consumer<Image> onImageDropped;
 
-    public ImageDropZone() {
+    public FileDropZone(String acceptedFile) {
         setPrefSize(300, 200);
         setStyle("-fx-border-color: #999; -fx-border-width: 2; -fx-border-style: dashed; -fx-alignment: center;");
 
@@ -37,7 +37,7 @@ public class ImageDropZone extends StackPane {
 
             if (db.hasFiles()) {
                 File file = db.getFiles().get(0);
-                if (file.getName().matches(".*\\.(png|jpg|jpeg|gif)")) {
+                if (file.getName().matches(acceptedFile)) {
                     Image image = new Image(file.toURI().toString());
                     imageView.setImage(image);
                     if (onImageDropped != null) {

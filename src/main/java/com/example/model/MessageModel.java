@@ -15,8 +15,10 @@ public class MessageModel extends JsonStorage<Message> {
 
     static Dotenv dotenv = Dotenv.load();
     private HashMap<String, String> errorMap = new HashMap<>();
-    ErrorToolManager errorToolManager = new ErrorToolManager(errorMap);
-    ValidationService validationService = new ValidationService(errorToolManager);
+    private final ErrorToolManager errorToolManager = new ErrorToolManager(errorMap);
+    private final ValidationService validationService = new ValidationService();
+    private final ValidationService.MessageModelValidations validator = validationService.new MessageModelValidations(
+            errorToolManager);
     private List<Message> listOfMessages;
 
     public MessageModel() {

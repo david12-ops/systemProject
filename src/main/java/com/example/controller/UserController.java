@@ -1,7 +1,6 @@
 package com.example.controller;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import com.example.model.User;
@@ -109,17 +108,12 @@ public class UserController implements AuthManagement, UserManagement {
 
     @Override
     public void updateImageProfile(File file) {
-        try {
-            UserToken userToken = getLoggedUser();
-            if (file == null) {
-                userModel.updateUser(userToken, null);
+        UserToken userToken = getLoggedUser();
+        if (file == null) {
+            userModel.updateUser(userToken, null);
 
-            } else {
-                String base64 = ImageConvertor.imageToBase64(file);
-                userModel.updateUser(userToken, base64);
-            }
-        } catch (IOException e) {
-            System.err.println("Error converting image: " + e.getMessage());
+        } else {
+            userModel.updateUser(userToken, file);
         }
     }
 

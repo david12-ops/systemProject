@@ -2,7 +2,7 @@ package com.example.view;
 
 import java.io.File;
 
-import com.example.components.ImageDropZone;
+import com.example.components.FileDropZone;
 import com.example.controller.MessageController;
 import com.example.controller.ScreenController;
 import com.example.controller.UserController;
@@ -17,12 +17,16 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class UpdateAvatar extends VBox {
+
+    private static final String SUPPORTED_FILES2 = "(?i)\\.(docx?|xlsx?|pptx?|pdf|txt|rtf|odt|ods|odp|jpg|jpeg|png|gif|bmp|tiff|webp|mp4|mov|avi|wmv|mp3|wav|m4a|zip|7z|tar|gz)$";
+
+    private static final String SUPPORTED_FILES = ".*\\.(png|jpg|jpeg|gif)";
+    private FileDropZone dropZone = new FileDropZone(SUPPORTED_FILES);
+
     public UpdateAvatar(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
         Label dropDownLabel = new Label("Drop new image profile");
         dropDownLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        ImageDropZone dropZone = new ImageDropZone();
 
         dropZone.setOnImageDropped(image -> {
             try {

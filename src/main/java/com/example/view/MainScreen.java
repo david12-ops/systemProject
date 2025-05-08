@@ -22,8 +22,7 @@ public class MainScreen extends VBox {
     // TODO - styling
     // TODO - bug in avatar in switchUser - switched but avatar dont updated - fixed
     // (need better way)
-    // TODO - consider only rebuilding if the list of users or the layout dimensions
-    // have actually changed.
+    // TODO - build tests - test validator on UserModel
 
     public MainScreen(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {

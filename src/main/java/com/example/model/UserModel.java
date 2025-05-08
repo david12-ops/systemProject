@@ -1,5 +1,7 @@
 package com.example.model;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +10,7 @@ import java.util.List;
 import org.mindrot.jbcrypt.BCrypt;
 
 import com.example.utils.ErrorToolManager;
+import com.example.utils.ImageConvertor;
 import com.example.utils.JsonStorage;
 import com.example.utils.enums.AddTypeOperation;
 import com.example.utils.enums.Operation;
@@ -20,8 +23,10 @@ public class UserModel extends JsonStorage<User> {
 
     static Dotenv dotenv = Dotenv.load();
     private HashMap<String, String> errorMap = new HashMap<>();
-    ErrorToolManager errorToolManager = new ErrorToolManager(errorMap);
-    ValidationService validationService = new ValidationService(errorToolManager);
+    private final ErrorToolManager errorToolManager = new ErrorToolManager(errorMap);
+    private final ValidationService validationService = new ValidationService();
+    private final ValidationService.UserModelValidations validator = validationService.new UserModelValidations(
+            errorToolManager);
     private List<User> listOfUsers;
 
     public UserModel() {
@@ -63,7 +68,7 @@ public class UserModel extends JsonStorage<User> {
 
     public boolean updateUser(UserToken userToken, String newPassword, String confirmationPassword) {
 
-        if (validationService.confirmedPassword(newPassword, confirmationPassword)) {
+        if (validator.confirmedPassword(newPassword, confirmationPassword)) {
 
             User foundUser = getUserByToken(userToken);
 
@@ -92,7 +97,7 @@ public class UserModel extends JsonStorage<User> {
     public boolean updateUser(User user, String newPassword, String confirmationPassword) {
 
         if (user != null) {
-            if (validationService.confirmedPassword(newPassword, confirmationPassword)) {
+            if (validator.confirmedPassword(newPassword, confirmationPassword)) {
 
                 if (BCrypt.checkpw(confirmationPassword, user.getPassword())) {
                     errorToolManager.logError(new AbstractMap.SimpleEntry<>("confirmPassword",
@@ -114,18 +119,23 @@ public class UserModel extends JsonStorage<User> {
         return false;
     }
 
-    public void updateUser(UserToken userToken, String base64) {
+    public void updateUser(UserToken userToken, File profileImage) {
         User user = getUserByToken(userToken);
-        if (user != null) {
-            user.setImage(base64);
-            updateItem(user, user);
+        if (user != null && validator.validProfileImage(profileImage)) {
+            try {
+                String base64 = ImageConvertor.imageToBase64(profileImage);
+                user.setImage(base64);
+                updateItem(user, user);
+            } catch (IOException e) {
+                System.err.println("Error converting image: " + e.getMessage());
+            }
         }
     }
 
     private boolean validateData(Operation operation, String email, String password, String confirmationPassword) {
-        return validationService.validateUserData(email, password)
-                && validationService.confirmedPassword(password, confirmationPassword)
-                && validationService.nonDuplicateUserWithEmail(operation, email, listOfUsers);
+        return validator.validEmailPassword(email, password)
+                && validator.confirmedPassword(password, confirmationPassword)
+                && validator.nonDuplicateUserWithEmail(operation, email, listOfUsers);
 
     }
 
