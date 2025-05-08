@@ -22,19 +22,19 @@ public class LoginScreen extends VBox {
                 new SwitchUserScreen(stage, screenController, userController, messageController));
     }
 
-    private void loginButtonAction(TextField emailField, PasswordField passwordField, Label emailError,
-            Label passwordError, UserController userController, ScreenController screenController,
+    private void loginButtonAction(TextField emailField, PasswordField passwordField, Label emailErrorLabel,
+            Label passwordErrorLabel, UserController userController, ScreenController screenController,
             MessageController messageController, Label labelError, Stage stage) {
 
         boolean valid = true;
 
         if (emailField.getText().isBlank()) {
-            emailError.setText("Email is required");
+            emailErrorLabel.setText("Email is required");
             valid = false;
         }
 
         if (passwordField.getText().isBlank()) {
-            passwordError.setText("Password is required");
+            passwordErrorLabel.setText("Password is required");
             valid = false;
         }
 
@@ -53,18 +53,18 @@ public class LoginScreen extends VBox {
 
     }
 
-    private void onchangeInitialize(TextField emailField, PasswordField passwordField, Label emailError,
-            Label passwordError, Label labelError) {
+    private void onchangeInitialize(TextField emailField, PasswordField passwordField, Label emailErrorLabel,
+            Label passwordErrorLabel, Label labelError) {
         emailField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
-                emailError.setText("");
+                emailErrorLabel.setText("");
                 labelError.setText("");
             }
         });
 
         passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
-                passwordError.setText("");
+                passwordErrorLabel.setText("");
                 labelError.setText("");
             }
         });
@@ -78,21 +78,21 @@ public class LoginScreen extends VBox {
 
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
-        Label emailError = new Label();
-        emailError.getStyleClass().add("error-label");
+        Label emailErrorLabel = new Label();
+        emailErrorLabel.getStyleClass().add("error-label");
 
         Label passwordLabel = new Label("Password:");
         PasswordField passwordField = new PasswordField();
-        Label passwordError = new Label();
-        passwordError.getStyleClass().add("error-label");
+        Label passwordErrorLabel = new Label();
+        passwordErrorLabel.getStyleClass().add("error-label");
 
-        onchangeInitialize(emailField, passwordField, emailError, passwordError, labelError);
+        onchangeInitialize(emailField, passwordField, emailErrorLabel, passwordErrorLabel, labelError);
 
         Button loginButton = new Button("Login");
         loginButton.getStyleClass().add("appButton");
         loginButton.setOnAction(event -> {
-            loginButtonAction(emailField, passwordField, emailError, passwordError, userController, screenController,
-                    messageController, labelError, stage);
+            loginButtonAction(emailField, passwordField, emailErrorLabel, passwordErrorLabel, userController,
+                    screenController, messageController, labelError, stage);
         });
 
         Hyperlink registerLink = new Hyperlink("Don't have an account? Register");
@@ -101,8 +101,8 @@ public class LoginScreen extends VBox {
         Hyperlink resetLink = new Hyperlink("Don't remember password? Reset password");
         resetLink.setOnAction(event -> screenController.activate("reset", stage));
 
-        VBox form = new VBox(5, labelError, emailLabel, emailField, emailError, passwordLabel, passwordField,
-                passwordError, loginButton, registerLink, resetLink);
+        VBox form = new VBox(5, labelError, emailLabel, emailField, emailErrorLabel, passwordLabel, passwordField,
+                passwordErrorLabel, loginButton, registerLink, resetLink);
         form.setAlignment(Pos.CENTER);
 
         this.getChildren().add(form);

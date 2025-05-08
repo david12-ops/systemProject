@@ -18,26 +18,36 @@ import javafx.stage.Stage;
 
 public class UpdateAvatar extends VBox {
 
-    private static final String SUPPORTED_FILES2 = "(?i)\\.(docx?|xlsx?|pptx?|pdf|txt|rtf|odt|ods|odp|jpg|jpeg|png|gif|bmp|tiff|webp|mp4|mov|avi|wmv|mp3|wav|m4a|zip|7z|tar|gz)$";
+    private static final String SUPPORTED_IMAGE_FILES = "(?i).*\\.(png|jpg|jpeg|gif)$";
+    private static final String SUPPORTED_FILES = "(?i).*\\.(docx?|xlsx?|pptx?|pdf|txt|rtf|odt|ods|odp|jpg|jpeg|png|gif|bmp|tiff|webp|mp4|mov|avi|wmv|mp3|wav|m4a|zip|7z|tar|gz)$";
 
-    private static final String SUPPORTED_FILES = ".*\\.(png|jpg|jpeg|gif)";
-    private FileDropZone dropZone = new FileDropZone(SUPPORTED_FILES);
+    private FileDropZone dropZone = new FileDropZone(SUPPORTED_IMAGE_FILES);
 
     public UpdateAvatar(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
         Label dropDownLabel = new Label("Drop new image profile");
         dropDownLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
+        Label imageErrorLabel = new Label();
+        imageErrorLabel.getStyleClass().add("error-label");
+
         dropZone.setOnImageDropped(image -> {
             try {
+                imageErrorLabel.setText("");
                 File file = new File(new java.net.URI(image.getUrl()));
                 userController.updateImageProfile(file);
-                dropZone.clear();
-                screenController.updateScreen("main",
-                        new MainScreen(stage, screenController, userController, messageController));
-                screenController.updateScreen("switchUser",
-                        new SwitchUserScreen(stage, screenController, userController, messageController));
-                screenController.activate("main", stage);
+
+                if (userController.getError("file") == null) {
+                    dropZone.clear();
+                    screenController.updateScreen("main",
+                            new MainScreen(stage, screenController, userController, messageController));
+                    screenController.updateScreen("switchUser",
+                            new SwitchUserScreen(stage, screenController, userController, messageController));
+                    screenController.activate("main", stage);
+                } else {
+                    imageErrorLabel.setText(userController.getError("file"));
+                }
+
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -66,7 +76,7 @@ public class UpdateAvatar extends VBox {
         HBox buttonBox = new HBox(20, backButton, defaultButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        VBox imageBox = new VBox(10, dropDownLabel, dropZone, buttonBox);
+        VBox imageBox = new VBox(10, dropDownLabel, imageErrorLabel, dropZone, buttonBox);
         imageBox.setAlignment(Pos.CENTER);
         VBox.setVgrow(imageBox, Priority.ALWAYS);
 

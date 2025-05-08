@@ -17,30 +17,30 @@ import javafx.stage.Stage;
 public class ForgotCredentialsScreen extends VBox {
 
     private void clearFields(PasswordField newPasswordField, PasswordField confirmPasswordField,
-            PasswordField passwordField, TextField emailField, UserController userController, Label emailError,
-            Label passwordError, Label newPasswordError, Label confirmPasswordError, Label labelError) {
+            PasswordField passwordField, TextField emailField, UserController userController, Label emailErrorLabel,
+            Label passwordErrorLabel, Label newPasswordErrorLabel, Label confirmPasswordErrorLabel, Label labelError) {
 
-        if (passwordError != null && passwordField != null) {
+        if (passwordErrorLabel != null && passwordField != null) {
             passwordField.clear();
-            passwordError.setText("");
+            passwordErrorLabel.setText("");
             userController.clearError("password");
         }
 
-        if (newPasswordError != null && newPasswordField != null) {
+        if (newPasswordErrorLabel != null && newPasswordField != null) {
             newPasswordField.clear();
-            newPasswordError.setText("");
+            newPasswordErrorLabel.setText("");
             userController.clearError("newPassword");
         }
 
-        if (confirmPasswordError != null && confirmPasswordField != null) {
+        if (confirmPasswordErrorLabel != null && confirmPasswordField != null) {
             confirmPasswordField.clear();
-            confirmPasswordError.setText("");
+            confirmPasswordErrorLabel.setText("");
             userController.clearError("confirmPassword");
         }
 
-        if (emailError != null && emailField != null) {
+        if (emailErrorLabel != null && emailField != null) {
             emailField.clear();
-            emailError.setText("");
+            emailErrorLabel.setText("");
             userController.clearError("email");
         }
 
@@ -49,47 +49,48 @@ public class ForgotCredentialsScreen extends VBox {
     }
 
     private VBox createVbox(UserToken userToken, Label labelError, Label emailLabel, TextField emailField,
-            Label emailError, Label passwordLabel, PasswordField passwordField, Label passwordError,
-            Label newPasswordLabel, PasswordField newPasswordField, Label newPasswordError, Label confirmPasswordLabel,
-            PasswordField confirmPasswordField, Label confirmPasswordError, HBox buttonBox) {
+            Label emailErrorLabel, Label passwordLabel, PasswordField passwordField, Label passwordErrorLabel,
+            Label newPasswordLabel, PasswordField newPasswordField, Label newPasswordErrorLabel,
+            Label confirmPasswordLabel, PasswordField confirmPasswordField, Label confirmPasswordErrorLabel,
+            HBox buttonBox) {
         return userToken != null
-                ? new VBox(5, labelError, newPasswordLabel, newPasswordField, newPasswordError, confirmPasswordLabel,
-                        confirmPasswordField, confirmPasswordError, buttonBox)
-                : new VBox(5, labelError, emailLabel, emailField, emailError, passwordLabel, passwordField,
-                        passwordError, newPasswordLabel, newPasswordField, newPasswordError, confirmPasswordLabel,
-                        confirmPasswordField, confirmPasswordError, buttonBox);
+                ? new VBox(5, labelError, newPasswordLabel, newPasswordField, newPasswordErrorLabel,
+                        confirmPasswordLabel, confirmPasswordField, confirmPasswordErrorLabel, buttonBox)
+                : new VBox(5, labelError, emailLabel, emailField, emailErrorLabel, passwordLabel, passwordField,
+                        passwordErrorLabel, newPasswordLabel, newPasswordField, newPasswordErrorLabel,
+                        confirmPasswordLabel, confirmPasswordField, confirmPasswordErrorLabel, buttonBox);
     }
 
     private void resetButtonAction(Stage stage, TextField emailField, PasswordField passwordField,
-            PasswordField newPasswordField, PasswordField confirmPasswordField, Label emailError, Label passwordError,
-            Label newPasswordError, Label confirmPasswordError, UserController userController,
-            ScreenController screenController, Label labelError, UserToken userToken) {
+            PasswordField newPasswordField, PasswordField confirmPasswordField, Label emailErrorLabel,
+            Label passwordErrorLabel, Label newPasswordErrorLabel, Label confirmPasswordErrorLabel,
+            UserController userController, ScreenController screenController, Label labelError, UserToken userToken) {
 
         boolean isBlankField = false;
         boolean valid = true;
 
         if (userToken == null) {
             if (emailField.getText().isBlank()) {
-                emailError.setText("Email is required");
+                emailErrorLabel.setText("Email is required");
                 isBlankField = true;
                 valid = false;
             }
 
             if (passwordField.getText().isBlank()) {
-                passwordError.setText("Current password is required");
+                passwordErrorLabel.setText("Current password is required");
                 isBlankField = true;
                 valid = false;
             }
         }
 
         if (newPasswordField.getText().isBlank()) {
-            newPasswordError.setText("New password is required");
+            newPasswordErrorLabel.setText("New password is required");
             isBlankField = true;
             valid = false;
         }
 
         if (confirmPasswordField.getText().isBlank()) {
-            confirmPasswordError.setText("Confirmation password is required");
+            confirmPasswordErrorLabel.setText("Confirmation password is required");
             isBlankField = true;
             valid = false;
         }
@@ -99,20 +100,20 @@ public class ForgotCredentialsScreen extends VBox {
                     confirmPasswordField.getText());
 
             if (!isBlankField && userController.getError("newPassword") != null) {
-                newPasswordError.setText(userController.getError("newPassword"));
+                newPasswordErrorLabel.setText(userController.getError("newPassword"));
                 isBlankField = false;
                 valid = false;
             }
 
             if (!isBlankField && userController.getError("confirmPassword") != null) {
-                confirmPasswordError.setText(userController.getError("confirmPassword"));
+                confirmPasswordErrorLabel.setText(userController.getError("confirmPassword"));
                 isBlankField = false;
                 valid = false;
             }
 
             if (valid && updateSuccess) {
                 clearFields(newPasswordField, confirmPasswordField, null, null, userController, null, null,
-                        newPasswordError, confirmPasswordError, labelError);
+                        newPasswordErrorLabel, confirmPasswordErrorLabel, labelError);
                 userController.logOut();
                 screenController.activate("login", stage);
             }
@@ -125,20 +126,21 @@ public class ForgotCredentialsScreen extends VBox {
                     newPasswordField.getText(), confirmPasswordField.getText());
 
             if (!isBlankField && userController.getError("newPassword") != null) {
-                newPasswordError.setText(userController.getError("newPassword"));
+                newPasswordErrorLabel.setText(userController.getError("newPassword"));
                 isBlankField = false;
                 valid = false;
             }
 
             if (!isBlankField && userController.getError("confirmPassword") != null) {
-                confirmPasswordError.setText(userController.getError("confirmPassword"));
+                confirmPasswordErrorLabel.setText(userController.getError("confirmPassword"));
                 isBlankField = false;
                 valid = false;
             }
 
             if (valid && updateSuccess) {
                 clearFields(newPasswordField, confirmPasswordField, passwordField, emailField, userController,
-                        emailError, passwordError, newPasswordError, confirmPasswordError, labelError);
+                        emailErrorLabel, passwordErrorLabel, newPasswordErrorLabel, confirmPasswordErrorLabel,
+                        labelError);
                 screenController.activate("login", stage);
             }
 
@@ -150,25 +152,26 @@ public class ForgotCredentialsScreen extends VBox {
     }
 
     private void onchangeInitialize(TextField emailField, PasswordField passwordField, PasswordField newPasswordField,
-            PasswordField confirmPasswordField, Label emailError, Label passwordError, Label newPasswordError,
-            Label confirmPasswordError, Label labelError, UserController userController) {
+            PasswordField confirmPasswordField, Label emailErrorLabel, Label passwordErrorLabel,
+            Label newPasswordErrorLabel, Label confirmPasswordErrorLabel, Label labelError,
+            UserController userController) {
         emailField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
                 labelError.setText("");
-                emailError.setText("");
+                emailErrorLabel.setText("");
             }
         });
 
         passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
                 labelError.setText("");
-                passwordError.setText("");
+                passwordErrorLabel.setText("");
             }
         });
 
         newPasswordField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
-                newPasswordError.setText("");
+                newPasswordErrorLabel.setText("");
                 labelError.setText("");
                 userController.clearError("newPassword");
             }
@@ -176,7 +179,7 @@ public class ForgotCredentialsScreen extends VBox {
 
         confirmPasswordField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
-                confirmPasswordError.setText("");
+                confirmPasswordErrorLabel.setText("");
                 labelError.setText("");
                 userController.clearError("confirmPassword");
             }
@@ -192,33 +195,33 @@ public class ForgotCredentialsScreen extends VBox {
 
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
-        Label emailError = new Label();
-        emailError.getStyleClass().add("error-label");
+        Label emailErrorLabel = new Label();
+        emailErrorLabel.getStyleClass().add("error-label");
 
         Label passwordLabel = new Label("Current password:");
         PasswordField passwordField = new PasswordField();
-        Label passwordError = new Label();
-        passwordError.getStyleClass().add("error-label");
+        Label passwordErrorLabel = new Label();
+        passwordErrorLabel.getStyleClass().add("error-label");
 
         Label newPasswordLabel = new Label("New password:");
         PasswordField newPasswordField = new PasswordField();
-        Label newPasswordError = new Label();
-        newPasswordError.getStyleClass().add("error-label");
+        Label newPasswordErrorLabel = new Label();
+        newPasswordErrorLabel.getStyleClass().add("error-label");
 
         Label confirmPasswordLabel = new Label("Confirm new password:");
         PasswordField confirmPasswordField = new PasswordField();
-        Label confirmPasswordError = new Label();
-        confirmPasswordError.getStyleClass().add("error-label");
+        Label confirmPasswordErrorLabel = new Label();
+        confirmPasswordErrorLabel.getStyleClass().add("error-label");
 
-        onchangeInitialize(emailField, passwordField, newPasswordField, confirmPasswordField, emailError, passwordError,
-                newPasswordError, confirmPasswordError, labelError, userController);
+        onchangeInitialize(emailField, passwordField, newPasswordField, confirmPasswordField, emailErrorLabel,
+                passwordErrorLabel, newPasswordErrorLabel, confirmPasswordErrorLabel, labelError, userController);
 
         Button resetButton = new Button("Reset");
         resetButton.getStyleClass().add("updateButton");
         resetButton.setOnAction(event -> {
-            resetButtonAction(stage, emailField, passwordField, newPasswordField, confirmPasswordField, emailError,
-                    passwordError, newPasswordError, confirmPasswordError, userController, screenController, labelError,
-                    userToken);
+            resetButtonAction(stage, emailField, passwordField, newPasswordField, confirmPasswordField, emailErrorLabel,
+                    passwordErrorLabel, newPasswordErrorLabel, confirmPasswordErrorLabel, userController,
+                    screenController, labelError, userToken);
         });
 
         Button backButton = new Button("Back");
@@ -226,11 +229,12 @@ public class ForgotCredentialsScreen extends VBox {
         backButton.setOnAction(event -> {
             if (userToken != null) {
                 clearFields(newPasswordField, confirmPasswordField, null, null, userController, null, null,
-                        newPasswordError, confirmPasswordError, labelError);
+                        newPasswordErrorLabel, confirmPasswordErrorLabel, labelError);
                 screenController.activate("main", stage);
             } else {
                 clearFields(newPasswordField, confirmPasswordField, passwordField, emailField, userController,
-                        emailError, passwordError, newPasswordError, confirmPasswordError, labelError);
+                        emailErrorLabel, passwordErrorLabel, newPasswordErrorLabel, confirmPasswordErrorLabel,
+                        labelError);
                 screenController.activate("login", stage);
             }
         });
@@ -238,9 +242,9 @@ public class ForgotCredentialsScreen extends VBox {
         HBox buttonBox = new HBox(20, backButton, resetButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        VBox form = createVbox(userToken, labelError, emailLabel, emailField, emailError, passwordLabel, passwordField,
-                passwordError, newPasswordLabel, newPasswordField, newPasswordError, confirmPasswordLabel,
-                confirmPasswordField, confirmPasswordError, buttonBox);
+        VBox form = createVbox(userToken, labelError, emailLabel, emailField, emailErrorLabel, passwordLabel,
+                passwordField, passwordErrorLabel, newPasswordLabel, newPasswordField, newPasswordErrorLabel,
+                confirmPasswordLabel, confirmPasswordField, confirmPasswordErrorLabel, buttonBox);
 
         form.setAlignment(Pos.CENTER);
 

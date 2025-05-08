@@ -25,10 +25,10 @@ public class SwitchUserScreen extends VBox {
         Layout layout = null;
         VBox content = null;
 
-        Label textInfo = new Label("No another accounts found");
-        textInfo.setStyle("-fx-text-fill: orangered; -fx-font-size: 30px;");
-        textInfo.setAlignment(Pos.CENTER);
-        textInfo.setMaxWidth(Double.MAX_VALUE);
+        Label textInfoLabel = new Label("No another accounts found");
+        textInfoLabel.setStyle("-fx-text-fill: orangered; -fx-font-size: 30px;");
+        textInfoLabel.setAlignment(Pos.CENTER);
+        textInfoLabel.setMaxWidth(Double.MAX_VALUE);
 
         Label textTitle = new Label("Your accounts");
         textTitle.setStyle("-fx-text-fill: rgb(244, 160, 4); -fx-font-size: 30px;");
@@ -42,7 +42,7 @@ public class SwitchUserScreen extends VBox {
 
             layout = new Layout(stage, content, screenController, userController, messageController);
         } else {
-            HBox textInfHBox = new HBox(textInfo);
+            HBox textInfHBox = new HBox(textInfoLabel);
             textInfHBox.setAlignment(Pos.CENTER);
 
             content = new VBox(20, textTitle, textInfHBox);

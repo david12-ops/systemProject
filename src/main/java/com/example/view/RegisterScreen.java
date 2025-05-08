@@ -15,13 +15,14 @@ import javafx.stage.Stage;
 
 public class RegisterScreen extends VBox {
 
-    private void clearFields(Label emailError, Label passwordError, TextField emailField, PasswordField passwordField,
-            PasswordField confirmPasswordField, Label confirmPasswordError, UserController userController) {
-        emailError.setText("");
-        passwordError.setText("");
+    private void clearFields(Label emailErrorLabel, Label passwordErrorLabel, TextField emailField,
+            PasswordField passwordField, PasswordField confirmPasswordField, Label confirmPasswordErrorLabel,
+            UserController userController) {
+        emailErrorLabel.setText("");
+        passwordErrorLabel.setText("");
         emailField.clear();
         passwordField.clear();
-        confirmPasswordError.setText("");
+        confirmPasswordErrorLabel.setText("");
         confirmPasswordField.setText("");
         userController.clearError("confirmPassword");
         userController.clearError("email");
@@ -29,26 +30,27 @@ public class RegisterScreen extends VBox {
     }
 
     private void registerButtonAction(Stage stage, TextField emailField, PasswordField passwordField,
-            PasswordField confirmPasswordField, Label confirmPasswordError, Label emailError, Label passwordError,
-            UserController userController, ScreenController screenController, Label labelError) {
+            PasswordField confirmPasswordField, Label confirmPasswordErrorLabel, Label emailErrorLabel,
+            Label passwordErrorLabel, UserController userController, ScreenController screenController,
+            Label labelError) {
 
         boolean isBlankField = false;
         boolean valid = true;
 
         if (emailField.getText().isBlank()) {
-            emailError.setText("Email is required");
+            emailErrorLabel.setText("Email is required");
             isBlankField = true;
             valid = false;
         }
 
         if (passwordField.getText().isBlank()) {
-            passwordError.setText("Password is required");
+            passwordErrorLabel.setText("Password is required");
             isBlankField = true;
             valid = false;
         }
 
         if (confirmPasswordField.getText().isBlank()) {
-            confirmPasswordError.setText("Confirmation password is required");
+            confirmPasswordErrorLabel.setText("Confirmation password is required");
             isBlankField = true;
             valid = false;
         }
@@ -57,26 +59,26 @@ public class RegisterScreen extends VBox {
                 confirmPasswordField.getText());
 
         if (!isBlankField && userController.getError("password") != null) {
-            passwordError.setText(userController.getError("password"));
+            passwordErrorLabel.setText(userController.getError("password"));
             isBlankField = false;
             valid = false;
         }
 
         if (!isBlankField && userController.getError("confirmPassword") != null) {
-            confirmPasswordError.setText(userController.getError("confirmPassword"));
+            confirmPasswordErrorLabel.setText(userController.getError("confirmPassword"));
             isBlankField = false;
             valid = false;
         }
 
         if (!isBlankField && userController.getError("email") != null) {
-            emailError.setText(userController.getError("email"));
+            emailErrorLabel.setText(userController.getError("email"));
             isBlankField = false;
             valid = false;
         }
 
         if (valid && registerSuccess) {
-            clearFields(emailError, passwordError, emailField, passwordField, confirmPasswordField,
-                    confirmPasswordError, userController);
+            clearFields(emailErrorLabel, passwordErrorLabel, emailField, passwordField, confirmPasswordField,
+                    confirmPasswordErrorLabel, userController);
             screenController.activate("login", stage);
         }
 
@@ -86,11 +88,11 @@ public class RegisterScreen extends VBox {
     }
 
     private void onchangeInitialize(TextField emailField, PasswordField passwordField,
-            PasswordField confirmPasswordField, Label confirmPasswordError, Label emailError, Label passwordError,
-            UserController userController, Label labelError) {
+            PasswordField confirmPasswordField, Label confirmPasswordErrorLabel, Label emailErrorLabel,
+            Label passwordErrorLabel, UserController userController, Label labelError) {
         emailField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
-                emailError.setText("");
+                emailErrorLabel.setText("");
                 labelError.setText("");
                 userController.clearError("email");
             }
@@ -98,7 +100,7 @@ public class RegisterScreen extends VBox {
 
         passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
-                passwordError.setText("");
+                passwordErrorLabel.setText("");
                 labelError.setText("");
                 userController.clearError("password");
             }
@@ -106,7 +108,7 @@ public class RegisterScreen extends VBox {
 
         confirmPasswordField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isBlank()) {
-                confirmPasswordError.setText("");
+                confirmPasswordErrorLabel.setText("");
                 labelError.setText("");
                 userController.clearError("confirmPassword");
             }
@@ -120,42 +122,42 @@ public class RegisterScreen extends VBox {
 
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
-        Label emailError = new Label();
-        emailError.getStyleClass().add("error-label");
+        Label emailErrorLabel = new Label();
+        emailErrorLabel.getStyleClass().add("error-label");
 
         Label passwordLabel = new Label("Password:");
         PasswordField passwordField = new PasswordField();
-        Label passwordError = new Label();
-        passwordError.getStyleClass().add("error-label");
+        Label passwordErrorLabel = new Label();
+        passwordErrorLabel.getStyleClass().add("error-label");
 
         Label confirmPasswordLabel = new Label("Confirm new password:");
         PasswordField confirmPasswordField = new PasswordField();
-        Label confirmPasswordError = new Label();
-        confirmPasswordError.getStyleClass().add("error-label");
+        Label confirmPasswordErrorLabel = new Label();
+        confirmPasswordErrorLabel.getStyleClass().add("error-label");
 
-        onchangeInitialize(emailField, passwordField, confirmPasswordField, confirmPasswordError, emailError,
-                passwordError, userController, labelError);
+        onchangeInitialize(emailField, passwordField, confirmPasswordField, confirmPasswordErrorLabel, emailErrorLabel,
+                passwordErrorLabel, userController, labelError);
 
         Button registerButton = new Button("Register");
         registerButton.getStyleClass().add("addButton");
         registerButton.setOnAction(event -> {
-            registerButtonAction(stage, emailField, passwordField, confirmPasswordField, confirmPasswordError,
-                    emailError, passwordError, userController, screenController, labelError);
+            registerButtonAction(stage, emailField, passwordField, confirmPasswordField, confirmPasswordErrorLabel,
+                    emailErrorLabel, passwordErrorLabel, userController, screenController, labelError);
         });
 
         Button backButton = new Button("Back");
         backButton.getStyleClass().add("appButton");
         backButton.setOnAction(event -> {
-            clearFields(emailError, passwordError, emailField, passwordField, confirmPasswordField,
-                    confirmPasswordError, userController);
+            clearFields(emailErrorLabel, passwordErrorLabel, emailField, passwordField, confirmPasswordField,
+                    confirmPasswordErrorLabel, userController);
             screenController.activate("login", stage);
         });
 
         HBox buttonBox = new HBox(20, backButton, registerButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        VBox form = new VBox(5, emailLabel, emailField, emailError, passwordLabel, passwordField, passwordError,
-                confirmPasswordLabel, confirmPasswordField, confirmPasswordError, buttonBox);
+        VBox form = new VBox(5, emailLabel, emailField, emailErrorLabel, passwordLabel, passwordField,
+                passwordErrorLabel, confirmPasswordLabel, confirmPasswordField, confirmPasswordErrorLabel, buttonBox);
         form.setAlignment(Pos.CENTER);
 
         this.getChildren().add(form);
