@@ -83,8 +83,6 @@ public class CustomGridPane extends HBox {
     private void refreshLayout(UserController userController, ScreenController screenController,
             MessageController messageController, Stage stage) {
 
-        System.out.println(stage.getHeight());
-
         GridDimension gridDimension = getGridDimension(stage.getWidth(), stage.getHeight());
         computeGridPanesAndList(userController.getAllUserAccounts(), gridDimension);
 
