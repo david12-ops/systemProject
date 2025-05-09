@@ -15,11 +15,12 @@ public class FileDropZone extends StackPane {
     private Consumer<Image> onImageDropped;
 
     public FileDropZone(String acceptedFile) {
-        setPrefSize(300, 200);
+        setPrefSize(500, 400);
         setStyle("-fx-border-color: #999; -fx-border-width: 2; -fx-border-style: dashed; -fx-alignment: center;");
 
         imageView.setPreserveRatio(true);
-        imageView.setFitWidth(200);
+        imageView.setFitHeight(300);
+        imageView.setFitWidth(300);
         getChildren().add(imageView);
 
         // Drag over

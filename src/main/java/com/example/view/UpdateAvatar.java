@@ -34,11 +34,11 @@ public class UpdateAvatar extends VBox {
         dropZone.setOnImageDropped(image -> {
             try {
                 imageErrorLabel.setText("");
+                userController.clearError("file");
                 File file = new File(new java.net.URI(image.getUrl()));
                 userController.updateImageProfile(file);
 
                 if (userController.getError("file") == null) {
-                    dropZone.clear();
                     screenController.updateScreen("main",
                             new MainScreen(stage, screenController, userController, messageController));
                     screenController.updateScreen("switchUser",
@@ -57,6 +57,8 @@ public class UpdateAvatar extends VBox {
         defaultButton.getStyleClass().add("updateButton");
         defaultButton.setOnAction(event -> {
             userController.updateImageProfile(null);
+            dropZone.clear();
+            imageErrorLabel.setText("");
             screenController.updateScreen("main",
                     new MainScreen(stage, screenController, userController, messageController));
             screenController.updateScreen("switchUser",

@@ -123,7 +123,7 @@ public class UserModel extends JsonStorage<User> {
         User user = getUserByToken(userToken);
         if (user != null && validator.validProfileImage(profileImage)) {
             try {
-                String base64 = ImageConvertor.imageToBase64(profileImage);
+                String base64 = profileImage != null ? ImageConvertor.imageToBase64(profileImage) : null;
                 user.setImage(base64);
                 updateItem(user, user);
             } catch (IOException e) {

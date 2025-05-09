@@ -98,11 +98,15 @@ public class ValidationService {
 
         @Override
         public boolean validProfileImage(File profileImage) {
-            String name = profileImage.getName().toLowerCase();
-            if (!name.matches(SUPPORTED_IMAGE_FILES)) {
-                errorToolManager
-                        .logError(new AbstractMap.SimpleEntry<>("file", "Unsupported file type for profile image"));
-                return false;
+            if (profileImage != null) {
+                String name = profileImage.getName().toLowerCase();
+                if (!name.matches(SUPPORTED_IMAGE_FILES)) {
+                    errorToolManager
+                            .logError(new AbstractMap.SimpleEntry<>("file", "Unsupported file type for profile image"));
+                    return false;
+                }
+
+                return true;
             }
 
             return true;
