@@ -3,15 +3,25 @@ package com.example.view;
 import com.example.controller.MessageController;
 import com.example.controller.ScreenController;
 import com.example.controller.UserController;
-import com.example.model.UserToken;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class LoginScreen extends VBox {
+
+    private Label createErrorLabel() {
+        Label label = new Label();
+        label.setWrapText(true);
+        label.setMaxWidth(250);
+        label.setTextAlignment(TextAlignment.CENTER);
+        label.setAlignment(Pos.CENTER);
+        label.getStyleClass().add("error-label");
+        return label;
+    }
 
     private void updateScreens(ScreenController screenController, UserController userController,
             MessageController messageController, Stage stage) {
@@ -40,17 +50,18 @@ public class LoginScreen extends VBox {
 
         if (valid) {
             userController.login(emailField.getText(), passwordField.getText());
-            UserToken userToken = userController.getLoggedUser();
-            if (userToken != null) {
+            if (userController.getLoggedUser() != null) {
                 emailField.clear();
                 passwordField.clear();
                 updateScreens(screenController, userController, messageController, stage);
                 screenController.activate("main", stage);
             } else {
-                labelError.setText("User not found, invalid email or password");
+                String error = userController.getError("unexpected");
+                labelError.setText(error == null
+                        ? "User not found or registration failed due to an unexpected error. Please try again or contact support"
+                        : error);
             }
         }
-
     }
 
     private void onchangeInitialize(TextField emailField, PasswordField passwordField, Label emailErrorLabel,
@@ -73,18 +84,19 @@ public class LoginScreen extends VBox {
     public LoginScreen(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
 
-        Label labelError = new Label();
-        labelError.getStyleClass().add("error-label");
+        Label labelError = createErrorLabel();
 
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
-        Label emailErrorLabel = new Label();
-        emailErrorLabel.getStyleClass().add("error-label");
+        emailField.getStyleClass().add("text-field");
+
+        Label emailErrorLabel = createErrorLabel();
 
         Label passwordLabel = new Label("Password:");
         PasswordField passwordField = new PasswordField();
-        Label passwordErrorLabel = new Label();
-        passwordErrorLabel.getStyleClass().add("error-label");
+        passwordField.getStyleClass().add("password-field");
+
+        Label passwordErrorLabel = createErrorLabel();
 
         onchangeInitialize(emailField, passwordField, emailErrorLabel, passwordErrorLabel, labelError);
 
@@ -96,10 +108,24 @@ public class LoginScreen extends VBox {
         });
 
         Hyperlink registerLink = new Hyperlink("Don't have an account? Register");
-        registerLink.setOnAction(event -> screenController.activate("register", stage));
+        registerLink.setOnAction(event -> {
+            emailField.clear();
+            passwordField.clear();
+            emailErrorLabel.setText("");
+            passwordErrorLabel.setText("");
+            labelError.setText("");
+            screenController.activate("register", stage);
+        });
 
         Hyperlink resetLink = new Hyperlink("Don't remember password? Reset password");
-        resetLink.setOnAction(event -> screenController.activate("reset", stage));
+        resetLink.setOnAction(event -> {
+            emailField.clear();
+            passwordField.clear();
+            emailErrorLabel.setText("");
+            passwordErrorLabel.setText("");
+            labelError.setText("");
+            screenController.activate("reset", stage);
+        });
 
         VBox form = new VBox(5, labelError, emailLabel, emailField, emailErrorLabel, passwordLabel, passwordField,
                 passwordErrorLabel, loginButton, registerLink, resetLink);

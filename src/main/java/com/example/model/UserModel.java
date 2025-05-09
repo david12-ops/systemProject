@@ -2,7 +2,6 @@ package com.example.model;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import com.example.utils.ErrorToolManager;
 import com.example.utils.ImageConvertor;
 import com.example.utils.JsonStorage;
 import com.example.utils.enums.AddTypeOperation;
+import com.example.utils.enums.Form;
 import com.example.utils.enums.Operation;
 import com.example.utils.services.ValidationService;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -36,8 +36,8 @@ public class UserModel extends JsonStorage<User> {
     }
 
     public void addUser(String emailAccount, String password, String confirmationPassword, UserToken userToken,
-            AddTypeOperation addTypeOperation) {
-        boolean valid = validateData(Operation.CREATE, emailAccount, password, confirmationPassword);
+            AddTypeOperation addTypeOperation, Form form) {
+        boolean valid = validateData(Operation.CREATE, emailAccount, password, confirmationPassword, form);
 
         if (addTypeOperation == AddTypeOperation.NEWACCOUNT) {
             if (valid) {
@@ -61,62 +61,38 @@ public class UserModel extends JsonStorage<User> {
         if (loggedUser != null && !loggedUser.getMailAccount().equals(user.getMailAccount())) {
             removeItem(user);
         } else {
-            errorToolManager.logError(
-                    new AbstractMap.SimpleEntry<>("removedAccount", "User is not logged or removing active account"));
+            errorToolManager.logError(errorToolManager.createErrorBody("removedAccount",
+                    "User is not logged or removing active account"));
         }
     }
 
-    public boolean updateUser(UserToken userToken, String newPassword, String confirmationPassword) {
+    public void updateUser(UserToken userToken, String password, String confirmationPassword, Form form) {
+        User foundUser = getUserByToken(userToken);
+        if (foundUser != null) {
+            boolean validPasswords = validator.validPassword(password, foundUser.getMailAccount(), form)
+                    && validator.confirmedPassword(foundUser.getPassword(), password, confirmationPassword, form);
 
-        if (validator.confirmedPassword(newPassword, confirmationPassword)) {
+            if (validPasswords) {
+                User updatedUser = new User(foundUser.getUserId(), foundUser.getGroupId(), foundUser.getMailAccount(),
+                        BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
-            User foundUser = getUserByToken(userToken);
-
-            if (foundUser != null) {
-                if (BCrypt.checkpw(confirmationPassword, foundUser.getPassword())) {
-                    errorToolManager.logError(new AbstractMap.SimpleEntry<>("confirmPassword",
-                            "New password must be different from the old password"));
-                    return false;
-                } else {
-                    User updatedUser = new User(foundUser.getUserId(), foundUser.getGroupId(),
-                            foundUser.getMailAccount(), BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
-
-                    updateItem(foundUser, updatedUser);
-                    return getUserByCredentials(updatedUser.getMailAccount(), confirmationPassword, null) != null ? true
-                            : false;
-
-                }
+                updateItem(foundUser, updatedUser);
             }
-
-            return false;
         }
-
-        return false;
     }
 
-    public boolean updateUser(User user, String newPassword, String confirmationPassword) {
-
+    public void updateUser(User user, String password, String confirmationPassword, Form form) {
         if (user != null) {
-            if (validator.confirmedPassword(newPassword, confirmationPassword)) {
+            boolean validPasswords = validator.validPassword(password, user.getMailAccount(), form)
+                    && validator.confirmedPassword(user.getPassword(), password, confirmationPassword, form);
 
-                if (BCrypt.checkpw(confirmationPassword, user.getPassword())) {
-                    errorToolManager.logError(new AbstractMap.SimpleEntry<>("confirmPassword",
-                            "New password must be different from the old password"));
-                    return false;
-                } else {
-                    User updatedUser = new User(user.getUserId(), user.getGroupId(), user.getMailAccount(),
-                            BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
+            if (validPasswords) {
+                User updatedUser = new User(user.getUserId(), user.getGroupId(), user.getMailAccount(),
+                        BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
-                    updateItem(user, updatedUser);
-                    return getUserByCredentials(updatedUser.getMailAccount(), confirmationPassword, null) != null ? true
-                            : false;
-                }
+                updateItem(user, updatedUser);
             }
-
-            return false;
         }
-
-        return false;
     }
 
     public void updateUser(UserToken userToken, File profileImage) {
@@ -132,11 +108,11 @@ public class UserModel extends JsonStorage<User> {
         }
     }
 
-    private boolean validateData(Operation operation, String email, String password, String confirmationPassword) {
-        return validator.validEmailPassword(email, password)
-                && validator.confirmedPassword(password, confirmationPassword)
-                && validator.nonDuplicateUserWithEmail(operation, email, listOfUsers);
-
+    private boolean validateData(Operation operation, String email, String password, String confirmationPassword,
+            Form form) {
+        return validator.validEmail(email) && validator.nonDuplicateUserWithEmail(operation, email, listOfUsers)
+                && validator.validPassword(password, email, form)
+                && validator.confirmedPassword(null, password, confirmationPassword, form);
     }
 
     public String getError(String errorName) {

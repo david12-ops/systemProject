@@ -12,9 +12,20 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public class AddAnotherAccountScreen extends VBox {
+
+    private Label createErrorLabel() {
+        Label label = new Label();
+        label.setWrapText(true);
+        label.setMaxWidth(250);
+        label.setTextAlignment(TextAlignment.CENTER);
+        label.setAlignment(Pos.CENTER);
+        label.getStyleClass().add("error-label");
+        return label;
+    }
 
     private void clearFields(Label emailErrorLabel, Label passwordErrorLabel, Label confirmPasswordErrorLabel,
             TextField emailField, PasswordField passwordField, PasswordField confirmPasswordField,
@@ -37,6 +48,7 @@ public class AddAnotherAccountScreen extends VBox {
 
         boolean isBlankField = false;
         boolean valid = true;
+        boolean addedAcount = false;
 
         if (emailField.getText().isBlank()) {
             emailErrorLabel.setText("Email is required");
@@ -56,7 +68,10 @@ public class AddAnotherAccountScreen extends VBox {
             valid = false;
         }
 
-        userController.addAnotherAccount(emailField.getText(), passwordField.getText(), confirmPasswordField.getText());
+        if (!isBlankField) {
+            addedAcount = userController.addAnotherAccount(emailField.getText(), passwordField.getText(),
+                    confirmPasswordField.getText());
+        }
 
         if (!isBlankField && userController.getError("password") != null) {
             passwordErrorLabel.setText(userController.getError("password"));
@@ -76,13 +91,21 @@ public class AddAnotherAccountScreen extends VBox {
             valid = false;
         }
 
-        if (valid) {
+        if (valid && addedAcount) {
             clearFields(emailErrorLabel, passwordErrorLabel, confirmPasswordErrorLabel, emailField, passwordField,
                     confirmPasswordField, userController);
             screenController.updateScreen("switchUser",
                     new SwitchUserScreen(stage, screenController, userController, messageControll));
             screenController.activate("main", stage);
         }
+
+        if (valid && !addedAcount) {
+            String error = userController.getError("unexpected");
+            labelError.setText(error == null
+                    ? "Adding new account failed due to an unexpected error or session issue. Please try again or contact support"
+                    : error);
+        }
+
     }
 
     private void onchangeInitialize(TextField emailField, PasswordField passwordField,
@@ -117,23 +140,25 @@ public class AddAnotherAccountScreen extends VBox {
     public AddAnotherAccountScreen(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageControll) {
 
-        Label labelError = new Label();
-        labelError.getStyleClass().add("error-label");
+        Label labelError = createErrorLabel();
 
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
-        Label emailErrorLabel = new Label();
-        emailErrorLabel.getStyleClass().add("error-label");
+        emailField.getStyleClass().add("text-field");
+
+        Label emailErrorLabel = createErrorLabel();
 
         Label passwordLabel = new Label("Password:");
         PasswordField passwordField = new PasswordField();
-        Label passwordErrorLabel = new Label();
-        passwordErrorLabel.getStyleClass().add("error-label");
+        passwordField.getStyleClass().add("password-field");
+
+        Label passwordErrorLabel = createErrorLabel();
 
         Label confirmPasswordLabel = new Label("Confirm password:");
         PasswordField confirmPasswordField = new PasswordField();
-        Label confirmPasswordErrorLabel = new Label();
-        confirmPasswordErrorLabel.getStyleClass().add("error-label");
+        confirmPasswordField.getStyleClass().add("password-field");
+
+        Label confirmPasswordErrorLabel = createErrorLabel();
 
         onchangeInitialize(emailField, passwordField, confirmPasswordField, confirmPasswordErrorLabel, emailErrorLabel,
                 passwordErrorLabel, userController, labelError);

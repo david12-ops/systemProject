@@ -1,6 +1,8 @@
 package com.example.utils;
 
+import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import com.example.utils.interfaces.ErrorManagement;
@@ -39,6 +41,11 @@ public class ErrorToolManager implements ErrorManagement {
     @Override
     public String getError(String errorName) {
         return errorMap.get(errorName);
+    }
+
+    @Override
+    public Map.Entry<String, String> createErrorBody(String key, String message) {
+        return new AbstractMap.SimpleEntry<>(key, message);
     }
 
 }

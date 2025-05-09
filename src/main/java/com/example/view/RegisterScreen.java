@@ -11,9 +11,20 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public class RegisterScreen extends VBox {
+
+    private Label createErrorLabel() {
+        Label label = new Label();
+        label.setWrapText(true);
+        label.setMaxWidth(250);
+        label.setTextAlignment(TextAlignment.CENTER);
+        label.setAlignment(Pos.CENTER);
+        label.getStyleClass().add("error-label");
+        return label;
+    }
 
     private void clearFields(Label emailErrorLabel, Label passwordErrorLabel, TextField emailField,
             PasswordField passwordField, PasswordField confirmPasswordField, Label confirmPasswordErrorLabel,
@@ -36,6 +47,7 @@ public class RegisterScreen extends VBox {
 
         boolean isBlankField = false;
         boolean valid = true;
+        boolean registerSuccess = false;
 
         if (emailField.getText().isBlank()) {
             emailErrorLabel.setText("Email is required");
@@ -55,8 +67,10 @@ public class RegisterScreen extends VBox {
             valid = false;
         }
 
-        boolean registerSuccess = userController.register(emailField.getText(), passwordField.getText(),
-                confirmPasswordField.getText());
+        if (!isBlankField) {
+            registerSuccess = userController.register(emailField.getText(), passwordField.getText(),
+                    confirmPasswordField.getText());
+        }
 
         if (!isBlankField && userController.getError("password") != null) {
             passwordErrorLabel.setText(userController.getError("password"));
@@ -83,7 +97,10 @@ public class RegisterScreen extends VBox {
         }
 
         if (valid && !registerSuccess) {
-            labelError.setText("Password update failed, user might not be logged in.");
+            String error = userController.getError("unexpected");
+            labelError.setText(error == null
+                    ? "Registration failed due to an unexpected error. Please try again or contact support"
+                    : error);
         }
     }
 
@@ -117,23 +134,25 @@ public class RegisterScreen extends VBox {
 
     public RegisterScreen(Stage stage, ScreenController screenController, UserController userController) {
 
-        Label labelError = new Label();
-        labelError.getStyleClass().add("error-label");
+        Label labelError = createErrorLabel();
 
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
-        Label emailErrorLabel = new Label();
-        emailErrorLabel.getStyleClass().add("error-label");
+        emailField.getStyleClass().add("text-field");
+
+        Label emailErrorLabel = createErrorLabel();
 
         Label passwordLabel = new Label("Password:");
         PasswordField passwordField = new PasswordField();
-        Label passwordErrorLabel = new Label();
-        passwordErrorLabel.getStyleClass().add("error-label");
+        passwordField.getStyleClass().add("password-field");
 
-        Label confirmPasswordLabel = new Label("Confirm new password:");
+        Label passwordErrorLabel = createErrorLabel();
+
+        Label confirmPasswordLabel = new Label("Confirm password:");
         PasswordField confirmPasswordField = new PasswordField();
-        Label confirmPasswordErrorLabel = new Label();
-        confirmPasswordErrorLabel.getStyleClass().add("error-label");
+        confirmPasswordField.getStyleClass().add("password-field");
+
+        Label confirmPasswordErrorLabel = createErrorLabel();
 
         onchangeInitialize(emailField, passwordField, confirmPasswordField, confirmPasswordErrorLabel, emailErrorLabel,
                 passwordErrorLabel, userController, labelError);

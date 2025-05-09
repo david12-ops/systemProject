@@ -1,5 +1,6 @@
 package com.example.utils.interfaces;
 
+import java.util.Map;
 import java.util.Map.Entry;
 
 public interface ErrorManagement {
@@ -11,4 +12,6 @@ public interface ErrorManagement {
     void removeError(String errorName);
 
     String getError(String errorName);
+
+    Map.Entry<String, String> createErrorBody(String key, String message);
 }

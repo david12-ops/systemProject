@@ -22,7 +22,7 @@ public class MainScreen extends VBox {
     // TODO - styling
     // TODO - bug in avatar in switchUser - switched but avatar dont updated - fixed
     // (need better way)
-    // TODO - build tests - test validator on UserModel
+    // TODO - build tests
 
     public MainScreen(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {
