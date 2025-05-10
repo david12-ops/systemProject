@@ -12,9 +12,9 @@ public interface UserModelValidationsTools {
 
     boolean validEmail(String email);
 
-    boolean validPassword(String password, String email, Form form);
+    boolean validPassword(String currentPassword, String password, String email, Form form);
 
-    boolean nonDuplicateUserWithEmail(Operation operation, String senderUserEm, List<User> users);
+    boolean nonDuplicateUserWithEmail(Operation operation, String senderEmail, List<User> users);
 
-    boolean confirmedPassword(String currentPassword, String password, String confirmationPassword, Form form);
+    boolean confirmedPassword(String password, String confirmationPassword, Form form);
 }

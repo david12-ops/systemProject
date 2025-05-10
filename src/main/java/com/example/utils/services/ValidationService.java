@@ -45,7 +45,7 @@ public class ValidationService {
         }
 
         @Override
-        public boolean validPassword(String password, String email, Form form) {
+        public boolean validPassword(String currentPassword, String password, String email, Form form) {
 
             int atIndex = email.indexOf('@');
             String emailPart = atIndex == -1 ? null : email.substring(0, atIndex).toLowerCase().trim();
@@ -83,18 +83,32 @@ public class ValidationService {
 
             }
 
+            if (currentPassword != null) {
+                if ((form == Form.ADDACCOUNT || form == Form.REGISTER) && BCrypt.checkpw(password, currentPassword)) {
+                    errorToolManager.logError(errorToolManager.createErrorBody("password",
+                            "Password must be different from the current password"));
+                    valid = false;
+                }
+
+                if (form == Form.FORGOTCREDENTIALS && BCrypt.checkpw(password, currentPassword)) {
+                    errorToolManager.logError(errorToolManager.createErrorBody("newPassword",
+                            "New password must be different from the current password"));
+                    valid = false;
+                }
+            }
+
             return valid;
         }
 
         @Override
-        public boolean nonDuplicateUserWithEmail(Operation operation, String senderUserEm, List<User> users) {
+        public boolean nonDuplicateUserWithEmail(Operation operation, String senderEmail, List<User> users) {
             if (users != null && !users.isEmpty()) {
                 List<User> list = operation == Operation.UPDATE ? users.stream()
-                        .filter(user -> !user.getMailAccount().equals(senderUserEm)).collect(Collectors.toList())
+                        .filter(user -> !user.getMailAccount().equals(senderEmail)).collect(Collectors.toList())
                         : users;
 
                 for (User user : list) {
-                    if (user.getMailAccount().equals(senderUserEm)) {
+                    if (user.getMailAccount().equals(senderEmail)) {
                         errorToolManager
                                 .logError(errorToolManager.createErrorBody("email", "Provided email is already used"));
                         return false;
@@ -107,25 +121,9 @@ public class ValidationService {
         }
 
         @Override
-        public boolean confirmedPassword(String currentPassword, String password, String confirmationPassword,
-                Form form) {
+        public boolean confirmedPassword(String password, String confirmationPassword, Form form) {
 
             boolean valid = true;
-
-            if (currentPassword != null) {
-                if ((form == Form.ADDACCOUNT || form == Form.REGISTER)
-                        && BCrypt.checkpw(confirmationPassword, currentPassword)) {
-                    errorToolManager.logError(errorToolManager.createErrorBody("confirmPassword",
-                            "Confirmed password must be different from the current password"));
-                    valid = false;
-                }
-
-                if (form == Form.FORGOTCREDENTIALS && BCrypt.checkpw(confirmationPassword, currentPassword)) {
-                    errorToolManager.logError(errorToolManager.createErrorBody("confirmNewPassword",
-                            "Confirmed new password must be different from the current password"));
-                    valid = false;
-                }
-            }
 
             if (!password.equals(confirmationPassword)) {
                 if (form == Form.ADDACCOUNT || form == Form.REGISTER) {

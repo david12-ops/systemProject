@@ -35,20 +35,36 @@ public class UserModel extends JsonStorage<User> {
         this.listOfUsers = getItems();
     }
 
+    private boolean validatePasswords(String currentPassword, String email, String password,
+            String confirmationPassword, Form form) {
+        return validator.validPassword(currentPassword, password, email, form)
+                && validator.confirmedPassword(password, confirmationPassword, form);
+    }
+
+    private boolean validateData(Operation operation, String currentPassword, String email, String password,
+            String confirmationPassword, Form form) {
+        return validator.validEmail(email) && validator.nonDuplicateUserWithEmail(operation, email, listOfUsers)
+                && validatePasswords(currentPassword, email, password, confirmationPassword, form);
+    }
+
     public void addUser(String emailAccount, String password, String confirmationPassword, UserToken userToken,
             AddTypeOperation addTypeOperation, Form form) {
-        boolean valid = validateData(Operation.CREATE, emailAccount, password, confirmationPassword, form);
 
         if (addTypeOperation == AddTypeOperation.NEWACCOUNT) {
-            if (valid) {
+
+            if (validateData(Operation.CREATE, null, emailAccount, password, confirmationPassword, form)) {
                 User newUser = new User(null, null, emailAccount, BCrypt.hashpw(password, BCrypt.gensalt()));
                 addItem(newUser);
             }
         }
 
         if (addTypeOperation == AddTypeOperation.ANOTHERACCOUNT) {
+
             User loggedUser = getUserByToken(userToken);
-            if (valid && loggedUser != null) {
+
+            if (loggedUser != null && validateData(Operation.CREATE, loggedUser.getPassword(), emailAccount, password,
+                    confirmationPassword, form)) {
+
                 User newUser = new User(null, loggedUser.getGroupId(), emailAccount,
                         BCrypt.hashpw(password, BCrypt.gensalt()));
                 addItem(newUser);
@@ -69,10 +85,8 @@ public class UserModel extends JsonStorage<User> {
     public void updateUser(UserToken userToken, String password, String confirmationPassword, Form form) {
         User foundUser = getUserByToken(userToken);
         if (foundUser != null) {
-            boolean validPasswords = validator.validPassword(password, foundUser.getMailAccount(), form)
-                    && validator.confirmedPassword(foundUser.getPassword(), password, confirmationPassword, form);
-
-            if (validPasswords) {
+            if (validatePasswords(foundUser.getPassword(), foundUser.getMailAccount(), password, confirmationPassword,
+                    form)) {
                 User updatedUser = new User(foundUser.getUserId(), foundUser.getGroupId(), foundUser.getMailAccount(),
                         BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
@@ -83,10 +97,7 @@ public class UserModel extends JsonStorage<User> {
 
     public void updateUser(User user, String password, String confirmationPassword, Form form) {
         if (user != null) {
-            boolean validPasswords = validator.validPassword(password, user.getMailAccount(), form)
-                    && validator.confirmedPassword(user.getPassword(), password, confirmationPassword, form);
-
-            if (validPasswords) {
+            if (validatePasswords(user.getPassword(), user.getMailAccount(), password, confirmationPassword, form)) {
                 User updatedUser = new User(user.getUserId(), user.getGroupId(), user.getMailAccount(),
                         BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
@@ -106,13 +117,6 @@ public class UserModel extends JsonStorage<User> {
                 System.err.println("Error converting image: " + e.getMessage());
             }
         }
-    }
-
-    private boolean validateData(Operation operation, String email, String password, String confirmationPassword,
-            Form form) {
-        return validator.validEmail(email) && validator.nonDuplicateUserWithEmail(operation, email, listOfUsers)
-                && validator.validPassword(password, email, form)
-                && validator.confirmedPassword(null, password, confirmationPassword, form);
     }
 
     public String getError(String errorName) {
