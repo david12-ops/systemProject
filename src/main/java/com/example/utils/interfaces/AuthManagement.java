@@ -5,8 +5,6 @@ import java.util.List;
 import com.example.model.User;
 import com.example.model.UserToken;
 
-import javafx.scene.image.Image;
-
 public interface AuthManagement {
 
     boolean register(String emailAccount, String password, String confirmationPassword);
@@ -22,5 +20,5 @@ public interface AuthManagement {
     boolean updateNotLoggedAccount(String emailAccount, String password, String newPassword,
             String confirmationPassword);
 
-    Image getImageProfile();
+    boolean updateLoggedInAccount(String newPassword, String confirmationPassword);
 }

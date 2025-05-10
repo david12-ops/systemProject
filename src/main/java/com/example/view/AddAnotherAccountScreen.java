@@ -124,7 +124,6 @@ public class AddAnotherAccountScreen extends VBox {
                 passwordErrorLabel.setText("");
                 labelError.setText("");
                 userController.clearError("password");
-                userController.clearError("confirmPassword");
             }
         });
 

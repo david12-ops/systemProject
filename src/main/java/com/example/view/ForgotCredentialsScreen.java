@@ -103,7 +103,7 @@ public class ForgotCredentialsScreen extends VBox {
         }
 
         if (confirmNewPasswordField.getText().isBlank()) {
-            confirmNewPasswordErrorLabel.setText("Confirmation password is required");
+            confirmNewPasswordErrorLabel.setText("Confirmation new password is required");
             isBlankField = true;
             valid = false;
         }

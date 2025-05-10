@@ -2,6 +2,8 @@ package com.example.utils.interfaces;
 
 import com.example.model.User;
 
+import javafx.scene.image.Image;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -13,7 +15,7 @@ public interface UserManagement {
 
     boolean removeAccount(User user);
 
-    boolean updateLoggedInAccount(String newPassword, String confirmationPassword);
-
     void updateImageProfile(File file) throws IOException;
+
+    Image getImageProfile();
 }
