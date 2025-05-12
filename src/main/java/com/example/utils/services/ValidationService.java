@@ -16,10 +16,10 @@ import com.example.utils.interfaces.UserModelValidationsTools;
 
 public class ValidationService {
     private static final Pattern EMAIL_REGEX = Pattern
-            .compile("^(?=.{1,254}$)(?=.{1,64}@)[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+            .compile("^(?=.{1,254}$)(?=.{1,64}@)(?!.*\\.\\.)(?!.*\\.$)[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final long MAX_FILE_SIZE = 25L * 1024 * 1024;
     private static final Pattern PASSWORD_REGEX = Pattern
-            .compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$");
+            .compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&.])[A-Za-z\\d@$!%*?&.]{8,}$");
     private static final String SUPPORTED_IMAGE_FILES = "(?i).*\\.(png|jpg|jpeg|gif)$";
     private static final String SUPPORTED_FILES = "(?i).*\\.(docx?|xlsx?|pptx?|pdf|txt|rtf|odt|ods|odp|jpg|jpeg|png|gif|bmp|tiff|webp|mp4|mov|avi|wmv|mp3|wav|m4a|zip|7z|tar|gz)$";
 
@@ -33,82 +33,91 @@ public class ValidationService {
         @Override
         public boolean validEmail(String email) {
 
-            boolean valid = true;
-
             if (email == null || !EMAIL_REGEX.matcher(email).matches()) {
                 errorToolManager.logError(errorToolManager.createErrorBody("email",
-                        "Please enter a valid email address (e.g., user@example.com)."));
-                valid = false;
+                        "Please enter a valid email address (e.g., user@example.com)"));
+                return false;
             }
 
-            return valid;
+            return true;
         }
 
         @Override
         public boolean validPassword(String currentPassword, String password, String email, Form form) {
 
-            int atIndex = email.indexOf('@');
-            String emailPart = atIndex == -1 ? null : email.substring(0, atIndex).toLowerCase().trim();
-            String lowerPassword = password.toLowerCase();
-            boolean valid = true;
-
             if (password == null || !PASSWORD_REGEX.matcher(password).matches()) {
                 if (form == Form.ADDACCOUNT || form == Form.REGISTER) {
                     errorToolManager.logError(errorToolManager.createErrorBody("password",
                             "Password must include uppercase, lowercase, number, and special character, and be at least 8 characters"));
-                    valid = false;
+                    return false;
                 }
 
                 if (form == Form.FORGOTCREDENTIALS) {
                     errorToolManager.logError(errorToolManager.createErrorBody("newPassword",
                             "New password must include uppercase, lowercase, number, and special character, and be at least 8 characters"));
-                    valid = false;
+                    return false;
                 }
             }
 
-            if (emailPart != null) {
+            if (email != null) {
 
-                if ((form == Form.ADDACCOUNT || form == Form.REGISTER) && lowerPassword.contains(emailPart)
-                        && emailPart.length() >= 4) {
-                    errorToolManager.logError(
-                            errorToolManager.createErrorBody("password", "Password is too similar to your email"));
-                    valid = false;
+                int atIndex = email.indexOf('@');
+                String emailPart = atIndex == -1 ? null : email.substring(0, atIndex).toLowerCase().trim();
+                String lowerPassword = password.toLowerCase();
+                String[] parts = emailPart.split("[._-]");
+
+                if (parts.length == 0 || parts[0].isEmpty()) {
+                    parts = new String[] { emailPart };
                 }
 
-                if (form == Form.FORGOTCREDENTIALS && lowerPassword.contains(emailPart) && emailPart.length() >= 4) {
-                    errorToolManager.logError(errorToolManager.createErrorBody("newPassword",
-                            "New password is too similar to your email"));
-                    valid = false;
-                }
+                for (String part : parts) {
+                    if ((form == Form.ADDACCOUNT || form == Form.REGISTER) && lowerPassword.contains(part)
+                            && emailPart.length() >= 4) {
+                        errorToolManager.logError(
+                                errorToolManager.createErrorBody("password", "Password is too similar to your email"));
+                        return false;
+                    }
 
+                    if (form == Form.FORGOTCREDENTIALS && lowerPassword.contains(part) && emailPart.length() >= 4) {
+                        errorToolManager.logError(errorToolManager.createErrorBody("newPassword",
+                                "New password is too similar to your email"));
+                        return false;
+                    }
+                }
             }
+
+            // TODO - for similarity use Levenshtein distance (edit distance), Substring
+            // overlap, Common prefix/suffix comparison
 
             if (currentPassword != null) {
                 if ((form == Form.ADDACCOUNT || form == Form.REGISTER) && BCrypt.checkpw(password, currentPassword)) {
                     errorToolManager.logError(errorToolManager.createErrorBody("password",
                             "Password must be different from the current password"));
-                    valid = false;
+                    return false;
                 }
 
                 if (form == Form.FORGOTCREDENTIALS && BCrypt.checkpw(password, currentPassword)) {
                     errorToolManager.logError(errorToolManager.createErrorBody("newPassword",
                             "New password must be different from the current password"));
-                    valid = false;
+                    return false;
                 }
             }
 
-            return valid;
+            return true;
         }
 
         @Override
-        public boolean nonDuplicateUserWithEmail(Operation operation, String senderEmail, List<User> users) {
+        public boolean nonDuplicateUserWithEmail(Operation operation, String currentUserEmail, String newEmail,
+                List<User> users) {
+            // This app does not allow changing email at all
+
             if (users != null && !users.isEmpty()) {
-                List<User> list = operation == Operation.UPDATE ? users.stream()
-                        .filter(user -> !user.getMailAccount().equals(senderEmail)).collect(Collectors.toList())
+                List<User> list = operation == Operation.UPDATE && currentUserEmail != null ? users.stream()
+                        .filter(user -> !user.getMailAccount().equals(currentUserEmail)).collect(Collectors.toList())
                         : users;
 
                 for (User user : list) {
-                    if (user.getMailAccount().equals(senderEmail)) {
+                    if (user.getMailAccount().equals(newEmail)) {
                         errorToolManager
                                 .logError(errorToolManager.createErrorBody("email", "Provided email is already used"));
                         return false;
@@ -123,8 +132,6 @@ public class ValidationService {
         @Override
         public boolean confirmedPassword(String password, String confirmationPassword, Form form) {
 
-            boolean valid = true;
-
             if (!password.equals(confirmationPassword)) {
                 if (form == Form.ADDACCOUNT || form == Form.REGISTER) {
                     errorToolManager.logError(errorToolManager.createErrorBody("confirmPassword",
@@ -136,10 +143,10 @@ public class ValidationService {
                             "New password does not match the confirmation"));
                 }
 
-                valid = false;
+                return false;
             }
 
-            return valid;
+            return true;
         }
 
         @Override
@@ -168,7 +175,6 @@ public class ValidationService {
 
         @Override
         public boolean validFiles(List<File> files) {
-            boolean valid = true;
 
             for (File file : files) {
                 String fileName = file.getName().toLowerCase();
@@ -176,55 +182,53 @@ public class ValidationService {
                 if (file.length() > MAX_FILE_SIZE) {
                     errorToolManager.logError(errorToolManager.createErrorBody("file", "The file \"" + file.getName()
                             + "\" is too big — only files smaller than 25 MB can be sent."));
-                    valid = false;
+                    return false;
                 }
 
                 if (!fileName.matches(SUPPORTED_FILES)) {
                     errorToolManager.logError(
                             errorToolManager.createErrorBody("file", "Unsupported file type: " + file.getName()));
-                    valid = false;
+                    return false;
                 }
             }
 
-            return valid;
+            return true;
         }
 
         @Override
         public boolean validMessageData(String sender, String acceptor, String subject, String message,
                 List<String> kopies) {
 
-            boolean valid = true;
-
             if (sender == null || !EMAIL_REGEX.matcher(sender).matches()) {
                 errorToolManager.logError(errorToolManager.createErrorBody("sender",
-                        "Please enter a valid email address (e.g., user@example.com)."));
-                valid = false;
+                        "Please enter a valid email address (e.g., user@example.com)"));
+                return false;
             }
 
             if (acceptor == null || !EMAIL_REGEX.matcher(acceptor).matches()) {
                 errorToolManager.logError(errorToolManager.createErrorBody("acceptor",
-                        "Please enter a valid email address (e.g., user@example.com)."));
-                valid = false;
+                        "Please enter a valid email address (e.g., user@example.com)"));
+                return false;
             }
 
             if (subject != null && subject.length() > 500) {
                 errorToolManager.logError(errorToolManager.createErrorBody("subject", "Subject is too long"));
-                valid = false;
+                return false;
             }
 
             if (message != null && message.length() > 10000) {
                 errorToolManager.logError(errorToolManager.createErrorBody("message", "Message is too long"));
-                valid = false;
+                return false;
             }
 
             if (kopies != null && kopies.size() > 500) {
 
                 errorToolManager.logError(errorToolManager.createErrorBody("kopies",
-                        "Too many recipients — you can't send more than 500 at once."));
-                valid = false;
+                        "Too many recipients — you can't send more than 500 at once"));
+                return false;
             }
 
-            return valid;
+            return true;
         }
     }
 }

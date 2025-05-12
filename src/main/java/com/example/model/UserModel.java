@@ -35,16 +35,17 @@ public class UserModel extends JsonStorage<User> {
         this.listOfUsers = getItems();
     }
 
-    private boolean validatePasswords(String currentPassword, String email, String password,
+    private boolean validatePasswords(String email, String currentPassword, String password,
             String confirmationPassword, Form form) {
         return validator.validPassword(currentPassword, password, email, form)
                 && validator.confirmedPassword(password, confirmationPassword, form);
     }
 
-    private boolean validateData(Operation operation, String currentPassword, String email, String password,
-            String confirmationPassword, Form form) {
-        return validator.validEmail(email) && validator.nonDuplicateUserWithEmail(operation, email, listOfUsers)
-                && validatePasswords(currentPassword, email, password, confirmationPassword, form);
+    private boolean validateData(Operation operation, String currentEmail, String newEmail, String currentPassword,
+            String password, String confirmationPassword, Form form) {
+        return validator.validEmail(newEmail)
+                && validator.nonDuplicateUserWithEmail(operation, currentEmail, newEmail, listOfUsers)
+                && validatePasswords(newEmail, currentPassword, password, confirmationPassword, form);
     }
 
     public void addUser(String emailAccount, String password, String confirmationPassword, UserToken userToken,
@@ -52,7 +53,7 @@ public class UserModel extends JsonStorage<User> {
 
         if (addTypeOperation == AddTypeOperation.NEWACCOUNT) {
 
-            if (validateData(Operation.CREATE, null, emailAccount, password, confirmationPassword, form)) {
+            if (validateData(Operation.CREATE, null, emailAccount, null, password, confirmationPassword, form)) {
                 User newUser = new User(null, null, emailAccount, BCrypt.hashpw(password, BCrypt.gensalt()));
                 addItem(newUser);
             }
@@ -62,8 +63,8 @@ public class UserModel extends JsonStorage<User> {
 
             User loggedUser = getUserByToken(userToken);
 
-            if (loggedUser != null && validateData(Operation.CREATE, loggedUser.getPassword(), emailAccount, password,
-                    confirmationPassword, form)) {
+            if (loggedUser != null && validateData(Operation.CREATE, null, emailAccount, loggedUser.getPassword(),
+                    password, confirmationPassword, form)) {
 
                 User newUser = new User(null, loggedUser.getGroupId(), emailAccount,
                         BCrypt.hashpw(password, BCrypt.gensalt()));
@@ -85,7 +86,7 @@ public class UserModel extends JsonStorage<User> {
     public void updateUser(UserToken userToken, String password, String confirmationPassword, Form form) {
         User foundUser = getUserByToken(userToken);
         if (foundUser != null) {
-            if (validatePasswords(foundUser.getPassword(), foundUser.getMailAccount(), password, confirmationPassword,
+            if (validatePasswords(foundUser.getMailAccount(), foundUser.getPassword(), password, confirmationPassword,
                     form)) {
                 User updatedUser = new User(foundUser.getUserId(), foundUser.getGroupId(), foundUser.getMailAccount(),
                         BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
@@ -97,7 +98,7 @@ public class UserModel extends JsonStorage<User> {
 
     public void updateUser(User user, String password, String confirmationPassword, Form form) {
         if (user != null) {
-            if (validatePasswords(user.getPassword(), user.getMailAccount(), password, confirmationPassword, form)) {
+            if (validatePasswords(user.getMailAccount(), user.getPassword(), password, confirmationPassword, form)) {
                 User updatedUser = new User(user.getUserId(), user.getGroupId(), user.getMailAccount(),
                         BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 

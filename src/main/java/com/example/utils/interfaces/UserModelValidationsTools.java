@@ -14,7 +14,7 @@ public interface UserModelValidationsTools {
 
     boolean validPassword(String currentPassword, String password, String email, Form form);
 
-    boolean nonDuplicateUserWithEmail(Operation operation, String senderEmail, List<User> users);
+    boolean nonDuplicateUserWithEmail(Operation operation, String currentUserEmail, String newEmail, List<User> users);
 
     boolean confirmedPassword(String password, String confirmationPassword, Form form);
 }
