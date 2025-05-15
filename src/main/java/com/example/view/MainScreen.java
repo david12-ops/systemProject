@@ -23,6 +23,7 @@ public class MainScreen extends VBox {
     // TODO - bug in avatar in switchUser - switched but avatar dont updated - fixed
     // (need better way)
     // TODO - build tests
+    // TODO - addacount bug
 
     public MainScreen(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public abstract class JsonStorage<T> {
+class FilePersistence<T> {
 
     Dotenv dotenv = Dotenv.load();
     private final String FOLDER_PATH = dotenv.get("FOLDER_DATA_LOCATION");
@@ -20,66 +20,79 @@ public abstract class JsonStorage<T> {
     private final Path filePath;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final TypeReference<List<T>> typeReference;
-    // syncronized CRUD operations for multi acces - prevent race conditions
-    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
 
     private List<T> items;
 
-    public JsonStorage(String fileName, TypeReference<List<T>> typeReference) {
+    public FilePersistence(String fileName, TypeReference<List<T>> typeReference, List<T> items) {
         this.filePath = Path.of(FOLDER_PATH, fileName);
         this.typeReference = typeReference;
-        loadFromFile();
+        this.items = items;
     }
 
-    private void loadFromFile() {
+    protected void loadFromFile() {
         File file = filePath.toFile();
         if (file.exists() && file.length() > 0) {
             try {
-                this.items = objectMapper.readValue(file, typeReference);
+                List<T> loaded = objectMapper.readValue(file, typeReference);
+                this.items.clear();
+                this.items.addAll(loaded);
             } catch (IOException e) {
                 e.printStackTrace();
                 this.items = new ArrayList<>();
             }
         } else {
-            this.items = createEmptyList();
+            this.items = new ArrayList<>();
             saveToFile();
         }
     }
 
-    private void saveToFile() {
+    protected void saveToFile() {
         try {
-            System.out.println("items: " + this.items);
             objectMapper.writeValue(filePath.toFile(), this.items);
-            System.out.println("Data saved to: " + filePath);
+            System.out.println("items: " + this.items);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+}
 
-    protected List<T> getItems() {
+public class JsonStorageTool<T> {
+
+    // syncronized CRUD operations for multi acces - prevent race conditions
+    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+
+    private List<T> items = new ArrayList<>();
+    private FilePersistence<T> filePersistence;
+
+    public JsonStorageTool(String fileName, TypeReference<List<T>> typeReference) {
+        filePersistence = new FilePersistence(fileName, typeReference, items);
+        filePersistence.loadFromFile();
+    }
+
+    public List<T> getItems() {
         rwLock.readLock().lock();
         try {
-            return this.items;
+            return new ArrayList<>(this.items);
         } finally {
             rwLock.readLock().unlock();
         }
     }
 
-    protected void addItem(T item) {
+    public void addItem(T item) {
         rwLock.writeLock().lock();
         try {
             this.items.add(item);
-            saveToFile();
+            filePersistence.saveToFile();
         } finally {
             rwLock.writeLock().unlock();
         }
     }
 
-    protected void removeItem(T item) {
+    public void removeItem(T item) {
         rwLock.writeLock().lock();
         try {
             this.items.remove(item);
-            saveToFile();
+            filePersistence.saveToFile();
         } catch (Exception e) {
             System.err.println("Failed to remove item: " + e.getMessage());
             e.printStackTrace();
@@ -89,7 +102,7 @@ public abstract class JsonStorage<T> {
         }
     }
 
-    protected void updateItem(T item, T updatedItem) {
+    public void updateItem(T item, T updatedItem) {
         rwLock.writeLock().lock();
         try {
             for (int i = 0; i < items.size(); i++) {
@@ -98,7 +111,7 @@ public abstract class JsonStorage<T> {
                     break;
                 }
             }
-            saveToFile();
+            filePersistence.saveToFile();
         } catch (Exception e) {
             System.err.println("Failed to update item: " + e.getMessage());
             e.printStackTrace();
@@ -107,7 +120,5 @@ public abstract class JsonStorage<T> {
             rwLock.writeLock().unlock();
         }
     }
-
-    protected abstract List<T> createEmptyList();
 
 }

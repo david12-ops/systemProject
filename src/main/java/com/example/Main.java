@@ -5,6 +5,7 @@ import com.example.controller.ScreenController;
 import com.example.controller.UserController;
 import com.example.model.MessageModel;
 import com.example.model.UserModel;
+import com.example.utils.enums.Environment;
 import com.example.view.AddAnotherAccountScreen;
 import com.example.view.ForgotCredentialsScreen;
 import com.example.view.LoginScreen;
@@ -18,7 +19,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-        private UserModel userModel = new UserModel();
+        private UserModel userModel = new UserModel(Environment.PRODUCTION);
         private MessageModel messageModel = new MessageModel();
         private UserController userController = new UserController(userModel);
         private MessageController messageController = new MessageController(messageModel);

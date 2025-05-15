@@ -10,6 +10,7 @@ import com.example.utils.services.ValidationService.UserModelValidations;
 import javafx.util.Pair;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mindrot.jbcrypt.BCrypt;
@@ -50,6 +51,7 @@ public class UserValidationsTest {
         }
 
         @Test
+        @DisplayName("Should validate password confirmation fails for mismatches and succeeds for exact matches")
         void testPasswordMatchSuccess() {
 
                 errors.put(Form.ADDACCOUNT, "Password does not match the confirmation");
@@ -58,8 +60,8 @@ public class UserValidationsTest {
 
                 List<Pair<String, String>> invalidInputs = Arrays.asList(new Pair<>("Secret", "secret"), // case-sensitive
                                 new Pair<>("a@čbc", "ca@čb"), // different order
-                                new Pair<>("abcde", "abfde") // one char difference
-                );
+                                new Pair<>("abcde", "abfde"), // one char difference
+                                new Pair<>("abcde", null));
 
                 List<Pair<String, String>> validInputs = Arrays
                                 .asList(new Pair<>("long@stringwithtext", "long@stringwithtext"));
@@ -84,6 +86,7 @@ public class UserValidationsTest {
         }
 
         @Test
+        @DisplayName("Should enforce password rules: structure, similarity to email, and uniqueness from current")
         void testPasswordContent() {
                 List<String> validPasswords = Arrays.asList("Password1!45", "Welcome2@456", "Secure3$7895");
 
@@ -91,8 +94,8 @@ public class UserValidationsTest {
 
                 List<String> invalidPasswords = Arrays.asList("password", // no uppercase, digit, or special character
                                 "PASSWORD1!", // no lowercase
-                                "12345!@" // no letters
-                );
+                                "12345!@", // no letters
+                                null);
 
                 List<String> tooSimilarPasswordsWithEmail = Arrays.asList("John.Doe123!", "Jane.smith@123",
                                 "Michael@123");
@@ -144,6 +147,7 @@ public class UserValidationsTest {
         }
 
         @Test
+        @DisplayName("Should detect invalid email formats and accept valid ones")
         void testEmailContent() {
                 List<String> invalidEmails = Arrays.asList(null, // Null email
                                 "", // Empty string
@@ -155,8 +159,8 @@ public class UserValidationsTest {
                                 "user@domain", // Missing domain suffix (.com, .org, etc.)
                                 "user@domain..com", // Double dots in the domain part
                                 "user@domain_com", // Underscore in the domain part is invalid
-                                "user@domain#com" // Invalid character '#' in domain part
-                );
+                                "user@domain#com", // Invalid character '#' in domain part
+                                null);
 
                 List<String> validEmails = Arrays.asList("user@example.com", // Basic valid email
                                 "user.name@domain.com", // Email with a dot in the local part
@@ -182,6 +186,7 @@ public class UserValidationsTest {
         }
 
         @Test
+        @DisplayName("Should detect duplicate emails correctly during user creation and update")
         void testEmailDuplication() {
 
                 List<User> users = Arrays.asList(

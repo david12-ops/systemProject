@@ -10,8 +10,9 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import com.example.utils.ErrorToolManager;
 import com.example.utils.ImageConvertor;
-import com.example.utils.JsonStorage;
+import com.example.utils.JsonStorageTool;
 import com.example.utils.enums.AddTypeOperation;
+import com.example.utils.enums.Environment;
 import com.example.utils.enums.Form;
 import com.example.utils.enums.Operation;
 import com.example.utils.services.ValidationService;
@@ -19,7 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-public class UserModel extends JsonStorage<User> {
+public class UserModel {
 
     static Dotenv dotenv = Dotenv.load();
     private HashMap<String, String> errorMap = new HashMap<>();
@@ -28,38 +29,88 @@ public class UserModel extends JsonStorage<User> {
     private final ValidationService.UserModelValidations validator = validationService.new UserModelValidations(
             errorToolManager);
     private List<User> listOfUsers;
+    private JsonStorageTool<User> storageTool;
+    private Environment environment;
 
-    public UserModel() {
-        super(dotenv.get("FILE_PATH_USERS"), new TypeReference<List<User>>() {
-        });
-        this.listOfUsers = getItems();
+    public UserModel(Environment environment) {
+        this.environment = environment;
+        if (environment == Environment.PRODUCTION) {
+            storageTool = new JsonStorageTool<User>(dotenv.get("FILE_PATH_USERS"), new TypeReference<List<User>>() {
+            });
+            this.listOfUsers = storageTool.getItems();
+        } else if (environment == Environment.TEST) {
+            this.listOfUsers = new ArrayList<>();
+        }
+    }
+
+    public void setTestData(List<User> listOfUsers) {
+        this.listOfUsers = listOfUsers;
+    }
+
+    public List<User> getTestData() {
+        return listOfUsers;
     }
 
     private boolean validatePasswords(String email, String currentPassword, String password,
             String confirmationPassword, Form form) {
-        return validator.validPassword(currentPassword, password, email, form)
-                && validator.confirmedPassword(password, confirmationPassword, form);
+
+        clearError("validation");
+        if (isFormSupported(form)) {
+            return validator.validPassword(currentPassword, password, email, form)
+                    && validator.confirmedPassword(password, confirmationPassword, form);
+        } else {
+            errorToolManager.logError(errorToolManager.createErrorBody("validation",
+                    "Validation for form " + form + " is not supported"));
+            return false;
+        }
     }
 
     private boolean validateData(Operation operation, String currentEmail, String newEmail, String currentPassword,
             String password, String confirmationPassword, Form form) {
-        return validator.validEmail(newEmail)
-                && validator.nonDuplicateUserWithEmail(operation, currentEmail, newEmail, listOfUsers)
-                && validatePasswords(newEmail, currentPassword, password, confirmationPassword, form);
+
+        clearError("validation");
+        if (isFormSupported(form)) {
+            return validator.validEmail(newEmail)
+                    && validator.nonDuplicateUserWithEmail(operation, currentEmail, newEmail, listOfUsers)
+                    && validatePasswords(newEmail, currentPassword, password, confirmationPassword, form);
+        } else {
+            errorToolManager.logError(errorToolManager.createErrorBody("validation",
+                    "Validation for form " + form + " is not supported"));
+            return false;
+        }
+
     }
 
     public void addUser(String emailAccount, String password, String confirmationPassword, UserToken userToken,
             AddTypeOperation addTypeOperation, Form form) {
 
-        if (addTypeOperation == AddTypeOperation.NEWACCOUNT) {
+        clearError("addAccount");
 
-            if (validateData(Operation.CREATE, null, emailAccount, null, password, confirmationPassword, form)) {
-                User newUser = new User(null, null, emailAccount, BCrypt.hashpw(password, BCrypt.gensalt()));
-                addItem(newUser);
-            }
+        if (!isFormSupported(form)) {
+            errorToolManager
+                    .logError(errorToolManager.createErrorBody("addAccount", "Form " + form + " is not supported"));
+            return;
         }
 
-        if (addTypeOperation == AddTypeOperation.ANOTHERACCOUNT) {
+        switch (addTypeOperation) {
+        case NEWACCOUNT:
+            if (validateData(Operation.CREATE, null, emailAccount, null, password, confirmationPassword, form)) {
+
+                User newUser = new User(null, null, emailAccount, BCrypt.hashpw(password, BCrypt.gensalt()));
+                if (environment == Environment.PRODUCTION) {
+                    storageTool.addItem(newUser);
+                } else if (environment == Environment.TEST) {
+                    listOfUsers.add(newUser);
+                }
+                clearError("addAccount");
+            }
+            break;
+
+        case ANOTHERACCOUNT:
+            if (userToken == null) {
+                errorToolManager.logError(errorToolManager.createErrorBody("addAccount", "User token is required"));
+                return;
+            }
 
             User loggedUser = getUserByToken(userToken);
 
@@ -68,55 +119,131 @@ public class UserModel extends JsonStorage<User> {
 
                 User newUser = new User(null, loggedUser.getGroupId(), emailAccount,
                         BCrypt.hashpw(password, BCrypt.gensalt()));
-                addItem(newUser);
+                if (environment == Environment.PRODUCTION) {
+                    storageTool.addItem(newUser);
+                } else if (environment == Environment.TEST) {
+                    listOfUsers.add(newUser);
+                }
+                clearError("addAccount");
+            } else {
+                errorToolManager.logError(errorToolManager.createErrorBody("addAccount",
+                        "Logged-in user not found or invalid credentials"));
             }
+            break;
+
+        default:
+            errorToolManager.logError(errorToolManager.createErrorBody("addAccount",
+                    "Operation " + addTypeOperation + " is not supported"));
         }
     }
 
     public void removeUser(UserToken userToken, User user) {
         User loggedUser = getUserByToken(userToken);
+        if (user == null) {
+            errorToolManager.logError(errorToolManager.createErrorBody("removeAccount", "User to remove is required"));
+            return;
+        }
+
         if (loggedUser != null && !loggedUser.getMailAccount().equals(user.getMailAccount())) {
-            removeItem(user);
+            if (environment == Environment.PRODUCTION) {
+                storageTool.removeItem(user);
+                clearError("removeAccount");
+            } else if (environment == Environment.TEST) {
+                listOfUsers.remove(user);
+                clearError("removeAccount");
+            }
         } else {
-            errorToolManager.logError(errorToolManager.createErrorBody("removedAccount",
-                    "User is not logged or removing active account"));
+            errorToolManager.logError(
+                    errorToolManager.createErrorBody("removeAccount", "User is not logged or removing active account"));
         }
     }
 
     public void updateUser(UserToken userToken, String password, String confirmationPassword, Form form) {
         User foundUser = getUserByToken(userToken);
-        if (foundUser != null) {
-            if (validatePasswords(foundUser.getMailAccount(), foundUser.getPassword(), password, confirmationPassword,
-                    form)) {
-                User updatedUser = new User(foundUser.getUserId(), foundUser.getGroupId(), foundUser.getMailAccount(),
-                        BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
-                updateItem(foundUser, updatedUser);
+        if (foundUser == null) {
+            errorToolManager.logError(
+                    errorToolManager.createErrorBody("updateUser", "Invalid or expired token — user not found"));
+            return;
+        }
+
+        if (!validatePasswords(foundUser.getMailAccount(), foundUser.getPassword(), password, confirmationPassword,
+                form)) {
+            errorToolManager.logError(errorToolManager.createErrorBody("updateUser", "Password validation failed"));
+            return;
+        }
+
+        User updatedUser = new User(foundUser.getUserId(), foundUser.getGroupId(), foundUser.getMailAccount(),
+                BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
+
+        if (environment == Environment.PRODUCTION) {
+            storageTool.updateItem(foundUser, updatedUser);
+        } else if (environment == Environment.TEST) {
+            int index = listOfUsers.indexOf(foundUser);
+            if (index >= 0) {
+                listOfUsers.set(index, updatedUser);
+            } else {
+                errorToolManager
+                        .logError(errorToolManager.createErrorBody("updateUser", "User not found in test user list"));
             }
         }
+
+        clearError("updateUser");
     }
 
     public void updateUser(User user, String password, String confirmationPassword, Form form) {
-        if (user != null) {
-            if (validatePasswords(user.getMailAccount(), user.getPassword(), password, confirmationPassword, form)) {
-                User updatedUser = new User(user.getUserId(), user.getGroupId(), user.getMailAccount(),
-                        BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
+        if (user == null) {
+            errorToolManager.logError(errorToolManager.createErrorBody("updateUser", "User is required"));
+            return;
+        }
 
-                updateItem(user, updatedUser);
+        if (!validatePasswords(user.getMailAccount(), user.getPassword(), password, confirmationPassword, form)) {
+            errorToolManager.logError(errorToolManager.createErrorBody("updateUser", "Password validation failed"));
+            return;
+        }
+
+        User updatedUser = new User(user.getUserId(), user.getGroupId(), user.getMailAccount(),
+                BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
+
+        if (environment == Environment.PRODUCTION) {
+            storageTool.updateItem(user, updatedUser);
+        } else if (environment == Environment.TEST) {
+            int index = listOfUsers.indexOf(user);
+            if (index >= 0) {
+                listOfUsers.set(index, updatedUser);
+            } else {
+                errorToolManager
+                        .logError(errorToolManager.createErrorBody("updateUser", "User not found in test list"));
             }
         }
+
+        clearError("updateUser");
     }
 
     public void updateUser(UserToken userToken, File profileImage) {
         User user = getUserByToken(userToken);
-        if (user != null && validator.validProfileImage(profileImage)) {
-            try {
-                String base64 = profileImage != null ? ImageConvertor.imageToBase64(profileImage) : null;
-                user.setImage(base64);
-                updateItem(user, user);
-            } catch (IOException e) {
-                System.err.println("Error converting image: " + e.getMessage());
+
+        if (user == null) {
+            errorToolManager
+                    .logError(errorToolManager.createErrorBody("updateUser", "User not found for provided token"));
+            return;
+        }
+
+        if (!validator.validProfileImage(profileImage)) {
+            errorToolManager.logError(errorToolManager.createErrorBody("updateUser", "Invalid profile image"));
+            return;
+        }
+
+        try {
+            String base64 = profileImage != null ? ImageConvertor.imageToBase64(profileImage) : null;
+            user.setImage(base64);
+            if (environment == Environment.PRODUCTION) {
+                storageTool.updateItem(user, user);
+            } else if (environment == Environment.TEST) {
+                listOfUsers.set(listOfUsers.indexOf(user), user);
             }
+        } catch (IOException e) {
+            System.err.println("Error converting image: " + e.getMessage());
         }
     }
 
@@ -129,19 +256,24 @@ public class UserModel extends JsonStorage<User> {
     }
 
     public User getUserByCredentials(String emailAccount, String password, UserToken userToken) {
-        if (listOfUsers != null && listOfUsers.size() > 0) {
-            if (emailAccount != null && password != null && userToken == null) {
-                return getUserByEmailAndPassword(emailAccount, password);
-            }
+        clearError("getAccount");
 
-            if (emailAccount == null && password == null && userToken != null) {
-                return getUserByToken(userToken);
-            }
-
-            return null;
-        } else {
+        if (listOfUsers == null || listOfUsers.isEmpty()) {
+            errorToolManager.logError(errorToolManager.createErrorBody("getAccount", "No users available"));
             return null;
         }
+
+        if (emailAccount != null && password != null && userToken == null) {
+            return getUserByEmailAndPassword(emailAccount, password);
+        }
+
+        if (emailAccount == null && password == null && userToken != null) {
+            return getUserByToken(userToken);
+        }
+
+        errorToolManager
+                .logError(errorToolManager.createErrorBody("getAccount", "Invalid credentials, user not found"));
+        return null;
     }
 
     private User getUserByEmailAndPassword(String email, String password) {
@@ -167,18 +299,17 @@ public class UserModel extends JsonStorage<User> {
         return null;
     }
 
+    private boolean isFormSupported(Form form) {
+        return form == Form.ADDACCOUNT || form == Form.FORGOTCREDENTIALS || form == Form.REGISTER;
+    }
+
     public List<User> getAllUserAccounts(UserToken userToken) {
-        if (getUserByToken(userToken) == null) {
+        if (getUserByToken(userToken) == null || userToken == null) {
+            errorToolManager.logError(errorToolManager.createErrorBody("getAccounts",
+                    "Invalid token or user not found by provided token"));
             return null;
         }
 
         return listOfUsers.stream().filter(user -> user.getGroupId().equals(userToken.getGroupId())).toList();
     }
-
-    @Override
-    protected List<User> createEmptyList() {
-        listOfUsers = new ArrayList<>();
-        return listOfUsers;
-    }
-
 }
