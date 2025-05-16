@@ -19,11 +19,10 @@ import javafx.stage.Stage;
 import java.util.List;
 
 public class MainScreen extends VBox {
-    // TODO - styling
+    // TODO - styling - message part
     // TODO - bug in avatar in switchUser - switched but avatar dont updated - fixed
-    // (need better way)
-    // TODO - build tests
-    // TODO - addacount bug
+    // (optional better way)
+    // TODO - build tests - message part
 
     public MainScreen(Stage stage, ScreenController screenController, UserController userController,
             MessageController messageController) {

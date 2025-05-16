@@ -3,6 +3,7 @@ package com.example.view;
 import com.example.controller.ScreenController;
 import com.example.controller.UserController;
 import com.example.model.UserToken;
+import com.example.utils.interfaces.GuiHelperFunctions;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,9 +16,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-public class ForgotCredentialsScreen extends VBox {
+public class ForgotCredentialsScreen extends VBox implements GuiHelperFunctions {
 
-    private Label createErrorLabel() {
+    @Override
+    public Label createErrorLabel() {
         Label label = new Label();
         label.setWrapText(true);
         label.setMaxWidth(250);
@@ -25,6 +27,18 @@ public class ForgotCredentialsScreen extends VBox {
         label.setAlignment(Pos.CENTER);
         label.getStyleClass().add("error-label");
         return label;
+    }
+
+    @Override
+    public void showIfError(String error, Label label) {
+        label.setText(error != null ? error : "");
+    }
+
+    @Override
+    public void clearErrorLabels(Label... labels) {
+        for (Label label : labels) {
+            label.setText("");
+        }
     }
 
     private void clearFields(PasswordField newPasswordField, PasswordField confirmNewPasswordField,
@@ -78,100 +92,83 @@ public class ForgotCredentialsScreen extends VBox {
             Label passwordErrorLabel, Label newPasswordErrorLabel, Label confirmNewPasswordErrorLabel,
             UserController userController, ScreenController screenController, Label labelError, UserToken userToken) {
 
-        boolean isBlankField = false;
         boolean valid = true;
-        boolean updateSuccess = false;
+        labelError.setText("");
+        clearErrorLabels(emailErrorLabel, passwordErrorLabel, newPasswordErrorLabel, confirmNewPasswordErrorLabel);
 
         if (userToken == null) {
             if (emailField.getText().isBlank()) {
                 emailErrorLabel.setText("Email is required");
-                isBlankField = true;
                 valid = false;
             }
 
             if (passwordField.getText().isBlank()) {
                 passwordErrorLabel.setText("Current password is required");
-                isBlankField = true;
                 valid = false;
             }
         }
 
         if (newPasswordField.getText().isBlank()) {
             newPasswordErrorLabel.setText("New password is required");
-            isBlankField = true;
             valid = false;
         }
 
         if (confirmNewPasswordField.getText().isBlank()) {
             confirmNewPasswordErrorLabel.setText("Confirmation new password is required");
-            isBlankField = true;
             valid = false;
         }
 
+        boolean updated = false;
+
         if (userToken != null) {
-            if (!isBlankField) {
-                updateSuccess = userController.updateLoggedInAccount(newPasswordField.getText(),
+            if (valid) {
+                updated = userController.updateLoggedInAccount(newPasswordField.getText(),
                         confirmNewPasswordField.getText());
+
+                showIfError(userController.getError("newPassword"), newPasswordErrorLabel);
+                showIfError(userController.getError("confirmNewPassword"), confirmNewPasswordErrorLabel);
+
+                if (userController.getError("newPassword") != null
+                        || userController.getError("confirmNewPassword") != null) {
+                    valid = false;
+                }
             }
 
-            if (!isBlankField && userController.getError("newPassword") != null) {
-                newPasswordErrorLabel.setText(userController.getError("newPassword"));
-                isBlankField = false;
-                valid = false;
-            }
-
-            if (!isBlankField && userController.getError("confirmNewPassword") != null) {
-                confirmNewPasswordErrorLabel.setText(userController.getError("confirmNewPassword"));
-                isBlankField = false;
-                valid = false;
-            }
-
-            if (valid && updateSuccess) {
+            if (valid && updated) {
                 clearFields(newPasswordField, confirmNewPasswordField, null, null, userController, null, null,
                         newPasswordErrorLabel, confirmNewPasswordErrorLabel, labelError);
                 userController.logOut();
                 screenController.activate("login", stage);
+            } else if (valid) {
+                labelError.setText(
+                        "Password update failed due to an unexpected error or bad credentials. Please try again or contact support");
             }
+        }
 
-            if (valid && !updateSuccess) {
-                String error = userController.getError("unexpected");
-                labelError.setText(error == null
-                        ? "Registration failed due to an unexpected error or session issue. Please try again or contact support"
-                        : error);
-            }
-        } else {
-            if (!isBlankField) {
-                updateSuccess = userController.updateNotLoggedAccount(emailField.getText(), passwordField.getText(),
+        if (userToken == null) {
+            if (valid) {
+                updated = userController.updateNotLoggedAccount(emailField.getText(), passwordField.getText(),
                         newPasswordField.getText(), confirmNewPasswordField.getText());
+
+                showIfError(userController.getError("newPassword"), newPasswordErrorLabel);
+                showIfError(userController.getError("confirmNewPassword"), confirmNewPasswordErrorLabel);
+
+                if (userController.getError("newPassword") != null
+                        || userController.getError("confirmNewPassword") != null) {
+                    valid = false;
+                }
             }
 
-            if (!isBlankField && userController.getError("newPassword") != null) {
-                newPasswordErrorLabel.setText(userController.getError("newPassword"));
-                isBlankField = false;
-                valid = false;
-            }
-
-            if (!isBlankField && userController.getError("confirmNewPassword") != null) {
-                confirmNewPasswordErrorLabel.setText(userController.getError("confirmNewPassword"));
-                isBlankField = false;
-                valid = false;
-            }
-
-            if (valid && updateSuccess) {
+            if (valid && updated) {
                 clearFields(newPasswordField, confirmNewPasswordField, passwordField, emailField, userController,
                         emailErrorLabel, passwordErrorLabel, newPasswordErrorLabel, confirmNewPasswordErrorLabel,
                         labelError);
                 screenController.activate("login", stage);
-            }
-
-            if (valid && !updateSuccess) {
-                String error = userController.getError("unexpected");
-                labelError.setText(error == null
-                        ? "Password update failed due to an unexpected error or bad credentials. Please try again or contact support"
-                        : error);
+            } else if (valid) {
+                labelError.setText(
+                        "Password update failed due to an unexpected error or bad credentials. Please try again or contact support");
             }
         }
-
     }
 
     private void onchangeInitialize(TextField emailField, PasswordField passwordField, PasswordField newPasswordField,

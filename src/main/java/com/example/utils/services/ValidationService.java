@@ -87,7 +87,7 @@ public class ValidationService {
             }
 
             // TODO - for similarity use Levenshtein distance (edit distance), Substring
-            // overlap, Common prefix/suffix comparison
+            // overlap, Common prefix/suffix comparison (optional)
 
             if (currentPassword != null) {
                 if ((form == Form.ADDACCOUNT || form == Form.REGISTER) && BCrypt.checkpw(password, currentPassword)) {

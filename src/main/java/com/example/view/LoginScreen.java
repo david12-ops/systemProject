@@ -56,10 +56,8 @@ public class LoginScreen extends VBox {
                 updateScreens(screenController, userController, messageController, stage);
                 screenController.activate("main", stage);
             } else {
-                String error = userController.getError("unexpected");
-                labelError.setText(error == null
-                        ? "User not found or registration failed due to an unexpected error. Please try again or contact support"
-                        : error);
+                labelError.setText(
+                        "User not found or registration failed due to an unexpected error. Please try again or contact support");
             }
         }
     }

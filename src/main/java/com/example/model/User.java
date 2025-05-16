@@ -89,6 +89,6 @@ public class User {
     @Override
     public String toString() {
         return "User{" + "userId='" + userId + '\'' + ", groupId='" + groupId + '\'' + ", mailAccount='" + mailAccount
-                + '\'' + ", password='" + password + '\'' + ", profileImage='" + profileImage + '\'' + '}';
+                + '}';
     }
 }

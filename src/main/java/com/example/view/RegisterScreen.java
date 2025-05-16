@@ -2,6 +2,7 @@ package com.example.view;
 
 import com.example.controller.ScreenController;
 import com.example.controller.UserController;
+import com.example.utils.interfaces.GuiHelperFunctions;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -14,9 +15,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-public class RegisterScreen extends VBox {
+public class RegisterScreen extends VBox implements GuiHelperFunctions {
 
-    private Label createErrorLabel() {
+    @Override
+    public Label createErrorLabel() {
         Label label = new Label();
         label.setWrapText(true);
         label.setMaxWidth(250);
@@ -24,6 +26,18 @@ public class RegisterScreen extends VBox {
         label.setAlignment(Pos.CENTER);
         label.getStyleClass().add("error-label");
         return label;
+    }
+
+    @Override
+    public void showIfError(String error, Label label) {
+        label.setText(error != null ? error : "");
+    }
+
+    @Override
+    public void clearErrorLabels(Label... labels) {
+        for (Label label : labels) {
+            label.setText("");
+        }
     }
 
     private void clearFields(Label emailErrorLabel, Label passwordErrorLabel, TextField emailField,
@@ -45,62 +59,47 @@ public class RegisterScreen extends VBox {
             Label passwordErrorLabel, UserController userController, ScreenController screenController,
             Label labelError) {
 
-        boolean isBlankField = false;
         boolean valid = true;
-        boolean registerSuccess = false;
+        labelError.setText("");
+        clearErrorLabels(emailErrorLabel, passwordErrorLabel, confirmPasswordErrorLabel);
 
         if (emailField.getText().isBlank()) {
             emailErrorLabel.setText("Email is required");
-            isBlankField = true;
             valid = false;
         }
 
         if (passwordField.getText().isBlank()) {
             passwordErrorLabel.setText("Password is required");
-            isBlankField = true;
             valid = false;
         }
 
         if (confirmPasswordField.getText().isBlank()) {
             confirmPasswordErrorLabel.setText("Confirmation password is required");
-            isBlankField = true;
             valid = false;
         }
 
-        if (!isBlankField) {
-            registerSuccess = userController.register(emailField.getText(), passwordField.getText(),
+        boolean registered = false;
+
+        if (valid) {
+            registered = userController.register(emailField.getText(), passwordField.getText(),
                     confirmPasswordField.getText());
+
+            showIfError(userController.getError("email"), emailErrorLabel);
+            showIfError(userController.getError("password"), passwordErrorLabel);
+            showIfError(userController.getError("confirmPassword"), confirmPasswordErrorLabel);
+
+            if (userController.getError("email") != null || userController.getError("password") != null
+                    || userController.getError("confirmPassword") != null) {
+                valid = false;
+            }
         }
 
-        if (!isBlankField && userController.getError("password") != null) {
-            passwordErrorLabel.setText(userController.getError("password"));
-            isBlankField = false;
-            valid = false;
-        }
-
-        if (!isBlankField && userController.getError("confirmPassword") != null) {
-            confirmPasswordErrorLabel.setText(userController.getError("confirmPassword"));
-            isBlankField = false;
-            valid = false;
-        }
-
-        if (!isBlankField && userController.getError("email") != null) {
-            emailErrorLabel.setText(userController.getError("email"));
-            isBlankField = false;
-            valid = false;
-        }
-
-        if (valid && registerSuccess) {
+        if (valid && registered) {
             clearFields(emailErrorLabel, passwordErrorLabel, emailField, passwordField, confirmPasswordField,
                     confirmPasswordErrorLabel, userController);
             screenController.activate("login", stage);
-        }
-
-        if (valid && !registerSuccess) {
-            String error = userController.getError("unexpected");
-            labelError.setText(error == null
-                    ? "Registration failed due to an unexpected error. Please try again or contact support"
-                    : error);
+        } else if (valid) {
+            labelError.setText("Registration failed due to an unexpected error. Please try again or contact support");
         }
     }
 

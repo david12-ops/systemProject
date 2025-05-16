@@ -3,6 +3,7 @@ package com.example.view;
 import com.example.controller.MessageController;
 import com.example.controller.ScreenController;
 import com.example.controller.UserController;
+import com.example.utils.interfaces.GuiHelperFunctions;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,9 +16,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-public class AddAnotherAccountScreen extends VBox {
+public class AddAnotherAccountScreen extends VBox implements GuiHelperFunctions {
 
-    private Label createErrorLabel() {
+    @Override
+    public Label createErrorLabel() {
         Label label = new Label();
         label.setWrapText(true);
         label.setMaxWidth(250);
@@ -27,11 +29,13 @@ public class AddAnotherAccountScreen extends VBox {
         return label;
     }
 
-    private void showIfError(String error, Label label) {
+    @Override
+    public void showIfError(String error, Label label) {
         label.setText(error != null ? error : "");
     }
 
-    private void clearErrorLabels(Label... labels) {
+    @Override
+    public void clearErrorLabels(Label... labels) {
         for (Label label : labels) {
             label.setText("");
         }
@@ -75,8 +79,6 @@ public class AddAnotherAccountScreen extends VBox {
         boolean addedAccount = false;
 
         if (valid) {
-            System.out.println("he kamo " + valid);
-
             addedAccount = userController.addAnotherAccount(emailField.getText(), passwordField.getText(),
                     confirmPasswordField.getText());
 
@@ -90,7 +92,6 @@ public class AddAnotherAccountScreen extends VBox {
             }
         }
 
-        System.out.println("he kamo2 " + addedAccount);
         if (valid && addedAccount) {
             clearFields(emailErrorLabel, passwordErrorLabel, confirmPasswordErrorLabel, emailField, passwordField,
                     confirmPasswordField, userController);
@@ -99,9 +100,8 @@ public class AddAnotherAccountScreen extends VBox {
                     new SwitchUserScreen(stage, screenController, userController, messageControll));
             screenController.activate("main", stage);
         } else if (valid) {
-            String error = userController.getError("unexpected");
-            labelError.setText(error != null ? error
-                    : "Adding new account failed due to an unexpected error or session issue. Please try again or contact support.");
+            labelError.setText(
+                    "Adding new account failed due to an unexpected error or session issue. Please try again or contact support");
         }
     }
 
