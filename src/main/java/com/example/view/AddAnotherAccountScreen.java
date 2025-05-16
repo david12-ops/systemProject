@@ -27,14 +27,23 @@ public class AddAnotherAccountScreen extends VBox {
         return label;
     }
 
+    private void showIfError(String error, Label label) {
+        label.setText(error != null ? error : "");
+    }
+
+    private void clearErrorLabels(Label... labels) {
+        for (Label label : labels) {
+            label.setText("");
+        }
+    }
+
     private void clearFields(Label emailErrorLabel, Label passwordErrorLabel, Label confirmPasswordErrorLabel,
             TextField emailField, PasswordField passwordField, PasswordField confirmPasswordField,
             UserController userController) {
-        emailErrorLabel.setText("");
-        passwordErrorLabel.setText("");
+
+        clearErrorLabels(emailErrorLabel, passwordErrorLabel, confirmPasswordErrorLabel);
         emailField.clear();
         passwordField.clear();
-        confirmPasswordErrorLabel.setText("");
         confirmPasswordField.setText("");
         userController.clearError("confirmPassword");
         userController.clearError("email");
@@ -46,66 +55,54 @@ public class AddAnotherAccountScreen extends VBox {
             Label passwordErrorLabel, UserController userController, ScreenController screenController,
             MessageController messageControll, Label labelError) {
 
-        boolean isBlankField = false;
         boolean valid = true;
-        boolean addedAcount = false;
+        labelError.setText("");
+        clearErrorLabels(emailErrorLabel, passwordErrorLabel, confirmPasswordErrorLabel);
 
         if (emailField.getText().isBlank()) {
             emailErrorLabel.setText("Email is required");
-            isBlankField = true;
             valid = false;
         }
-
         if (passwordField.getText().isBlank()) {
             passwordErrorLabel.setText("Password is required");
-            isBlankField = true;
             valid = false;
         }
-
         if (confirmPasswordField.getText().isBlank()) {
             confirmPasswordErrorLabel.setText("Confirmation password is required");
-            isBlankField = true;
             valid = false;
         }
 
-        if (!isBlankField) {
-            addedAcount = userController.addAnotherAccount(emailField.getText(), passwordField.getText(),
+        boolean addedAccount = false;
+
+        if (valid) {
+            System.out.println("he kamo " + valid);
+
+            addedAccount = userController.addAnotherAccount(emailField.getText(), passwordField.getText(),
                     confirmPasswordField.getText());
+
+            showIfError(userController.getError("email"), emailErrorLabel);
+            showIfError(userController.getError("password"), passwordErrorLabel);
+            showIfError(userController.getError("confirmPassword"), confirmPasswordErrorLabel);
+
+            if (userController.getError("email") != null || userController.getError("password") != null
+                    || userController.getError("confirmPassword") != null) {
+                valid = false;
+            }
         }
 
-        if (!isBlankField && userController.getError("password") != null) {
-            passwordErrorLabel.setText(userController.getError("password"));
-            isBlankField = false;
-            valid = false;
-        }
-
-        if (!isBlankField && userController.getError("confirmPassword") != null) {
-            confirmPasswordErrorLabel.setText(userController.getError("confirmPassword"));
-            isBlankField = false;
-            valid = false;
-        }
-
-        if (!isBlankField && userController.getError("email") != null) {
-            emailErrorLabel.setText(userController.getError("email"));
-            isBlankField = false;
-            valid = false;
-        }
-
-        if (valid && addedAcount) {
+        System.out.println("he kamo2 " + addedAccount);
+        if (valid && addedAccount) {
             clearFields(emailErrorLabel, passwordErrorLabel, confirmPasswordErrorLabel, emailField, passwordField,
                     confirmPasswordField, userController);
+
             screenController.updateScreen("switchUser",
                     new SwitchUserScreen(stage, screenController, userController, messageControll));
             screenController.activate("main", stage);
-        }
-
-        if (valid && !addedAcount) {
+        } else if (valid) {
             String error = userController.getError("unexpected");
-            labelError.setText(error == null
-                    ? "Adding new account failed due to an unexpected error or session issue. Please try again or contact support"
-                    : error);
+            labelError.setText(error != null ? error
+                    : "Adding new account failed due to an unexpected error or session issue. Please try again or contact support.");
         }
-
     }
 
     private void onchangeInitialize(TextField emailField, PasswordField passwordField,
