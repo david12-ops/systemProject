@@ -49,9 +49,8 @@ public class UserController implements AuthManagement, UserManagement {
     // Auth
     @Override
     public boolean register(String emailAccount, String password, String confirmationPassword) {
-        userModel.addUser(emailAccount, password, confirmationPassword, null, AddTypeOperation.NEWACCOUNT,
+        return userModel.addUser(emailAccount, password, confirmationPassword, null, AddTypeOperation.NEWACCOUNT,
                 Form.REGISTER);
-        return getUser(emailAccount, confirmationPassword, GetUserTypeOperation.BYCREDENTIALS) != null ? true : false;
     }
 
     @Override
@@ -68,9 +67,7 @@ public class UserController implements AuthManagement, UserManagement {
             String confirmationNewPassword) {
 
         User foundUser = getUser(emailAccount, password, GetUserTypeOperation.BYCREDENTIALS);
-        userModel.updateUser(foundUser, newPassword, confirmationNewPassword, Form.FORGOTCREDENTIALS);
-        return getUser(emailAccount, confirmationNewPassword, GetUserTypeOperation.BYCREDENTIALS) != null ? true
-                : false;
+        return userModel.updateUser(foundUser, newPassword, confirmationNewPassword, Form.FORGOTCREDENTIALS);
     }
 
     @Override
@@ -98,18 +95,13 @@ public class UserController implements AuthManagement, UserManagement {
     @Override
     public boolean removeAccount(User user) {
         UserToken userToken = getLoggedUser();
-        userModel.removeUser(userToken, user);
-        return getUser(user.getMailAccount(), user.getPassword(), GetUserTypeOperation.BYCREDENTIALS) == null ? true
-                : false;
+        return userModel.removeUser(userToken, user);
     }
 
     @Override
     public boolean updateLoggedInAccount(String newPassword, String confirmationNewPassword) {
         UserToken userToken = getLoggedUser();
-        userModel.updateUser(userToken, newPassword, confirmationNewPassword, Form.FORGOTCREDENTIALS);
-        return getUser(userToken.getMailAccount(), confirmationNewPassword, GetUserTypeOperation.BYCREDENTIALS) != null
-                ? true
-                : false;
+        return userModel.updateUser(userToken, newPassword, confirmationNewPassword, Form.FORGOTCREDENTIALS);
     }
 
     @Override
@@ -126,9 +118,8 @@ public class UserController implements AuthManagement, UserManagement {
     @Override
     public boolean addAnotherAccount(String emailAccount, String password, String confirmationPassword) {
         UserToken userToken = getLoggedUser();
-        userModel.addUser(emailAccount, password, confirmationPassword, userToken, AddTypeOperation.ANOTHERACCOUNT,
-                Form.ADDACCOUNT);
-        return getUser(emailAccount, confirmationPassword, GetUserTypeOperation.BYCREDENTIALS) != null ? true : false;
+        return userModel.addUser(emailAccount, password, confirmationPassword, userToken,
+                AddTypeOperation.ANOTHERACCOUNT, Form.ADDACCOUNT);
     }
 
     @Override
