@@ -296,10 +296,6 @@ public class UserModel {
     }
 
     private User getUserByToken(UserToken userToken) {
-        if (userToken == null) {
-            return null;
-        }
-
         for (User user : listOfUsers) {
             if (user.getUserId().equals(userToken.getUserId())
                     && user.getMailAccount().equals(userToken.getMailAccount())) {
