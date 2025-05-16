@@ -88,6 +88,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "Message{" + "userId=" + userId + ", email=" + mailAccount + '}';
+        return "User{" + "userId='" + userId + '\'' + ", groupId='" + groupId + '\'' + ", mailAccount='" + mailAccount
+                + '\'' + ", password='" + password + '\'' + ", profileImage='" + profileImage + '\'' + '}';
     }
 }

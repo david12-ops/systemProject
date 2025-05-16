@@ -81,143 +81,115 @@ public class UserModel {
 
     }
 
-    public void addUser(String emailAccount, String password, String confirmationPassword, UserToken userToken,
+    public boolean addUser(String emailAccount, String password, String confirmationPassword, UserToken userToken,
             AddTypeOperation addTypeOperation, Form form) {
-
-        clearError("addAccount");
 
         if (!isFormSupported(form)) {
             errorToolManager
                     .logError(errorToolManager.createErrorBody("addAccount", "Form " + form + " is not supported"));
-            return;
+            return false;
         }
 
-        switch (addTypeOperation) {
-        case NEWACCOUNT:
+        if (addTypeOperation == AddTypeOperation.NEWACCOUNT) {
             if (validateData(Operation.CREATE, null, emailAccount, null, password, confirmationPassword, form)) {
-
                 User newUser = new User(null, null, emailAccount, BCrypt.hashpw(password, BCrypt.gensalt()));
-                if (environment == Environment.PRODUCTION) {
-                    storageTool.addItem(newUser);
-                } else if (environment == Environment.TEST) {
-                    listOfUsers.add(newUser);
-                }
-                clearError("addAccount");
+                return applyUserAdding(newUser, emailAccount, confirmationPassword);
             }
-            break;
+            return false;
+        }
 
-        case ANOTHERACCOUNT:
+        if (addTypeOperation == AddTypeOperation.ANOTHERACCOUNT) {
             if (userToken == null) {
                 errorToolManager.logError(errorToolManager.createErrorBody("addAccount", "User token is required"));
-                return;
+                return false;
             }
 
             User loggedUser = getUserByToken(userToken);
-
             if (loggedUser != null && validateData(Operation.CREATE, null, emailAccount, loggedUser.getPassword(),
                     password, confirmationPassword, form)) {
-
                 User newUser = new User(null, loggedUser.getGroupId(), emailAccount,
                         BCrypt.hashpw(password, BCrypt.gensalt()));
-                if (environment == Environment.PRODUCTION) {
-                    storageTool.addItem(newUser);
-                } else if (environment == Environment.TEST) {
-                    listOfUsers.add(newUser);
-                }
-                clearError("addAccount");
+                return applyUserAdding(newUser, newUser.getMailAccount(), confirmationPassword);
             } else {
                 errorToolManager.logError(errorToolManager.createErrorBody("addAccount",
                         "Logged-in user not found or invalid credentials"));
+                return false;
             }
-            break;
-
-        default:
-            errorToolManager.logError(errorToolManager.createErrorBody("addAccount",
-                    "Operation " + addTypeOperation + " is not supported"));
         }
+
+        errorToolManager.logError(
+                errorToolManager.createErrorBody("addAccount", "Operation " + addTypeOperation + " is not supported"));
+        return false;
     }
 
-    public void removeUser(UserToken userToken, User user) {
+    public boolean removeUser(UserToken userToken, User user) {
         User loggedUser = getUserByToken(userToken);
+
         if (user == null) {
             errorToolManager.logError(errorToolManager.createErrorBody("removeAccount", "User to remove is required"));
-            return;
+            return false;
         }
 
         if (loggedUser != null && !loggedUser.getMailAccount().equals(user.getMailAccount())) {
             if (environment == Environment.PRODUCTION) {
                 storageTool.removeItem(user);
-                clearError("removeAccount");
+                listOfUsers = storageTool.getItems();
             } else if (environment == Environment.TEST) {
                 listOfUsers.remove(user);
-                clearError("removeAccount");
             }
-        } else {
-            errorToolManager.logError(
-                    errorToolManager.createErrorBody("removeAccount", "User is not logged or removing active account"));
+
+            boolean stillExists = listOfUsers.stream()
+                    .anyMatch(item -> item.getMailAccount().equals(user.getMailAccount()));
+
+            if (!stillExists) {
+                clearError("removeAccount");
+                return true;
+            }
+            return false;
         }
+
+        errorToolManager.logError(errorToolManager.createErrorBody("removeAccount",
+                "User is not logged in or is attempting to remove their own account"));
+        return false;
     }
 
-    public void updateUser(UserToken userToken, String password, String confirmationPassword, Form form) {
+    public boolean updateUser(UserToken userToken, String password, String confirmationPassword, Form form) {
         User foundUser = getUserByToken(userToken);
 
         if (foundUser == null) {
             errorToolManager.logError(
                     errorToolManager.createErrorBody("updateUser", "Invalid or expired token — user not found"));
-            return;
+            return false;
         }
 
         if (!validatePasswords(foundUser.getMailAccount(), foundUser.getPassword(), password, confirmationPassword,
                 form)) {
             errorToolManager.logError(errorToolManager.createErrorBody("updateUser", "Password validation failed"));
-            return;
+            return false;
         }
 
         User updatedUser = new User(foundUser.getUserId(), foundUser.getGroupId(), foundUser.getMailAccount(),
                 BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
-        if (environment == Environment.PRODUCTION) {
-            storageTool.updateItem(foundUser, updatedUser);
-        } else if (environment == Environment.TEST) {
-            int index = listOfUsers.indexOf(foundUser);
-            if (index >= 0) {
-                listOfUsers.set(index, updatedUser);
-            } else {
-                errorToolManager
-                        .logError(errorToolManager.createErrorBody("updateUser", "User not found in test user list"));
-            }
-        }
-
-        clearError("updateUser");
+        return applyUserUpdate(foundUser, updatedUser, confirmationPassword);
     }
 
-    public void updateUser(User user, String password, String confirmationPassword, Form form) {
+    public boolean updateUser(User user, String password, String confirmationPassword, Form form) {
+
         if (user == null) {
             errorToolManager.logError(errorToolManager.createErrorBody("updateUser", "User is required"));
-            return;
+            return false;
         }
 
         if (!validatePasswords(user.getMailAccount(), user.getPassword(), password, confirmationPassword, form)) {
             errorToolManager.logError(errorToolManager.createErrorBody("updateUser", "Password validation failed"));
-            return;
+            return false;
         }
 
         User updatedUser = new User(user.getUserId(), user.getGroupId(), user.getMailAccount(),
                 BCrypt.hashpw(confirmationPassword, BCrypt.gensalt()));
 
-        if (environment == Environment.PRODUCTION) {
-            storageTool.updateItem(user, updatedUser);
-        } else if (environment == Environment.TEST) {
-            int index = listOfUsers.indexOf(user);
-            if (index >= 0) {
-                listOfUsers.set(index, updatedUser);
-            } else {
-                errorToolManager
-                        .logError(errorToolManager.createErrorBody("updateUser", "User not found in test list"));
-            }
-        }
-
-        clearError("updateUser");
+        return applyUserUpdate(user, updatedUser, confirmationPassword);
     }
 
     public void updateUser(UserToken userToken, File profileImage) {
@@ -274,6 +246,44 @@ public class UserModel {
         errorToolManager
                 .logError(errorToolManager.createErrorBody("getAccount", "Invalid credentials, user not found"));
         return null;
+    }
+
+    private boolean applyUserUpdate(User user, User updatedUser, String confirmationPassword) {
+        if (environment == Environment.PRODUCTION) {
+            storageTool.updateItem(user, updatedUser);
+            listOfUsers = storageTool.getItems();
+        } else if (environment == Environment.TEST) {
+            int index = listOfUsers.indexOf(user);
+            if (index >= 0) {
+                listOfUsers.set(index, updatedUser);
+            } else {
+                errorToolManager
+                        .logError(errorToolManager.createErrorBody("updateUser", "User not found in test user list"));
+            }
+        }
+
+        boolean updated = getUserByEmailAndPassword(updatedUser.getMailAccount(), confirmationPassword) != null;
+        if (updated) {
+            clearError("updateUser");
+        }
+
+        return updated;
+    }
+
+    private boolean applyUserAdding(User user, String email, String confirmationPassword) {
+        if (environment == Environment.PRODUCTION) {
+            storageTool.addItem(user);
+            listOfUsers = storageTool.getItems();
+        } else if (environment == Environment.TEST) {
+            listOfUsers.add(user);
+        }
+
+        boolean added = getUserByEmailAndPassword(email, confirmationPassword) != null;
+        if (added) {
+            clearError("addAccount");
+        }
+
+        return added;
     }
 
     private User getUserByEmailAndPassword(String email, String password) {
